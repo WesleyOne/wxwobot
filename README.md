@@ -1,25 +1,37 @@
 # wxwobot
 
 #### 项目介绍
-项目简介：微_信_机器人
-特       点：管理界面，允许多开，单纯收发信息无夹杂无关业务
-技术选型：JFinal3.5 + itchat4j + Bootstrap4.0+等
+项目简介：某信聊天机器人
+
+#### 项目特点
+- 有待完善的管理后台
+- 允许多开
+- 定义多种发送形式
+- 功能单纯
 
 #### 软件架构
 软件架构说明
+- JDK1.8
+- JFinal3.5
+- itchat4j
+- Bootstrap4.0
+- ......
 
+#### 计划任务
+- [ ] 短时间重新登入不掉线（待实现）
+- [ ] 兼容MySql和Excel存储方式
+- [ ] 【长期任务】线程操作优化( **各位大师大神大老爷们多多指点** )
+- [ ] 【长期任务】代码优化
 
 #### 安装教程
 
-1. xxxx
-2. xxxx
-3. xxxx
+按照maven-webapp项目操作
 
 #### 使用说明
 
-1. xxxx
-2. xxxx
-3. xxxx
+1. 警钟长鸣-都是社会主义接班人，用途不要太社会
+2. 警钟长鸣-不要频繁操作，如发送消息
+3. 警钟长鸣-建议使用小号
 
 #### 参与贡献
 
@@ -27,13 +39,3 @@
 2. 新建 Feat_xxx 分支
 3. 提交代码
 4. 新建 Pull Request
-
-
-#### 码云特技
-
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
