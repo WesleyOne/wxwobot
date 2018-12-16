@@ -1,4 +1,4 @@
-package cn.zhouyafeng.itchat4j.core;
+package io.wxwobot.admin.itchat4j.core;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,5 +25,20 @@ public class CoreManage {
             coreMap.put(coreKey, core);
         }
         return core;
+    }
+
+    /**
+     * 查询是否在线
+     * @param coreKey
+     * @return
+     */
+    public static boolean isActive(String coreKey) {
+        if (StringUtils.isEmpty(coreKey)){
+            return false;
+        }
+        if (coreMap.containsKey(coreKey) && coreMap.get(coreKey).isAlive()){
+            return true;
+        }
+        return false;
     }
 }

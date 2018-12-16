@@ -1,13 +1,11 @@
-package cn.zhouyafeng.itchat4j.controller;
+package io.wxwobot.admin.itchat4j.controller;
 
-import cn.zhouyafeng.itchat4j.api.WechatTools;
-import cn.zhouyafeng.itchat4j.core.Core;
-import cn.zhouyafeng.itchat4j.core.CoreManage;
-import cn.zhouyafeng.itchat4j.service.ILoginService;
-import cn.zhouyafeng.itchat4j.service.impl.LoginServiceImpl;
-import cn.zhouyafeng.itchat4j.thread.CheckLoginStatusThread;
-import cn.zhouyafeng.itchat4j.utils.LogInterface;
-import cn.zhouyafeng.itchat4j.utils.SleepUtils;
+import io.wxwobot.admin.itchat4j.api.WechatTools;
+import io.wxwobot.admin.itchat4j.service.ILoginService;
+import io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl;
+import io.wxwobot.admin.itchat4j.thread.CheckLoginStatusThread;
+import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.SleepUtils;
 
 /**
  * 登陆控制器
@@ -20,17 +18,15 @@ import cn.zhouyafeng.itchat4j.utils.SleepUtils;
 public class LoginController  implements LogInterface {
 
 	private ILoginService loginService;
-	private Core core;
 	private String coreKey;
 
 	public LoginController(String coreKey){
 		this.coreKey = coreKey;
 		this.loginService = new LoginServiceImpl(coreKey);
-		this.core = CoreManage.getInstance(coreKey);
 	}
 
 	public void login(String qrPath) {
-		if (core.isAlive()) { // 已登陆
+		if (loginService.getCore().isAlive()) { // 已登陆
 			LOG.info("微信已登陆");
 			return;
 		}
@@ -53,9 +49,9 @@ public class LoginController  implements LogInterface {
 				}
 			}
 			LOG.info("3. 请扫描二维码图片，并在手机上确认");
-			if (!core.isAlive()) {
+			if (!loginService.getCore().isAlive()) {
 				loginService.login();
-				core.setAlive(true);
+				loginService.getCore().setAlive(true);
 				LOG.info(("登陆成功"));
 				break;
 			}
@@ -73,7 +69,7 @@ public class LoginController  implements LogInterface {
 
 		LOG.info("7. 清除。。。。");
 //		CommonTools.clearScreen();
-		LOG.info(String.format("欢迎回来， %s", core.getNickName()));
+		LOG.info(String.format("欢迎回来， %s", loginService.getCore().getNickName()));
 
 		LOG.info("8. 开始接收消息");
 		loginService.startReceiving();
@@ -97,7 +93,7 @@ public class LoginController  implements LogInterface {
 	 * 分步登录
 	 */
 	public void login_1(String qrPath) {
-		if (core.isAlive()) { // 已登陆
+		if (loginService.getCore().isAlive()) { // 已登陆
 			LOG.info("itchat4j已登陆");
 			return;
 		}
@@ -124,9 +120,9 @@ public class LoginController  implements LogInterface {
 	public void login_2() {
 
 		LOG.info("3. 请扫描二维码图片，并在手机上确认");
-		if (!core.isAlive()) {
+		if (!loginService.getCore().isAlive()) {
 			loginService.login();
-			core.setAlive(true);
+			loginService.getCore().setAlive(true);
 			LOG.info(("登陆成功"));
 		}
 
@@ -141,7 +137,7 @@ public class LoginController  implements LogInterface {
 
 		LOG.info("7. 清除。。。。");
 //		CommonTools.clearScreen();
-		LOG.info(String.format("欢迎回来， %s", core.getNickName()));
+		LOG.info(String.format("欢迎回来， %s", loginService.getCore().getNickName()));
 
 		LOG.info("8. 开始接收消息");
 		loginService.startReceiving();

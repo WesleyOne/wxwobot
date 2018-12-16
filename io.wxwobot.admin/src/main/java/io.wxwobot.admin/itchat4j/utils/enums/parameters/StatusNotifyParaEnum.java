@@ -1,4 +1,4 @@
-package cn.zhouyafeng.itchat4j.utils.enums.parameters;
+package io.wxwobot.admin.itchat4j.utils.enums.parameters;
 
 /**
  * 状态通知
@@ -10,7 +10,8 @@ public enum StatusNotifyParaEnum {
     CODE("Code", "3"),
     FROM_USERNAME("FromUserName", ""),
     TO_USERNAME("ToUserName", ""),
-    CLIENT_MSG_ID("ClientMsgId", ""); //时间戳
+    //时间戳
+    CLIENT_MSG_ID("ClientMsgId", "");
 
     private String para;
     private String value;

@@ -31,6 +31,19 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <pro.jdbc.agent.driver.sqlserve>com.microsoft.sqlserver.jdbc.SQLServerDriver</pro.jdbc.agent.driver.sqlserve>
+    <pro.jdbc.agent.url><![CDATA[jdbc:sqlserver://120.78.251.84:33341;Database=agent]]></pro.jdbc.agent.url>
+    <pro.jdbc.agent.username>sa</pro.jdbc.agent.username>
+    <pro.jdbc.agent.password>xiangyoukeji</pro.jdbc.agent.password>
+    <pro.devMode>true</pro.devMode>
+    <log.level>debug</log.level>
+    <log.file.path>/home/www/output/logs/hyagent/wxrobot</log.file.path>
+    <pro.cookie.domain>devrob.com</pro.cookie.domain>
+    <pro.upload.cachpath>E:\home\www\images\rob\cache</pro.upload.cachpath>
+    <pro.upload.realpath>E:\home\www\images\rob</pro.upload.realpath>
+    <pro.domain.img>http://devrob.com/</pro.domain.img>
   </properties>
 
 
@@ -44,25 +57,19 @@
     <dependency>
       <groupId>com.jfinal</groupId>
       <artifactId>jfinal</artifactId>
-      <version>3.5</version>
+      <version>3.4</version>
     </dependency>
-    <!-- cos -->
     <dependency>
       <groupId>com.jfinal</groupId>
       <artifactId>cos</artifactId>
       <version>2017.5</version>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>com.jfinal</groupId>-->
-      <!--<artifactId>jetty-server</artifactId>-->
-      <!--<version>2018.11</version>-->
-    <!--</dependency>-->
-    <!-- dependency>
+    <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
         <version>3.1.0</version>
         <scope>provided</scope>
-    </dependency -->
+    </dependency>
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>druid</artifactId>
@@ -132,48 +139,35 @@
       <version>1.1.1</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.squareup.okhttp3</groupId>
-      <artifactId>okhttp</artifactId>
-      <version>3.8.0</version>
-    </dependency>
   </dependencies>
   <build>
     <finalName>ROOT</finalName>
     <resources>
       <resource>
-        <directory>src/main/java</directory>
+        <directory>src/main/resources</directory>
         <includes>
-          <!-- **/* 写法，可以将各级子目录下的资源文件被打包 -->
           <include>*/*</include>
+          <include>*</include>
         </includes>
         <filtering>true</filtering>
       </resource>
     </resources>
-
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.1</version>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>maven-jetty-plugin</artifactId>
+        <version>6.1.10</version>
         <configuration>
-          <!-- <compilerArgument>-parameters</compilerArgument> -->
-          <source>1.8</source>
-          <target>1.8</target>
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
-        <configuration>
-          <!-- 解决 java8  发布到 maven 异常 -->
-          <additionalparam>-Xdoclint:none</additionalparam>
-          <encoding>UTF-8</encoding>
-          <outputDirectory>${basedir}</outputDirectory>
-          <reportOutputDirectory>${basedir}</reportOutputDirectory>
+          <contextPath>/</contextPath>
+          <scanIntervalSeconds>1</scanIntervalSeconds>
+          <stopKey>foo</stopKey>
+          <stopPort>9990</stopPort>
+          <connectors>
+            <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+              <port>8080</port>
+              <maxIdleTime>60000</maxIdleTime>
+            </connector>
+          </connectors>
         </configuration>
       </plugin>
     </plugins>

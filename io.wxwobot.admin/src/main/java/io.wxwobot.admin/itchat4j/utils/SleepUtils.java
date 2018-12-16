@@ -1,4 +1,4 @@
-package cn.zhouyafeng.itchat4j.utils;
+package io.wxwobot.admin.itchat4j.utils;
 
 /**
  * Created by xiaoxiaomo on 2017/5/6.

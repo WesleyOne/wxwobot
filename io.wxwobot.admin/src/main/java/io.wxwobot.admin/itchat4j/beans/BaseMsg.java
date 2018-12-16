@@ -1,4 +1,4 @@
-package cn.zhouyafeng.itchat4j.beans;
+package io.wxwobot.admin.itchat4j.beans;
 
 import java.io.Serializable;
 

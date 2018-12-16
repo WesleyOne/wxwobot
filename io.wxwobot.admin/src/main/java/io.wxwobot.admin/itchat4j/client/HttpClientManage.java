@@ -1,6 +1,5 @@
-package cn.zhouyafeng.itchat4j.client;
+package io.wxwobot.admin.itchat4j.client;
 
-import cn.zhouyafeng.itchat4j.core.Core;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;

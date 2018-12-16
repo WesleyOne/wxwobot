@@ -1,4 +1,4 @@
-package cn.zhouyafeng.itchat4j.utils;
+package io.wxwobot.admin.itchat4j.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

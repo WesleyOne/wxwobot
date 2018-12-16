@@ -1,6 +1,6 @@
-package cn.zhouyafeng.itchat4j.utils;
+package io.wxwobot.admin.itchat4j.utils;
 
-import cn.zhouyafeng.itchat4j.utils.enums.OsNameEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.OsNameEnum;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class Config {
 
 	public static final String API_WXAPPID = "API_WXAPPID";
 
-	public static final String picDir = "D://cn.zhouyafeng.itchat4j";
+	public static final String picDir = "D://io.wxwobot.admin.itchat4j";
 	public static final String VERSION = "1.2.18";
 	public static final String BASE_URL = "https://login.weixin.qq.com";
 	public static final String OS = "";

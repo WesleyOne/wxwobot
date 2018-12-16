@@ -1,12 +1,11 @@
-package cn.zhouyafeng.itchat4j.utils.tools;
+package io.wxwobot.admin.itchat4j.utils.tools;
 
-import cn.zhouyafeng.itchat4j.beans.BaseMsg;
-import cn.zhouyafeng.itchat4j.core.Core;
-import cn.zhouyafeng.itchat4j.core.CoreManage;
-import cn.zhouyafeng.itchat4j.utils.LogInterface;
-import cn.zhouyafeng.itchat4j.utils.MyHttpClient;
-import cn.zhouyafeng.itchat4j.utils.enums.MsgTypeEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.URLEnum;
+import io.wxwobot.admin.itchat4j.beans.BaseMsg;
+import io.wxwobot.admin.itchat4j.core.Core;
+import io.wxwobot.admin.itchat4j.core.CoreManage;
+import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.enums.MsgTypeEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
 import org.apache.http.HttpEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;

@@ -1,9 +1,9 @@
-package cn.zhouyafeng.itchat4j.thread;
+package io.wxwobot.admin.itchat4j.thread;
 
-import cn.zhouyafeng.itchat4j.core.Core;
-import cn.zhouyafeng.itchat4j.core.CoreManage;
-import cn.zhouyafeng.itchat4j.utils.LogInterface;
-import cn.zhouyafeng.itchat4j.utils.SleepUtils;
+import io.wxwobot.admin.itchat4j.core.Core;
+import io.wxwobot.admin.itchat4j.core.CoreManage;
+import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.SleepUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

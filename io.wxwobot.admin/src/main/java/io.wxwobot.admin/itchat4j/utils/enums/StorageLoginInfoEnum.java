@@ -1,4 +1,4 @@
-package cn.zhouyafeng.itchat4j.utils.enums;
+package io.wxwobot.admin.itchat4j.utils.enums;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -12,8 +12,8 @@ public enum StorageLoginInfoEnum {
     url("url",new String()),
     fileUrl("fileUrl",new String()),
     syncUrl("syncUrl",new String()),
-
-    deviceid("deviceid",new String()), //生成15位随机数
+    //生成15位随机数
+    deviceid("deviceid",new String()),
 
     //baseRequest
     skey("skey",new String()),

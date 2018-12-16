@@ -1,8 +1,8 @@
-package cn.zhouyafeng.itchat4j;
+package io.wxwobot.admin.itchat4j;
 
-import cn.zhouyafeng.itchat4j.controller.LoginController;
-import cn.zhouyafeng.itchat4j.core.MsgCenter;
-import cn.zhouyafeng.itchat4j.face.IMsgHandlerFace;
+import io.wxwobot.admin.itchat4j.controller.LoginController;
+import io.wxwobot.admin.itchat4j.core.MsgCenter;
+import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

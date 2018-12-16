@@ -1,6 +1,6 @@
-package cn.zhouyafeng.itchat4j.client;
+package io.wxwobot.admin.itchat4j.client;
 
-import cn.zhouyafeng.itchat4j.utils.Config;
+import io.wxwobot.admin.itchat4j.utils.Config;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;

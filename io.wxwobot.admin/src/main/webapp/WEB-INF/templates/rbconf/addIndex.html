@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="utf-8" />
+    <title></title>
+    <meta name="description" content="overview &amp; stats" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/assets/font-awesome/4.5.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/assets/css/fonts.googleapis.com.css" />
+    <link href="https://cdn.bootcss.com/ionicons/4.1.2/css/ionicons.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-validator/0.5.3/css/bootstrapValidator.min.css" rel="stylesheet">
+</head>
+<body class="no-skin">
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">添加机器人</h3>
+    </div>
+    <div class="panel-body">
+        <div class="well" ><span style="color: red">为了确保机器人唯一性，请确保信息真实对应！</span></div>
+        <div>
+            <form class="form-horizontal"  id="addRobForm">
+                <div class="form-group">
+                    <label for="appid" class="col-sm-2 control-label">渠道号:</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" id="appid" name="appid" required>
+                            <option value="">请选择渠道</option>
+                            #for(ap : apps)
+                                <option value="#(ap.id)">#(ap.id)-#(ap.name)</option>
+                            #end
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="numAccount" class="col-sm-2 control-label">识别码:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="numAccount" name="numAccount" placeholder="请优先填写代理邀请码" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="remark" class="col-sm-2 control-label">机器昵称:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="remark" name="remark" placeholder="请优先填写机器人微信号，用于菜单显示" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-8 col-sm-2">
+                        <button type="reset" class="btn btn-default btn-lg btn-block" >重置</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-lg btn-block" onclick="openAddModel()">提交</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="addPostModal" tabindex="-1" role="dialog" aria-labelledby="addPostModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="addPostModalLabel">确认添加机器人</h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addPost()">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/assets/js/jquery-1.11.3.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/dist/js/all.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-validator/0.5.3/js/bootstrapValidator.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-validator/0.5.3/js/language/zh_CN.min.js"></script>
+<script type="text/javascript">
+    var addRobValid;
+
+    $(function () {
+        addRobValid = $('#addRobForm').bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                appid: {
+                    validators: {
+                        notEmpty: {
+                            message: '渠道号不能为空'
+                        }
+                    }
+                },
+                numAccount: {
+                    validators: {
+                        notEmpty: {
+                            message: '识别码不能为空'
+                        }
+                    }
+                },
+                remark: {
+                    validators: {
+                        notEmpty: {
+                            message: '备注不能为空'
+                        }
+                    }
+                }
+            }
+        });
+
+    });
+
+    function openAddModel() {
+        addRobValid.bootstrapValidator('validate');
+        if ( $("#addRobForm").data('bootstrapValidator').isValid()){
+            // 显示模态框
+            $('#addPostModal').modal('show');
+        }
+    }
+
+
+    function addPost() {
+        addRobValid.bootstrapValidator('validate');
+        if ( $("#addRobForm").data('bootstrapValidator').isValid()){
+
+            var fv = $('#addRobForm').serializeObject();
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/rbconf/addPost" ,
+                data: JSON.stringify(fv),
+                contentType: "application/json",
+                success: function (result) {
+                    $('#addPostModal').modal('hide');
+                    if (result.code == '00'){
+                        alert(result.message);
+                    } else{
+                        alert("请求异常:"+result.message);
+                    }
+                },
+                error : function() {
+                    $('#addPostModal').modal('hide');
+                    alert("请求异常");
+                }
+            });
+            $("#addRobForm").data('bootstrapValidator').resetForm(true);
+        }
+    }
+
+</script>
+</body>
+</html>
+
+
+

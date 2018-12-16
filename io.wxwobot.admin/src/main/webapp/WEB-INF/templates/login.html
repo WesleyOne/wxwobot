@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+
+<title>WX机器人管理后台</title>
+
+<link rel="stylesheet" href="assets/css/login.css" />
+
+	<script src="assets/js/jquery-1.11.3.min.js"></script>
+<style type="text/css">
+body {
+	width: 100%;
+	height: 100%;
+	background: url('assets/images/background/bg1.jpg');
+	background-attachment: fixed;
+	background-size: 100% 80%;
+	background-position: left 80px;
+	background-repeat: no-repeat;
+	margin: 0 auto;
+	background-color: #f7f7f6;
+}
+
+.login_button {
+	position: relative;
+	color: rgba(255, 255, 255, 1);
+	text-decoration: none;
+	background-color: rgb(99, 81, 89);
+	font-family: 'Yanone Kaffeesatz';
+	font-weight: 700;
+	font-size: 3em;
+	display: block;
+	padding: 4px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px
+		rgba(0, 0, 0, .7);
+	-moz-box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px
+		rgba(0, 0, 0, .7);
+	box-shadow: 0px 9px 0px rgba(219, 31, 5, 1), 0px 9px 25px
+		rgba(0, 0, 0, .7);
+	margin: 100px auto;
+	width: 260px;
+	text-align: center;
+	-webkit-transition: all .1s ease;
+	-moz-transition: all .1s ease;
+	-ms-transition: all .1s ease;
+	-o-transition: all .1s ease;
+	transition: all .1s ease;
+	cursor: pointer;
+}
+
+.login_button:active {
+	-webkit-box-shadow: 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px
+		rgba(0, 0, 0, .9);
+	-moz-box-shadow: 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px
+		rgba(0, 0, 0, .9);
+	box-shadow: 0px 3px 0px rgba(219, 31, 5, 1), 0px 3px 6px
+		rgba(0, 0, 0, .9);
+	position: relative;
+	top: 6px;
+}
+
+.login_button_wrap {
+	position: fixed;
+	bottom: 50px;
+	left: 45%;
+}
+</style>
+
+</head>
+<body>
+	<div class="drop"></div>
+	<div class="header">
+
+		<div class="nav">
+			<span><a target="_blank" href="http://www.fengying78.com">WX鸡气人管理后台</a></span>
+		</div>
+
+	</div>
+
+	<div class="body">
+
+
+
+		<div class="login">
+
+
+			<div class="login-tab">
+				<div class="tab">
+					<!--<form action="#loginPost" type="post">-->
+					<div>
+						<div class="tab-one">
+							<span>用户名：<input type="text" class="text" id="username"
+								name="username" autocomplete="on" placeholder="请输入用户名"></span>
+						</div>
+						<div class="tab-one">
+							<span>密码&nbsp;&nbsp;&nbsp;：<input type="password" name="password"
+								class="text" id="password" autocomplete="on" placeholder="请输入密码"></span>
+						</div>
+						<!-- <div class="tab-one">
+							<span>验证码：<input type="text" class="text" name="code"  
+							autocomplete="on" placeholder="请输入验证码"/></span>
+						</div> -->
+						<!-- <div class="tab-one">
+							<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<img src="/validCode" onclick="this.src='/validCode?x='+Math.random()"></span>
+						</div> -->
+
+						<div class="tab-error">
+							<span style="color: red;" id="errorMsg">#(error ??)</span>
+						</div>
+						<div class="tab-button">
+							<!--<input type="submit" name="login_btn" id="login_btn" value="登录"-->
+									<!--class="login-btn">-->
+							<button name="login_btn" id="login_btn"
+									class="login-btn">登录</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<div class="footer">
+		<p>WX鸡气人管理后台</p>
+	</div>
+</body>
+<script language="JavaScript">
+    if (window != top)
+        top.location.href = location.href;
+</script>
+<script>
+    $(document).ready(function () {
+        $("#login_btn").click(function () {
+
+            $.ajax({
+                url: '/loginPost', // 请求的url
+                type: 'POST', //GET
+                async: true,    //或false,是否异步
+                data: {
+                    username: $('#username').val(),
+                    password:  $('#password').val()
+                },
+                timeout: 5000,    //超时时间
+                dataType: 'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+                success: function (data, textStatus, jqXHR) {
+                    console.log(data);
+                    if (data.code == '00'){
+                        console.log(window.location.host);
+                     	window.location.href = "http://"+window.location.host;
+					} else{
+                    	$('#errorMsg').html(data.message);
+					}
+
+                },
+                error: function (xhr, textStatus) {
+                    $('#errorMsg').html("网络异常");
+
+                },
+            })
+        });
+    });
+</script>
+
+</html>

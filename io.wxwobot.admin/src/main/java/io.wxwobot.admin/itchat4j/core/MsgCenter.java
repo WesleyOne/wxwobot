@@ -1,16 +1,16 @@
-package cn.zhouyafeng.itchat4j.core;
+package io.wxwobot.admin.itchat4j.core;
 
-import cn.zhouyafeng.itchat4j.api.MessageTools;
-import cn.zhouyafeng.itchat4j.api.WechatTools;
-import cn.zhouyafeng.itchat4j.beans.BaseMsg;
-import cn.zhouyafeng.itchat4j.face.IMsgHandlerFace;
-import cn.zhouyafeng.itchat4j.utils.LogInterface;
-import cn.zhouyafeng.itchat4j.utils.enums.MsgCodeEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.MsgTypeEnum;
-import cn.zhouyafeng.itchat4j.utils.tools.CommonTools;
+import io.wxwobot.admin.itchat4j.api.MessageTools;
+import io.wxwobot.admin.itchat4j.api.WechatTools;
+import io.wxwobot.admin.itchat4j.beans.BaseMsg;
+import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
+import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.enums.MsgCodeEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.MsgTypeEnum;
+import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import cn.zhouyafeng.itchat4j.core.Core;
+import io.wxwobot.admin.itchat4j.core.Core;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

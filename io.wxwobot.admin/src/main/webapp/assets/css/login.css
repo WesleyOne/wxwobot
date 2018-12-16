@@ -1,0 +1,188 @@
+div{
+	font-family: "微软雅黑";
+}
+body{
+	margin: 0px;
+	padding:0px;
+}
+/*header*/
+.header{
+	margin: 0 auto;
+	height:100px;
+	
+}
+.logo{
+
+	height:100px;
+	line-height: 100px;
+	font-size: 30px;
+	font-family: "微软雅黑";
+	
+	float:left;
+	margin-left: 100px;
+}
+.purple{
+	margin-right: 30px;
+	color:#437ff3;
+}
+.gray{
+	color: #989898;
+}
+.nav{
+	float:right;
+	height:100px;
+	line-height: 100px;
+	padding-right: 8%;
+}
+.nav span a{
+	color: #666666;
+    padding: 0 14px;
+    font-size: 16px;
+}
+
+ul, li, a {
+    border: none;
+    list-style-type: none;
+    text-decoration: none;
+}
+/*body*/
+.body{
+	width:100%;
+	height:700px;
+	margin:0;
+	position:relative;
+}
+.body .img_bg img{
+	width:100%;
+	height: 100%;
+	position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+.text_bg{
+	width: 35%;
+    height: 143px;
+    position: absolute;
+    top: 100px;
+    right: 5px;
+    font-size: 2em;
+    color:#fff;
+}
+.login{
+	width: 360px;
+    height: 250px;
+    position: absolute;
+    top: 5px;
+    right: 15%;
+    border:1px solid rgba(163, 148, 148, 0.44);
+    border-radius:3px;
+    
+}
+.login-tab{
+	
+    height: 294px;
+    width: 365px;
+    
+   border-radius:3px;
+}
+.tab-one{
+	margin:0px auto;
+	width: 304px;
+    height: 36px;
+    
+    margin-bottom: 10px;
+    overflow: hidden;
+    font-size: 14px;
+}
+.tab-one span {
+    float: left;
+    padding-top: 4px;
+    color: #999;
+    padding-left: 5px;
+}
+.tab-one span input {
+    border: none;
+    background: #fff;
+    height: 25px;
+    width: 200px;
+    line-height: 25px;
+    outline: none;
+    border-radius:5px;
+    border:1px solid rgba(163, 148, 148, 0.44);;
+}
+.tab{
+	margin-top: 40px;
+}
+.tab-button{
+	text-align: center;
+	margin-top: 20px;
+}
+.login-btn{
+    width: 250px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+    border: none;
+    background:rgba(132, 46, 65, 0.42);;
+    color: #fff;
+    font-weight: bold;
+    border-radius:5px;
+    
+}
+
+.tab-two{
+	margin:0px auto;
+	width: 304px;
+    height: 36px;
+    border:solid 1px #E4E4E4;
+    margin-bottom: 10px;
+    overflow: hidden;
+    font-size: 14px;
+}
+.tab-two span {
+    float: left;
+    padding-top: 4px;
+    color: #999;
+    padding-left: 5px;
+}
+.tab-two span input {
+    border: none;
+    background: #fff;
+    height: 25px;
+    width: 140px;
+    line-height: 25px;
+    outline: none; 
+}
+
+.tab-two img{
+	
+	height: 38px;
+    width: 100px;
+    line-height: 38px;
+}
+
+
+.tab-error{
+	height: 25px;
+    width: 200px;
+    line-height: 25px;
+    text-align: center;
+    font-size:14px;
+}
+.footer{
+	
+	height: 145px;
+    text-align: center;
+    margin: 0 auto;
+    //background: #ebebeb;
+    //border-top: 2px solid #cecece;
+}
+.footer p{
+	
+    line-height: 20px;
+    color: #666;
+    margin: 0px;
+    font-size: 12px;
+    padding-top: 60px;
+}

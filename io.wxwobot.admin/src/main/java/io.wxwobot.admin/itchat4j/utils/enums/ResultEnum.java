@@ -1,4 +1,4 @@
-package cn.zhouyafeng.itchat4j.utils.enums;
+package io.wxwobot.admin.itchat4j.utils.enums;
 
 /**
  * 返回结构枚举类
@@ -22,14 +22,5 @@ public enum ResultEnum {
     public String getCode() {
         return code;
     }
-
-//    public static MsgInfoEnum getCode(String code) {
-//        switch (code) {
-//            case "Text":
-//                return MsgInfoEnum.TEXT;
-//            default:
-//                return MsgInfoEnum.VIDEO;
-//        }
-//    }
 
 }

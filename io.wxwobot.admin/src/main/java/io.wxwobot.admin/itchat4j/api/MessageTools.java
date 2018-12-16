@@ -1,15 +1,14 @@
-package cn.zhouyafeng.itchat4j.api;
+package io.wxwobot.admin.itchat4j.api;
 
-import cn.zhouyafeng.itchat4j.beans.BaseMsg;
-import cn.zhouyafeng.itchat4j.beans.RecommendInfo;
-import cn.zhouyafeng.itchat4j.core.Core;
-import cn.zhouyafeng.itchat4j.core.CoreManage;
-import cn.zhouyafeng.itchat4j.utils.Config;
-import cn.zhouyafeng.itchat4j.utils.LogInterface;
-import cn.zhouyafeng.itchat4j.utils.MyHttpClient;
-import cn.zhouyafeng.itchat4j.utils.enums.StorageLoginInfoEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.URLEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.VerifyFriendEnum;
+import io.wxwobot.admin.itchat4j.beans.BaseMsg;
+import io.wxwobot.admin.itchat4j.beans.RecommendInfo;
+import io.wxwobot.admin.itchat4j.core.Core;
+import io.wxwobot.admin.itchat4j.core.CoreManage;
+import io.wxwobot.admin.itchat4j.utils.Config;
+import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.enums.StorageLoginInfoEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.VerifyFriendEnum;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -19,8 +18,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
@@ -80,7 +77,27 @@ public class MessageTools implements LogInterface {
 	 */
 	public static boolean sendMsgByNickName(String text, String nickName, String coreKey) {
 		if (nickName != null) {
-			String toUserName = WechatTools.getUserNameByNickName(nickName,coreKey);
+			String toUserName = WechatTools.getContactUserNameByNickName(nickName,coreKey);
+			if (toUserName != null) {
+				webWxSendMsg(1, text, toUserName, coreKey);
+				return true;
+			}
+		}
+		return false;
+
+	}
+
+
+	/**
+	 * 根据NickName发送群文本消息
+	 * @param text
+	 * @param nickName
+	 * @param coreKey
+	 * @return
+	 */
+	public static boolean sendGroupMsgByNickName(String text, String nickName, String coreKey) {
+		if (nickName != null) {
+			String toUserName = WechatTools.getGroupUserNameByNickName(nickName,coreKey);
 			if (toUserName != null) {
 				webWxSendMsg(1, text, toUserName, coreKey);
 				return true;
@@ -149,7 +166,7 @@ public class MessageTools implements LogInterface {
 		String passTicket = (String) core.getLoginInfo().get("pass_ticket");
 		String clientMediaId = String.valueOf(System.currentTimeMillis())
 				+ String.valueOf(new Random().nextLong()).substring(0, 4);
-		String webwxDataTicket = MyHttpClient.getCookie("webwx_data_ticket");
+		String webwxDataTicket = core.getMyHttpClient().getCookie("webwx_data_ticket");
 		if (webwxDataTicket == null) {
 			LOG.error("get cookie webwx_data_ticket error");
 			return null;
@@ -200,7 +217,7 @@ public class MessageTools implements LogInterface {
 	 * @return
 	 */
 	public static boolean sendPicMsgByNickName(String nickName, String filePath, String coreKey) {
-		String toUserName = WechatTools.getUserNameByNickName(nickName,coreKey);
+		String toUserName = WechatTools.getContactUserNameByNickName(nickName,coreKey);
 		if (toUserName != null) {
 			return sendPicMsgByUserId(toUserName, filePath, coreKey);
 		}
@@ -303,7 +320,7 @@ public class MessageTools implements LogInterface {
 	 * @return
 	 */
 	public static boolean sendFileMsgByNickName(String nickName, String filePath, String coreKey) {
-		String toUserName = WechatTools.getUserNameByNickName(nickName,coreKey);
+		String toUserName = WechatTools.getContactUserNameByNickName(nickName,coreKey);
 		if (toUserName != null) {
 			return sendFileMsgByUserId(toUserName, filePath, coreKey);
 		}

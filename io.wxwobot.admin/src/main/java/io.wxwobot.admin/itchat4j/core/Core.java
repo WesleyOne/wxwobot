@@ -1,13 +1,11 @@
-package cn.zhouyafeng.itchat4j.core;
+package io.wxwobot.admin.itchat4j.core;
 
-import cn.zhouyafeng.itchat4j.beans.BaseMsg;
-import cn.zhouyafeng.itchat4j.client.HttpClientManage;
-import cn.zhouyafeng.itchat4j.client.SingleHttpClient;
-import cn.zhouyafeng.itchat4j.utils.MyHttpClient;
-import cn.zhouyafeng.itchat4j.utils.enums.parameters.BaseParaEnum;
+import io.wxwobot.admin.itchat4j.beans.BaseMsg;
+import io.wxwobot.admin.itchat4j.client.HttpClientManage;
+import io.wxwobot.admin.itchat4j.client.SingleHttpClient;
+import io.wxwobot.admin.itchat4j.utils.enums.parameters.BaseParaEnum;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

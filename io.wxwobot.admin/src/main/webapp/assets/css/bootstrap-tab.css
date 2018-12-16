@@ -1,0 +1,90 @@
+.nav-tabs{
+    background: #fafafa;
+    border-bottom: 3px #3498db solid;
+}
+
+.nav-tabs li a{
+    line-height:2;
+    border:1px #ddd solid;
+    margin-right: -1px;
+    color: #999;
+    border-radius: 0;
+}
+.nav-tabs li a .glyphicon-remove-sign:hover{
+    color:red;
+    cursor: pointer;
+}
+.nav-tabs li a i:first-child{
+    margin-right: 3px;
+}
+.nav-tabs .active a{
+    border-top: solid 2px #3498db !important;
+    background: #3498db !important;
+    color:#fff !important;
+}
+
+.nav-my-tab{
+    padding-left: 0px;
+    margin-bottom: 0px;
+}
+.nav-my-tab .middletab{
+    height: 36px;
+    overflow: hidden;
+    border-bottom: 3px #3498db solid;
+    position: relative;
+    width: auto !important;
+    background: #fafafa;
+}
+.nav-my-tab li{
+    list-style-type: none;
+}
+.nav-my-tab li a{
+    padding:5px 10px;
+}
+.nav-my-tab .leftbackward{
+    float: left;
+    background: #fff;
+    padding-top: 7px;
+    border-top: 1px #ddd solid;
+    height:36px;
+    border-bottom: 3px #3498db solid;
+}
+.nav-my-tab .leftbackward a{
+    border-left-width: 0px;
+    color: #999;
+    padding-top: 9px;
+    padding-bottom: 8px;
+    margin-right: -1px;
+}
+.nav-my-tab .leftbackward a:hover,.nav-my-tab .leftbackward a:focus{
+    text-decoration: none;
+    background: #ddd;
+}
+
+.nav-my-tab .rightforward{
+    float:right;
+    position: relative;
+    line-height: 2.6;
+    background: #fff;
+    border-top: 1px #ddd solid;
+    border-bottom: 3px #3498db solid;
+
+}
+.nav-my-tab .rightforward a{
+    width: 35.5px;
+    line-height: 2;
+    color: #999;
+    height: 35px;
+    padding: 8px 10px;
+    padding-left: 13px;
+    border-left: 1px #ddd solid;
+}
+.nav-my-tab .rightforward a:hover,.nav-my-tab .rightforward a:focus{
+    text-decoration: none;
+    background: #ddd;
+}
+
+#sidebar{
+    overflow-x: hidden;
+    overflow-y: auto;
+}

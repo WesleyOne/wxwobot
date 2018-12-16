@@ -1,23 +1,22 @@
-package cn.zhouyafeng.itchat4j.service.impl;
+package io.wxwobot.admin.itchat4j.service.impl;
 
-import cn.zhouyafeng.itchat4j.beans.BaseMsg;
-import cn.zhouyafeng.itchat4j.core.Core;
-import cn.zhouyafeng.itchat4j.core.CoreManage;
-import cn.zhouyafeng.itchat4j.core.MsgCenter;
-import cn.zhouyafeng.itchat4j.service.ILoginService;
-import cn.zhouyafeng.itchat4j.utils.Config;
-import cn.zhouyafeng.itchat4j.utils.LogInterface;
-import cn.zhouyafeng.itchat4j.utils.MyHttpClient;
-import cn.zhouyafeng.itchat4j.utils.SleepUtils;
-import cn.zhouyafeng.itchat4j.utils.enums.ResultEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.RetCodeEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.StorageLoginInfoEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.URLEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.parameters.BaseParaEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.parameters.LoginParaEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.parameters.StatusNotifyParaEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.parameters.UUIDParaEnum;
-import cn.zhouyafeng.itchat4j.utils.tools.CommonTools;
+import io.wxwobot.admin.itchat4j.beans.BaseMsg;
+import io.wxwobot.admin.itchat4j.core.Core;
+import io.wxwobot.admin.itchat4j.core.CoreManage;
+import io.wxwobot.admin.itchat4j.core.MsgCenter;
+import io.wxwobot.admin.itchat4j.service.ILoginService;
+import io.wxwobot.admin.itchat4j.utils.Config;
+import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.SleepUtils;
+import io.wxwobot.admin.itchat4j.utils.enums.ResultEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.RetCodeEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.StorageLoginInfoEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.parameters.BaseParaEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.parameters.LoginParaEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.parameters.StatusNotifyParaEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.parameters.UUIDParaEnum;
+import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -25,8 +24,6 @@ import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.io.File;
@@ -52,6 +49,16 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 	public LoginServiceImpl(String coreKey) {
 		this.coreKey = coreKey;
 		this.core = CoreManage.getInstance(coreKey);
+	}
+
+	@Override
+	public Core getCore() {
+		return this.core;
+	}
+
+	@Override
+	public String getCoreKey() {
+		return coreKey;
 	}
 
 	@Override
@@ -135,6 +142,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			if (file.exists() && file.isFile()){
 				file.delete();
 			}
+			System.out.println(qrPath);
 			// 写入二维码
 			OutputStream out = new FileOutputStream(qrPath);
 			byte[] bytes = EntityUtils.toByteArray(entity);
@@ -157,6 +165,8 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
 		return true;
 	}
+
+
 
 	@Override
 	public boolean webWxInit() {

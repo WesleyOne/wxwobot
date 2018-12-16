@@ -1,8 +1,9 @@
-package cn.zhouyafeng.itchat4j.utils.enums;
+package io.wxwobot.admin.itchat4j.utils.enums;
 
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+
 
 public enum RetCodeEnum {
 

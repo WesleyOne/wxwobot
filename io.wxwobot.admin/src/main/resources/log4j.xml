@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="console-log" class="org.apache.log4j.ConsoleAppender">
+	    <param name="encoding" value="utf-8" />
+	    <param name="threshold" value="info" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{dd日 HH:mm:ss,SSS} : %-5p %C{1}.%M() - %m%n" />
+		</layout>
+	</appender>
+
+
+	<appender name="INFO-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${log.file.path}/info.log" />
+		<param name="append" value="true" />
+		<param name="encoding" value="utf-8" />
+		<param name="threshold" value="info" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%d{yyyy-MM-dd hh:mm:ss a} : %p [%t]%F.%M()%c - %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="WARN-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${log.file.path}/warn.log" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="append" value="true" />
+		<param name="threshold" value="WARN" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd hh:mm:ss a} : %p [%t]%M() - %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="ERROR-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${log.file.path}/error.log" />
+		<param name="append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="threshold" value="error" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd hh:mm:ss a} : %p [%t]%M() - %m%n" />
+		</layout>
+	</appender>
+	<appender name="WXROB-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${log.file.path}/wxrob.log" />
+		<param name="append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="threshold" value="info" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd hh:mm:ss a} : [%t] %-5p => %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="UTIL-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${log.file.path}/util.log" />
+		<param name="append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="threshold" value="info" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd hh:mm:ss a} : %p [%t]%M() => %m%n" />
+		</layout>
+	</appender>
+
+	<logger name="WXROBLOG" additivity="false">
+		<level value="info" />
+		<appender-ref ref="WXROB-APPENDER" />
+	</logger>
+
+	<logger name="UTILLOG" additivity="false">
+		<level value="info" />
+		<appender-ref ref="UTIL-APPENDER" />
+	</logger>
+
+	<root>
+		<level value="${log.level}" />
+		
+		<appender-ref ref="INFO-APPENDER" /> 
+		<appender-ref ref="WARN-APPENDER" /> 
+		<appender-ref ref="ERROR-APPENDER" /> 
+	</root>
+
+</log4j:configuration>

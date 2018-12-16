@@ -1,6 +1,6 @@
-package cn.zhouyafeng.itchat4j.face;
+package io.wxwobot.admin.itchat4j.face;
 
-import cn.zhouyafeng.itchat4j.beans.BaseMsg;
+import io.wxwobot.admin.itchat4j.beans.BaseMsg;
 
 /**
  * 消息处理接口

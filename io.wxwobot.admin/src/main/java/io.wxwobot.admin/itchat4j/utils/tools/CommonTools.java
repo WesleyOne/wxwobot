@@ -1,7 +1,7 @@
-package cn.zhouyafeng.itchat4j.utils.tools;
+package io.wxwobot.admin.itchat4j.utils.tools;
 
-import cn.zhouyafeng.itchat4j.utils.Config;
-import cn.zhouyafeng.itchat4j.utils.enums.OsNameEnum;
+import io.wxwobot.admin.itchat4j.utils.Config;
+import io.wxwobot.admin.itchat4j.utils.enums.OsNameEnum;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;

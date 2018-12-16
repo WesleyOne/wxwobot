@@ -1,20 +1,18 @@
-package cn.zhouyafeng.itchat4j.api;
+package io.wxwobot.admin.itchat4j.api;
 
-import cn.zhouyafeng.itchat4j.core.Core;
-import cn.zhouyafeng.itchat4j.core.CoreManage;
-import cn.zhouyafeng.itchat4j.utils.LogInterface;
-import cn.zhouyafeng.itchat4j.utils.enums.StorageLoginInfoEnum;
-import cn.zhouyafeng.itchat4j.utils.enums.URLEnum;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import io.wxwobot.admin.itchat4j.core.Core;
+import io.wxwobot.admin.itchat4j.core.CoreManage;
+import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.enums.StorageLoginInfoEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 微信小工具，如获好友列表等
- * 
+ * 微信小工具，如获好友列表,根据昵称查找好友或群等
+ *
  * @author https://github.com/yaphone
  * @date 创建时间：2017年5月4日 下午10:49:16
  * @version 1.0
@@ -32,52 +30,14 @@ import java.util.Map;
 public class WechatTools  implements LogInterface {
 
 	/**
-	 * 根据用户名发送文本消息
-	 * 
-	 * @author https://github.com/yaphone
-	 * @date 2017年5月4日 下午10:43:14
-	 * @param msg
-	 * @param toUserName
-	 * @param coreKey
-	 */
-	public static void sendMsgByUserName(String msg, String toUserName, String coreKey) {
-		MessageTools.sendMsgById(msg, toUserName, coreKey);
-	}
-
-	/**
-	 * <p>
-	 * 通过RealName获取本次UserName
-	 * </p>
-	 * <p>
-	 * 如NickName为"yaphone"，则获取UserName=
-	 * "@1212d3356aea8285e5bbe7b91229936bc183780a8ffa469f2d638bf0d2e4fc63"，
-	 * 可通过UserName发送消息
-	 * </p>
-	 * 
-	 * @author https://github.com/yaphone
-	 * @date 2017年5月4日 下午10:56:31
-	 * @param nickName
-	 * @return
-	 */
-	public static String getUserNameByNickName(String nickName, String coreKey) {
-        Core core = CoreManage.getInstance(coreKey);
-        for (JSONObject o : core.getContactList()) {
-			if (o.getString("NickName").equals(nickName)) {
-				return o.getString("UserName");
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * 返回好友昵称列表
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月4日 下午11:37:20
 	 * @return
 	 */
 	public static List<String> getContactNickNameList(String coreKey) {
-        Core core = CoreManage.getInstance(coreKey);
+		Core core = CoreManage.getInstance(coreKey);
 		List<String> contactNickNameList = new ArrayList<String>();
 		for (JSONObject o : core.getContactList()) {
 			contactNickNameList.add(o.getString("NickName"));
@@ -87,64 +47,53 @@ public class WechatTools  implements LogInterface {
 
 	/**
 	 * 返回好友完整信息列表
-	 * 
+	 *
 	 * @date 2017年6月26日 下午9:45:39
 	 * @return
 	 */
 	public static List<JSONObject> getContactList(String coreKey) {
-        Core core = CoreManage.getInstance(coreKey);
+		Core core = CoreManage.getInstance(coreKey);
 		return core.getContactList();
 	}
 
 	/**
 	 * 返回群列表
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月5日 下午9:55:21
 	 * @return
 	 */
 	public static List<JSONObject> getGroupList(String coreKey) {
-        Core core = CoreManage.getInstance(coreKey);
+		Core core = CoreManage.getInstance(coreKey);
 		return core.getGroupList();
 	}
 
 	/**
-	 * 获取群ID列表
-	 * 
-	 * @date 2017年6月21日 下午11:42:56
-	 * @return
-	 */
-	public static List<String> getGroupIdList(String coreKey) {
-        Core core = CoreManage.getInstance(coreKey);
-		return core.getGroupIdList();
-	}
-
-	/**
 	 * 获取群NickName列表
-	 * 
+	 *
 	 * @date 2017年6月21日 下午11:43:38
 	 * @return
 	 */
 	public static List<String> getGroupNickNameList(String coreKey) {
-        Core core = CoreManage.getInstance(coreKey);
+		Core core = CoreManage.getInstance(coreKey);
 		return core.getGroupNickNameList();
 	}
 
 	/**
 	 * 根据groupIdList返回群成员列表
-	 * 
+	 *
 	 * @date 2017年6月13日 下午11:12:31
 	 * @param groupId
 	 * @return
 	 */
 	public static JSONArray getMemberListByGroupId(String groupId, String coreKey) {
-        Core core = CoreManage.getInstance(coreKey);
+		Core core = CoreManage.getInstance(coreKey);
 		return core.getGroupMemeberMap().get(groupId);
 	}
 
 	/**
 	 * 退出微信
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月18日 下午11:56:54
 	 */
@@ -153,7 +102,7 @@ public class WechatTools  implements LogInterface {
 	}
 
 	private static boolean webWxLogout(String coreKey) {
-        Core core = CoreManage.getInstance(coreKey);
+		Core core = CoreManage.getInstance(coreKey);
 		String url = String.format(URLEnum.WEB_WX_LOGOUT.getUrl(),
 				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()));
 		List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -167,12 +116,15 @@ public class WechatTools  implements LogInterface {
 			return true;
 		} catch (Exception e) {
 			LOG.debug(e.getMessage());
+		} finally {
+			// 强制退出，提示相关线程退出
+			core.setAlive(false);
 		}
 		return false;
 	}
 
 	public static void setUserInfo(String coreKey) {
-        Core core = CoreManage.getInstance(coreKey);
+		Core core = CoreManage.getInstance(coreKey);
 		for (JSONObject o : core.getContactList()) {
 			core.getUserInfoMap().put(o.getString("NickName"), o);
 			core.getUserInfoMap().put(o.getString("UserName"), o);
@@ -180,15 +132,15 @@ public class WechatTools  implements LogInterface {
 	}
 
 	/**
-	 * 
+	 *
 	 * 根据用户昵称设置备注名称
-	 * 
+	 *
 	 * @date 2017年5月27日 上午12:21:40
 	 * @param nickName
 	 * @param remName
 	 */
 	public static void remarkNameByNickName(String nickName, String remName, String coreKey) {
-        Core core = CoreManage.getInstance(coreKey);
+		Core core = CoreManage.getInstance(coreKey);
 		String url = String.format(URLEnum.WEB_WX_REMARKNAME.getUrl(), core.getLoginInfo().get("url"),
 				core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
 		Map<String, Object> msgMap = new HashMap<String, Object>(8);
@@ -213,12 +165,12 @@ public class WechatTools  implements LogInterface {
 
 	/**
 	 * 获取微信在线状态
-	 * 
+	 *
 	 * @date 2017年6月16日 上午12:47:46
 	 * @return
 	 */
 	public static boolean getWechatStatus(String coreKey) {
-        Core core = CoreManage.getInstance(coreKey);
+		Core core = CoreManage.getInstance(coreKey);
 		return core.isAlive();
 	}
 
@@ -229,8 +181,8 @@ public class WechatTools  implements LogInterface {
 	 * @param nickName
 	 * @return
 	 */
-	public static JSONObject getContactByNickNameAndUserName(String userName, String nickName, String coreKey){
-        Core core = CoreManage.getInstance(coreKey);
+	private static JSONObject getContactByNickNameAndUserName(String userName, String nickName, String coreKey){
+		Core core = CoreManage.getInstance(coreKey);
 		// 通过userName查询
 		if (StringUtils.isNotEmpty(userName) && StringUtils.isEmpty(nickName)){
 			for (JSONObject contact:core.getContactList()){
@@ -294,8 +246,8 @@ public class WechatTools  implements LogInterface {
 	 * @param userName
 	 * @return
 	 */
-	public static JSONObject getGroupByNickNameAndUserName(String userName, String nickName, String coreKey){
-        Core core = CoreManage.getInstance(coreKey);
+	private static JSONObject getGroupByNickNameAndUserName(String userName, String nickName, String coreKey){
+		Core core = CoreManage.getInstance(coreKey);
 		// 通过userName查询
 		if (StringUtils.isNotEmpty(userName) && StringUtils.isEmpty(nickName)){
 			for (JSONObject group:core.getGroupList()){
