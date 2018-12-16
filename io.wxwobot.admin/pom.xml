@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.wxwobot</groupId>
+  <artifactId>admin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>war</packaging>
+
+  <name>wxwobot</name>
+  <url>https://gitee.com/wesleyOne/wxwobot</url>
+
+  <!-- 使用阿里 maven 库 -->
+  <repositories>
+    <repository>
+      <id>ali-maven</id>
+      <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+  </properties>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.jfinal</groupId>
+      <artifactId>jfinal</artifactId>
+      <version>3.5</version>
+    </dependency>
+    <!-- cos -->
+    <dependency>
+      <groupId>com.jfinal</groupId>
+      <artifactId>cos</artifactId>
+      <version>2017.5</version>
+    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.jfinal</groupId>-->
+      <!--<artifactId>jetty-server</artifactId>-->
+      <!--<version>2018.11</version>-->
+    <!--</dependency>-->
+    <!-- dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.1.0</version>
+        <scope>provided</scope>
+    </dependency -->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>druid</artifactId>
+      <version>1.0.29</version>
+    </dependency>
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.31</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.21</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.21</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>1.7.12</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>sqljdbc4</artifactId>
+      <version>4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <version>4.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+      <version>4.2</version>
+    </dependency>
+
+    <!-- emoji -->
+    <dependency>
+      <groupId>com.vdurmont</groupId>
+      <artifactId>emoji-java</artifactId>
+      <version>3.2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>activation</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>3.8.0</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <finalName>ROOT</finalName>
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <!-- **/* 写法，可以将各级子目录下的资源文件被打包 -->
+          <include>*/*</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.6.1</version>
+        <configuration>
+          <!-- <compilerArgument>-parameters</compilerArgument> -->
+          <source>1.8</source>
+          <target>1.8</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.3</version>
+        <configuration>
+          <!-- 解决 java8  发布到 maven 异常 -->
+          <additionalparam>-Xdoclint:none</additionalparam>
+          <encoding>UTF-8</encoding>
+          <outputDirectory>${basedir}</outputDirectory>
+          <reportOutputDirectory>${basedir}</reportOutputDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
