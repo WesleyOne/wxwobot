@@ -46,11 +46,11 @@ public class IndexController extends _BaseController {
             UserSession.addUserSession(username,sid);
             addCookie("uid",username,-1);
             addCookie("sid",sid,-1);
+            redirect("/",false);
         }else {
-            setOperateErr("账号密码不正确");
+            setAttr("error","账号密码不正确");
+            renderTemplate("login.html");
         }
-        renderJson();
-        return;
     }
 
     @UnCheckLogin

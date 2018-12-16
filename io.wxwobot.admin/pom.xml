@@ -40,7 +40,8 @@
     <pro.devMode>true</pro.devMode>
     <log.level>debug</log.level>
     <log.file.path>/home/www/output/logs/hyagent/wxrobot</log.file.path>
-    <pro.cookie.domain>devrob.com</pro.cookie.domain>
+    <pro.cookie.domain>localhost</pro.cookie.domain>
+    <!--<pro.cookie.domain>devrob.com</pro.cookie.domain>-->
     <pro.upload.cachpath>E:\home\www\images\rob\cache</pro.upload.cachpath>
     <pro.upload.realpath>E:\home\www\images\rob</pro.upload.realpath>
     <pro.domain.img>http://devrob.com/</pro.domain.img>
