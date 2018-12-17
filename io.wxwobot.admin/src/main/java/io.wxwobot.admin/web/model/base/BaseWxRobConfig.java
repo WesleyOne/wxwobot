@@ -90,4 +90,13 @@ public abstract class BaseWxRobConfig<M extends BaseWxRobConfig<M>> extends Mode
 		return get("enable");
 	}
 
+	public M setFromOut(java.lang.Boolean fromOut) {
+		set("from_out", fromOut);
+		return (M)this;
+	}
+	
+	public java.lang.Boolean getFromOut() {
+		return get("from_out");
+	}
+
 }

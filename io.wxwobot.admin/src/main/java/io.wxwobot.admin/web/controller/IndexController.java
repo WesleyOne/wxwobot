@@ -16,8 +16,11 @@ public class IndexController extends _BaseController {
 
 
     public void index(){
+
         setAttr("username",getCookie("uid"));
         setAttr("imgdomain",PropKit.get("imgDomain"));
+
+        setAttr("active","#");
         renderTemplate("index.html");
     }
 
@@ -47,6 +50,7 @@ public class IndexController extends _BaseController {
             addCookie("uid",username,-1);
             addCookie("sid",sid,-1);
             redirect("/",false);
+            return;
         }else {
             setAttr("error","账号密码不正确");
             renderTemplate("login.html");

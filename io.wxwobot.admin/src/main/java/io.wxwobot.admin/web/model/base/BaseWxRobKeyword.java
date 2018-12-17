@@ -72,4 +72,22 @@ public abstract class BaseWxRobKeyword<M extends BaseWxRobKeyword<M>> extends Mo
 		return get("enable");
 	}
 
+	public M setToGroup(java.lang.Boolean toGroup) {
+		set("to_group", toGroup);
+		return (M)this;
+	}
+	
+	public java.lang.Boolean getToGroup() {
+		return get("to_group");
+	}
+
+	public M setNickName(java.lang.String nickName) {
+		set("nick_name", nickName);
+		return (M)this;
+	}
+	
+	public java.lang.String getNickName() {
+		return getStr("nick_name");
+	}
+
 }

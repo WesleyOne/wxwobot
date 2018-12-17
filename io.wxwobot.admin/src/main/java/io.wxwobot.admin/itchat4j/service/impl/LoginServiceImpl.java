@@ -42,23 +42,12 @@ import java.util.regex.Matcher;
  *
  */
 public class LoginServiceImpl implements ILoginService , LogInterface {
-
 	private Core core ;
 	private String coreKey;
 
 	public LoginServiceImpl(String coreKey) {
 		this.coreKey = coreKey;
 		this.core = CoreManage.getInstance(coreKey);
-	}
-
-	@Override
-	public Core getCore() {
-		return this.core;
-	}
-
-	@Override
-	public String getCoreKey() {
-		return coreKey;
 	}
 
 	@Override
@@ -72,7 +61,9 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		params.add(new BasicNameValuePair(LoginParaEnum.TIP.para(), LoginParaEnum.TIP.value()));
 
 		// long time = 4000;
-		while (!isLogin) {
+		long startMillis = System.currentTimeMillis();
+		boolean overTime = false;
+		while (!isLogin && !overTime) {
 			SleepUtils.sleep(1000);
 			long millis = System.currentTimeMillis();
 			params.add(new BasicNameValuePair(LoginParaEnum.R.para(), String.valueOf(millis / 1579L)));
@@ -82,12 +73,13 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			try {
 				String result = EntityUtils.toString(entity);
 				String status = checklogin(result);
-
 				if (ResultEnum.SUCCESS.getCode().equals(status)) {
-					processLoginInfo(result); // 处理结果
-					isLogin = true;
-					core.setAlive(isLogin);
-					break;
+					// 处理结果
+					if (processLoginInfo(result)){
+						isLogin = true;
+						core.setAlive(isLogin);
+						break;
+					}
 				}
 				if (ResultEnum.WAIT_CONFIRM.getCode().equals(status)) {
 					LOG.info("请点击微信确认按钮，进行登陆");
@@ -96,6 +88,8 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			} catch (Exception e) {
 				LOG.error("微信登陆异常！", e);
 			}
+			// 一分钟超时不再请求
+			overTime = (millis - startMillis) > 1000 * 60;
 		}
 		return isLogin;
 	}
@@ -142,7 +136,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			if (file.exists() && file.isFile()){
 				file.delete();
 			}
-			System.out.println(qrPath);
 			// 写入二维码
 			OutputStream out = new FileOutputStream(qrPath);
 			byte[] bytes = EntityUtils.toByteArray(entity);
@@ -165,8 +158,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
 		return true;
 	}
-
-
 
 	@Override
 	public boolean webWxInit() {
@@ -465,7 +456,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 	 * @date 2017年4月9日 下午12:16:26
 	 * @param loginContent
 	 */
-	private void processLoginInfo(String loginContent) {
+	private boolean processLoginInfo(String loginContent) {
 		String regEx = "window.redirect_uri=\"(\\S+)\";";
 		Matcher matcher = CommonTools.getMatcher(regEx, loginContent);
 		if (matcher.find()) {
@@ -502,14 +493,15 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 				text = EntityUtils.toString(entity);
 			} catch (Exception e) {
 				LOG.info(e.getMessage());
-				return;
+				return false;
 			}
 			//add by 默非默 2017-08-01 22:28:09
 			//如果登录被禁止时，则登录返回的message内容不为空，下面代码则判断登录内容是否为空，不为空则退出程序
 			String msg = getLoginMessage(text);
 			if (!"".equals(msg)){
 				LOG.info(msg);
-				System.exit(0);
+//				System.exit(0);
+				return false;
 			}
 			Document doc = CommonTools.xmlParser(text);
 			if (doc != null) {
@@ -528,13 +520,14 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			}
 
 		}
+		return true;
 	}
 
 	private Map<String, List<String>> getPossibleUrlMap() {
 		Map<String, List<String>> possibleUrlMap = new HashMap<String, List<String>>();
 		possibleUrlMap.put("wx.qq.com", new ArrayList<String>() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -546,7 +539,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
 		possibleUrlMap.put("wx2.qq.com", new ArrayList<String>() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -557,7 +550,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		});
 		possibleUrlMap.put("wx8.qq.com", new ArrayList<String>() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -569,7 +562,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
 		possibleUrlMap.put("web2.wechat.com", new ArrayList<String>() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -580,7 +573,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		});
 		possibleUrlMap.put("wechat.com", new ArrayList<String>() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -594,7 +587,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
 	/**
 	 * 同步消息 sync the messages
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月12日 上午12:24:55
 	 * @return
@@ -639,11 +632,11 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
 	/**
 	 * 检查是否有新消息 check whether there's a message
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年4月16日 上午11:11:34
 	 * @return
-	 * 
+	 *
 	 */
 	private Map<String, String> syncCheck() {
 		Map<String, String> resultMap = new HashMap<String, String>();

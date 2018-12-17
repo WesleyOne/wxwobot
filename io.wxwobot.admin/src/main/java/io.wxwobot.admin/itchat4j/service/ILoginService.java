@@ -1,6 +1,6 @@
 package io.wxwobot.admin.itchat4j.service;
 
-import io.wxwobot.admin.itchat4j.core.Core;
+
 
 /**
  * 登陆服务接口
@@ -11,10 +11,6 @@ import io.wxwobot.admin.itchat4j.core.Core;
  *
  */
 public interface ILoginService {
-
-	Core getCore();
-
-	String getCoreKey();
 
 	/**
 	 * 登陆

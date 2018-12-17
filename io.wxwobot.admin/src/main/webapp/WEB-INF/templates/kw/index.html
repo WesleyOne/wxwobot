@@ -1,0 +1,388 @@
+#@layout()
+
+#define main()
+<div>
+    <form class="form-inline" >
+        <div class="form-group">
+            <label for="search_unique_key">唯一码</label>
+            <input type="text" class="form-control" id="search_unique_key">
+        </div>
+        <div class="form-group">
+            <label for="search_key_data">关键字</label>
+            <input type="text" class="form-control" id="search_key_data">
+        </div>
+        <div class="form-group">
+            <label for="search_type_data">类型</label>
+            <select class="form-control" id="search_type_data" aria-describedby="search_type_data">
+                <option value="" selected="selected">全部</option>
+                <option value="TEXT">纯文本</option>
+                <option value="PIC">图片</option>
+                <option value="FILE">文件</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="search_enable">是否已启用</label>
+            <select class="form-control" id="search_enable" aria-describedby="search_enable">
+                <option value="" selected="selected">全部</option>
+                <option value="1">是</option>
+                <option value="0">否</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="search_togrp">是否群聊</label>
+            <select class="form-control" id="search_togrp" aria-describedby="search_togrp">
+                <option value="" selected="selected">全部</option>
+                <option value="1">群聊</option>
+                <option value="0">好友</option>
+            </select>
+        </div>
+        <button type="button" class="btn btn-primary" id="searchPost">
+            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>搜索
+        </button>
+    </form>
+</div>
+
+<div class="tableBody">
+    <table id="rob_config" class="table table-hover"></table>
+</div>
+
+<div class="modal fade bs-example-modal-sm" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="qrModalLabel">请尽快用手机微信扫码确认登录</h4>
+            </div>
+            <div class="modal-body">
+                <h5 id="wxqr_nickname" style="color:red"></h5>
+                <img id="wxqrimg" src="#" class="img-thumbnail">
+            </div>
+        </div>
+    </div>
+</div>
+#end
+
+#define css()
+<link href="https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.min.css" rel="stylesheet">
+<link href="/assets/css/bootstrap-switch.min.css" rel="stylesheet">
+#end
+
+#define js()
+<script src="https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.12.1/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="/assets/js/bootstrap-switch.min.js"></script>
+<script type="text/javascript">
+
+    var search_url = "/rob/list";
+    // 保存定时器ID
+    var tid = null;
+
+    $(document)
+        .ready(
+            function() {
+
+                $('#rob_config').bootstrapTable(
+                        {
+                            method : 'post',// post/get
+                            contentType : "application/x-www-form-urlencoded",// 'application/json'
+                            undefinedText : '暂无数据',
+                            striped : true,// 隔行变色true/false
+                            dataType : 'json',
+                            url : search_url,//接口路径
+                            pagination : true,// 是否开启分页
+                            pageNumber : 1,// 初始化加载第一页，默认第一页
+                            pageSize : 10,// 每页的记录行数（*）
+                            pageList : [ 10, 20, 30 ],// 可供选择的每页的行数（*）
+                            sidePagination : "server", // 分页方式：client客户端分页，server服务端分页（*）
+                            queryParams : function queryParams(
+                                params) {
+
+                                params.remark = $('#search_remark').val();
+                                params.uniqueKey = $('#search_unique_key').val();
+                                params.enable = $('#search_enable').val();
+
+                                return params;// 分页下默认limit,offset,order
+                            },// 查询函数
+                            queryParamsType : 'limit',
+                            locale : 'zh-CN',// 中文支持
+                            showColumns : 'true',
+                            showRefresh : 'true',
+                            sortOrder : 'desc',//默认排序
+                            // showPaginationSwitch:'true',
+                            clickToSelect : 'true',// 是否启用点击选中行
+                            toolbarAlign : 'left',
+                            buttonsAlign : 'right',// 按钮对齐方式
+                            paginationPreText : "<",// 上一页按钮显示文本
+                            paginationNextText : ">",// 下一页显示文本
+                            paginationLoop : false,// 分页无限循环
+                            showToggle : false,// 显示
+                            // 切换试图（table/card）按钮
+                            detailView : false,
+                            detailFormatter : function(index, row) {// detailView要改成true时,用于查看更多信息,点击列头加号展开
+
+                                return '';
+                            },
+                            toolbar : "#toolbar",
+                            columns : [
+
+                                {
+                                    field : 'id',
+                                    title : '编号',
+                                    align : 'center',
+                                    valign : 'middle',
+                                },
+                                {
+                                    field : 'uniqueKey',
+                                    title : '唯一机器码',
+                                    align : 'center',
+                                    valign : 'middle',
+                                },
+                                {
+                                    field : 'remark',
+                                    title : '微信号',
+                                    align : 'center',
+                                    valign : 'middle',
+                                },
+                                {
+                                    field : 'active',
+                                    title : '在线操作',
+                                    align : 'center',
+                                    valign : 'middle',
+                                    formatter : function(value,
+                                                         row, index) {
+                                        var result = "";
+                                        switch(value)
+                                        {
+                                            case true:
+                                                var btn = "<button type='button' class='btn btn-danger' onclick='wxlogout(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>登陆中,点击退出</button>";
+                                                result = btn;
+                                                break;
+                                            case false:
+                                                var btn = "<button type='button' class='btn btn-primary' onclick='wxloginPost(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>未登录,点击登录</button>";
+                                                result = btn;
+                                                break;
+                                            default:
+                                                result = "异常";
+                                        }
+                                        return result;
+                                    }
+                                },
+                                {
+                                    field : 'enable',
+                                    title : '是否启用',
+                                    align : 'center',
+                                    valign : 'middle',
+                                    formatter : function(value,
+                                                         row, index) {
+                                        var result = "";
+                                        var diff = "";
+                                        if (value){
+                                            diff = " checked ";
+                                        }
+                                        result = "<input name='my-checkbox' type='checkbox' data-nickname='"+row['remark']+"' data-rid='"+row['id']+"' data-type='enable' data-typename='启禁开关' "+ diff +" >";
+                                        return result;
+                                    }
+                                },
+                                {
+                                    field : 'fromOut',
+                                    title : '允许对外接口',
+                                    align : 'center',
+                                    valign : 'middle',
+                                    formatter : function(value,
+                                                         row, index) {
+                                        var result = "";
+                                        var diff = "";
+                                        if (value){
+                                            diff = " checked ";
+                                        }
+                                        result = "<input name='my-checkbox' type='checkbox' data-nickname='"+row['remark']+"' data-rid='"+row['id']+"' data-type='fromout' data-typename='对外接口开关' "+ diff +" >";
+                                        return result;
+                                    }
+                                },
+                                {
+                                    field : 'toGroup',
+                                    title : '允许回复群消息',
+                                    align : 'center',
+                                    valign : 'middle',
+                                    formatter : function(value,
+                                                         row, index) {
+                                        var result = "";
+                                        var diff = "";
+                                        if (value){
+                                            diff = " checked ";
+                                        }
+                                        result = "<input name='my-checkbox' type='checkbox' data-nickname='"+row['remark']+"' data-rid='"+row['id']+"' data-type='togrp' data-typename='回复群聊开关' "+ diff +" >";
+                                        return result;
+                                    }
+                                },
+                                {
+                                    field : 'toFriend',
+                                    title : '允许回复好友消息',
+                                    align : 'center',
+                                    valign : 'middle',
+                                    formatter : function(value,
+                                                         row, index) {
+                                        var result = "";
+                                        var diff = "";
+                                        if (value){
+                                            diff = " checked ";
+                                        }
+                                        result = "<input name='my-checkbox' type='checkbox' data-nickname='"+row['remark']+"' data-rid='"+row['id']+"' data-type='tofrd' data-typename='回复好友开关' "+ diff +" >";
+                                        return result;
+                                    }
+                                },
+                                {
+                                    field : 'tool',
+                                    title : '编辑',
+                                    align : 'center',
+                                    valign : 'middle',
+                                    formatter : function(value,
+                                                         row, index) {
+                                        // 此处应根据需求修改
+                                        var bt_edit = "<button id='btn_edit' type='button' class='btn btn-warning' data-toggle='modal' data-target='#editModal' data-edit='edit' data-rowid='"+row.id+"'>关键字</button>";
+
+                                        var element = "<div class='btn-group' role='group' aria-label='table_tool'>"
+                                            + bt_edit
+                                            + "</div>"
+                                        return element;
+                                    }
+                                }
+                            ],
+                            onLoadSuccess:function(){
+                                $("[name='my-checkbox']").bootstrapSwitch({
+                                    onText:"已开启",
+                                    offText:"已关闭",
+                                    onColor:"success",
+                                    offColor:"danger",
+                                    size:"mini",
+                                    labelWidth:0,
+                                    onSwitchChange:function(event,state){
+                                        var data_map = event.currentTarget.dataset;
+                                        var rid = data_map.rid;
+                                        var nickname = data_map.nickname;
+                                        var type = data_map.type;
+                                        var typename = data_map.typename;
+                                        var statename = "关闭";
+                                        if (state){
+                                            statename = "打开";
+                                        }
+                                        bootbox.confirm("<h4>确定 【"+statename+"】【"+nickname+"】的【"+ typename +"】吗？</h4>",function(result){
+                                            if (result){
+                                                $.ajax({
+                                                    type: "POST",
+                                                    dataType: "json",
+                                                    url:"/rob/change",
+                                                    data:JSON.stringify({
+                                                        rid : rid,
+                                                        type : type,
+                                                        state : state
+                                                    }),
+                                                    contentType: "application/json; charset=utf-8",
+                                                    success:function(result){
+                                                        if (result.code == '00'){
+                                                            bootbox.alert(result.message);
+                                                        } else{
+                                                            bootbox.alert("错误！"+result.message);
+                                                            refreshTable();
+                                                        }
+                                                    },
+                                                    error : function() {
+                                                        bootbox.alert("请求异常");
+                                                        refreshTable();
+                                                    }
+                                                });
+                                            }else{
+                                                refreshTable();
+                                            }
+
+                                        });
+                                    }
+                                });
+                            }
+
+                        });
+
+                // 查询按钮事件
+                $('#searchPost').click(function() {
+                    $('#rob_config').bootstrapTable('refresh', {
+                        url : search_url
+                    });
+                });
+            });
+
+    // 退出登录
+    function wxlogout(key,name) {
+        bootbox.confirm("<h4>确定退出【"+name+"】吗？</h4>",function(result){
+            if (result){
+                $.ajax({url:"/robwk/logout?_ck="+key,
+                    success:function(result){
+                        if (result.code == '00'){
+                            refreshTable();
+                        } else{
+                            bootbox.alert("错误！"+result.message);
+                        }
+                    },
+                    error : function() {
+                        bootbox.alert("请求异常");
+                    }
+                });
+            }
+
+        });
+
+    };
+
+    //延迟执行函数
+    function debounce(fn,wait){
+        //设定默认的延迟时间
+        wait=wait||500;
+        //清除定时器
+        tid && clearTimeout(tid);
+        //定时器执行
+        tid=setTimeout(fn,wait);
+    }
+
+    // 登入请求
+    function wxloginPost(key,name) {
+        //清理之前数据
+        clearQrModel();
+        // 弹窗二维码
+        $('#qrModal').modal('show');
+        $('#wxqr_nickname').html("请确保使用该微信账号："+name);
+        $("#wxqrimg").attr("src", "/robwk/getQr?_r=" + Math.random() + "&_ck=" + key);
+        // 延时请求
+        debounce(function () {
+            $.ajax({
+                url: "/robwk/init?_ck=" + key,
+                success: function (result) {
+                    if (result.code == '00'){
+                        $('#qrModal').modal('hide');
+                        refreshTable();
+                    }else{
+                        bootbox.alert("错误！"+result.message);
+                    }
+                },
+                error: function () {
+                    console.log("请求异常")
+                }
+            });
+        },1000);
+    };
+
+    function clearQrModel() {
+        $("#wxqrimg").attr("src", "#");
+        $("#loginwx_tip").html("");
+        $("#wxqr_nickname").html("");
+    }
+
+    // 延时请求刷新列表
+    function refreshTable() {
+        debounce(function () {
+            $('#rob_config').bootstrapTable('refresh', {
+                url : search_url
+            });
+        },200);
+    }
+
+</script>
+#end

@@ -10,6 +10,7 @@ import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.template.Engine;
 import com.jfinal.template.source.ClassPathSourceFactory;
 import io.wxwobot.admin.web.interceptor.ExceptionInterceptor;
+import io.wxwobot.admin.web.model._MappingKit;
 import io.wxwobot.admin.web.utils.NewSqlServerDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class MyConfig extends JFinalConfig {
 	public void configConstant(Constants me) {
 		// 加载少量必要配置，随后可用PropKit.get(...)获取值
 		PropKit.use("appConfig.properties");
-		me.setDevMode(PropKit.getBoolean("devMode", false));
+		me.setDevMode(PropKit.use("appConfig.properties").getBoolean("devMode", false));
 		//上传的文件的最大50M
 		me.setMaxPostSize(50 * 1024 * 1024);
 		me.setEncoding("UTF-8");
@@ -48,7 +49,8 @@ public class MyConfig extends JFinalConfig {
 
 	@Override
 	public void configEngine(Engine me) {
-
+		me.setDevMode(PropKit.use("appConfig.properties").getBoolean("devMode", false));
+		me.addSharedFunction("/WEB-INF/templates/bs4temp/layout.html");
 	}
 	
 	/**
@@ -69,6 +71,7 @@ public class MyConfig extends JFinalConfig {
 		// 配置ActiveRecord插件
 		ActiveRecordPlugin arp = new ActiveRecordPlugin(druidPlugin);
 		// 所有映射在 MappingKit 中自动化搞定
+		_MappingKit.mapping(arp);
 		arp.setDialect(new NewSqlServerDialect());
 		arp.setShowSql(PropKit.getBoolean("devMode", false));
 		arp.getEngine().setSourceFactory(new ClassPathSourceFactory());

@@ -1,12 +1,15 @@
 package io.wxwobot.admin.web.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.render.JsonRender;
-import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.web.model.WxRobConfig;
+import io.wxwobot.admin.web.utils.UUIDShortUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -22,7 +25,7 @@ public class RobotController extends _BaseController {
      * 机器人页面
      */
     public void index(){
-
+        setAttr("active","rob");
         renderTemplate("index.html");
     }
 
@@ -33,44 +36,117 @@ public class RobotController extends _BaseController {
     public void list(){
         int rows = getParaToInt("limit", 10);
         int pageNum = getPageNum(getParaToInt("offset", 1), rows);
+        String searchUniqueKey = getPara("uniqueKey");
+        String remark = getPara("remark");
+        Integer enable = getParaToInt("enable");
+        String where = " where 1=1 ";
+        if (StringUtils.isNotEmpty(searchUniqueKey)){
+            where += " and unique_key = "+searchUniqueKey;
+        }
+        if (StringUtils.isNotEmpty(remark)) {
+            where += " and remark = " + remark;
+        }
+        if (enable != null){
+            where += " and enable = " + enable;
+        }
 
         Page<WxRobConfig> page = WxRobConfig.dao.paginate(pageNum, rows, "select * ",
-                " from  wx_rob_config ");
+                " from wx_rob_config with(nolock) "+where);
         //其他处理
         List<WxRobConfig> dataList = page.getList();
-        for (WxRobConfig conf: dataList){
-            // TODO 获取机器人状态
-            String uniqueKey = conf.getUniqueKey();
-            conf.setActive(CoreManage.isActive(uniqueKey));
+        if (CollectionUtils.isNotEmpty(dataList)){
+            for (WxRobConfig conf: dataList){
+                // 获取机器人状态
+                String uniqueKey = conf.getUniqueKey();
+                conf.setActive(CoreManage.isActive(uniqueKey));
+            }
         }
 
         setAttrs(buildPagination(dataList, page.getTotalRow()));
         render(new JsonRender().forIE());
+    }
 
-        renderJson();
+    /**
+     * 机器人页面
+     */
+    public void addIndex(){
+        setAttr("active","addrob");
+        renderTemplate("addIndex.html");
     }
 
     /**
      * 添加机器人
      */
     public void addRob(){
-        WxRobConfig bean = getBean(WxRobConfig.class, true);
-        bean.setWhiteList("");
-        bean.setCreateTime(new Date());
-        bean.setUpdateTime(new Date());
-        bean.setToFriend(false);
-        bean.setToGroup(false);
-        bean.save();
+        JSONObject postParam = getPostParam();
+        String remark = postParam.getString("remark");
+
+        if (validatorParamNull(remark,"微信号不能为空")){
+            return;
+        }
+
+        Record remarkRecord = Db.findFirst("SELECT TOP 1 remark FROM wx_rob_config with(nolock) WHERE remark = ?", remark);
+        if (validatorParamNull(remarkRecord != null,"微信号已存在")){
+            return;
+        }
+        WxRobConfig bean = new WxRobConfig();
+        bean.setWhiteList("")
+                .setRemark(remark)
+                .setCreateTime(new Date())
+                .setUpdateTime(new Date())
+                .setToFriend(false)
+                .setToGroup(true)
+                .setFromOut(false);
+        boolean isSuccess = false;
+        int maxTime = 5;
+        while (!isSuccess && maxTime >0){
+            String uniKey = UUIDShortUtil.generateShortUuid();
+            bean.setUniqueKey(UUIDShortUtil.generateShortUuid());
+            isSuccess = bean.save();
+            maxTime--;
+        }
+
+        if (!isSuccess){
+            setOperateErr();
+        }else{
+            setData(bean);
+        }
         renderJson();
     }
 
     /**
-     * 删除机器人
+     * 机器人启动禁止开关，发送群聊开关，发送好友开关,对外接口消息开关
      */
-    public void delRob(){
+    public void change(){
+        JSONObject postParam = getPostParam();
+        Integer id = postParam.getInteger("rid");
+        String type = postParam.getString("type");
+        Boolean state = postParam.getBoolean("state");
 
+        WxRobConfig config = new WxRobConfig();
+        config.setId(id);
+        if ("enable".equals(type)){
+            config.setEnable(state);
+        }else if ("tofrd".equals(type)){
+            config.setToFriend(state);
+        }else if ("togrp".equals(type)){
+            config.setToGroup(state);
+        }else if ("fromout".equals(type)){
+            config.setFromOut(state);
+        }else {
+            setOperateErr("非法操作");
+            render(new JsonRender().forIE());
+            return;
+        }
 
-        renderJson();
+        config.setUpdateTime(new Date());
+        boolean update = config.update();
+        if (!update){
+            setOperateErr();
+        }else{
+            setData(update);
+        }
+        render(new JsonRender().forIE());
     }
 
 

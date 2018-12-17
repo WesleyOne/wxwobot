@@ -4,7 +4,10 @@ import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.itchat4j.Wechat;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.controller.LoginController;
+import io.wxwobot.admin.itchat4j.core.Core;
+import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
+import io.wxwobot.admin.itchat4j.utils.SleepUtils;
 import io.wxwobot.admin.web.base.BaseException;
 import io.wxwobot.admin.web.utils.FileUtil;
 import io.wxwobot.admin.web.wxrob.MyMsgHandler;
@@ -16,7 +19,7 @@ import java.io.*;
  * @author WesleyOne
  * @create 2018/12/16
  */
-public class RobotOperationController extends _BaseController {
+public class RobotWorkController extends _BaseController {
 
     /**
      * 获取状态
@@ -40,8 +43,6 @@ public class RobotOperationController extends _BaseController {
         FileUtil.delFile(realUploadPath,"QR.jpg");
 
         String qrPath = realUploadPath;
-        IMsgHandlerFace msgHandler = new MyMsgHandler(coreKey);
-        Wechat wechat = new Wechat(msgHandler, qrPath, true,coreKey);
         LoginController login = new LoginController(coreKey);
         login.login_1(qrPath);
 
@@ -61,6 +62,7 @@ public class RobotOperationController extends _BaseController {
             outputStream.flush();
             outputStream.close();
         }
+        renderNull();
     }
 
 
@@ -72,9 +74,13 @@ public class RobotOperationController extends _BaseController {
         String coreKey = getCoreKey();
         IMsgHandlerFace msgHandler = new MyMsgHandler(coreKey);
         Wechat wechat = new Wechat(msgHandler,coreKey);
-        wechat.wxInit();
+        boolean loginResult = wechat.wxInit();
         wechat.start();
-        setMsg("登录成功");
+        if (loginResult){
+            setMsg("登录成功");
+        }else{
+            setMsg("登录失败，关闭二维码后重新打开");
+        }
         renderJson();
     }
 

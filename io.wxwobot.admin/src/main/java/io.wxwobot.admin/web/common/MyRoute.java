@@ -1,8 +1,8 @@
 package io.wxwobot.admin.web.common;
 
 import com.jfinal.config.Routes;
-import io.wxwobot.admin.web.controller.*;
 import io.wxwobot.admin.web.interceptor.VisitLogInterceptor;
+import io.wxwobot.admin.web.controller.*;
 
 /**
  * 路由统一管理
@@ -20,8 +20,8 @@ public class MyRoute extends Routes {
 		//添加路由
 		add("/", IndexController.class);
 		add("/rob",RobotController.class);
-		add("/robopr",RobotOperationController.class);
-		add("/cmm",CommonController.class);
+		add("/robwk",RobotWorkController.class);
+		add("/relate",RelateController.class);
 		add("/kw",KeyWordController.class);
 
 		add("/upload",UploadController.class);

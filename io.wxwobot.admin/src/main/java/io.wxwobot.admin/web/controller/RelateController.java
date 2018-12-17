@@ -1,14 +1,14 @@
 package io.wxwobot.admin.web.controller;
 
 /**
- * TODO 通用配置
+ * TODO 关联配置
  * @author WesleyOne
  * @create 2018/12/16
  */
-public class CommonController extends _BaseController {
+public class RelateController extends _BaseController {
 
     public void index(){
-
+        setAttr("active","relate");
         renderTemplate("index.html");
     }
 

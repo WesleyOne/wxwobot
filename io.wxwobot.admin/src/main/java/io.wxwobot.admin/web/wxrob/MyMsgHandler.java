@@ -42,7 +42,9 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
         String answer = config.getKeywords().get(text);
         String fromUserName = msg.getFromUserName();
         if (StringUtils.isNotEmpty(answer)){
-            if (answer.startsWith(KeyMsgValueType.IMG.toValue())){
+
+            // TODO 以下是为了外接做的测试
+          if (answer.startsWith(KeyMsgValueType.IMG.toValue())){
                 String filePath = answer.substring(KeyMsgValueType.IMG.toValue().length()).trim();
                 MessageTools.sendPicMsgByUserId(fromUserName,filePath,coreKey);
             }else if (answer.startsWith(KeyMsgValueType.FILE.toValue())) {

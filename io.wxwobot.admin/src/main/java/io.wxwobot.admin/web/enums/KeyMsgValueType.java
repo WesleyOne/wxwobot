@@ -13,7 +13,7 @@ public enum KeyMsgValueType {
     IMG("*IMG*","图片"),
     FILE("*FILE*","文件"),
     CASH("*CASH*","收款码"),
-    TEXT("","文本")
+    TEXT("*TEXT*","文本")
     ;
 
     private String value;

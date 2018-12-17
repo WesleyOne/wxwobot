@@ -21,9 +21,6 @@ public class CoreDefaultConfig implements Serializable {
     }
 
     private String coreKey;
-    private int appId;
-    private String numAccount;
-    private int numId;
     // 关闭群聊
     private boolean noGroup = true;
     // 关闭好友聊天
@@ -64,30 +61,6 @@ public class CoreDefaultConfig implements Serializable {
 
     public void setKeywords(Map<String, String> keywords) {
         this.keywords = keywords;
-    }
-
-    public int getAppId() {
-        return appId;
-    }
-
-    public void setAppId(int appId) {
-        this.appId = appId;
-    }
-
-    public String getNumAccount() {
-        return numAccount;
-    }
-
-    public void setNumAccount(String numAccount) {
-        this.numAccount = numAccount;
-    }
-
-    public int getNumId() {
-        return numId;
-    }
-
-    public void setNumId(int numId) {
-        this.numId = numId;
     }
 
     public String getCashImg() {

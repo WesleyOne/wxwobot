@@ -36,8 +36,9 @@ public class Wechat {
         }
 	}
 
-	public void wxInit(){
-		login.login_2();
+	public boolean wxInit(){
+		return login.login_2();
+
 	}
 
 

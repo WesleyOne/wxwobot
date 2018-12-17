@@ -7,6 +7,11 @@ package io.wxwobot.admin.web.controller;
  */
 public class KeyWordController extends _BaseController{
 
+    public void index(){
+
+
+    }
+
 
     public void keyWordList(){
 

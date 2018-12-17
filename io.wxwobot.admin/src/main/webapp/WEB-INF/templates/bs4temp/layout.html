@@ -1,0 +1,66 @@
+#define layout()
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <link rel="shortcut icon" href="#" />
+    <title>WxWobot管理后台</title>
+    <!--<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">-->
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="/assets/css/navbar-fixed-top.css" rel="stylesheet">
+    #@css?()
+</head>
+
+<body>
+
+<!-- Fixed navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">WxWobot管理后台</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li #if(active == '#') class="active" #end ><a href="/">首页</a></li>
+                <li #if(active == 'addrob') class="active" #end><a href="/rob/addIndex">添加机器人</a></li>
+                <li #if(active == 'rob') class="active" #end><a href="/rob">机器人管理</a></li>
+                <li #if(active == 'kw') class="active" #end><a href="/kw">关键字配置</a></li>
+                <li #if(active == 'relate') class="active" #end><a href="/relate">对外接口配置</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/logout">
+                        <i class="ace-icon fa fa-power-off"></i>
+                        退出
+                    </a>
+                </li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div class="container">
+
+    #@main()
+
+</div>
+<script src="/assets/js/jquery-2.2.4.min.js"></script>
+<!--<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>-->
+<!--<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/bootbox.min.js"></script>
+<script src="/assets/js/common.js"></script>
+#@js?()
+</body>
+</html>
+#end
