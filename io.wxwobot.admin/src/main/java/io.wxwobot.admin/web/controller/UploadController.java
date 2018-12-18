@@ -13,7 +13,7 @@ public class UploadController extends _BaseController {
 
     public void img2local(){
         UploadFile file = getFile();
-        String realUploadPath = PropKit.get("realUploadPath");
+        String realImgUploadPath = PropKit.get("realImgUploadPath");
         String imgDomain = PropKit.get("imgDomain");
 
         String fn = getPara("fn", "");
@@ -21,12 +21,32 @@ public class UploadController extends _BaseController {
         int i = file.getOriginalFileName().lastIndexOf(".")+1;
         String fileType = originalFileName.substring(i);
         String fileName = fn + "_" + System.currentTimeMillis() + "." + fileType;
-        String newFilePath = realUploadPath+File.separator+fileName;
+        String newFilePath = realImgUploadPath+File.separator+fileName;
         String newFileUrl = imgDomain+fileName;
         file.getFile().renameTo(new File(newFilePath));
 
-        setAttr("imgUrl",newFileUrl);
-        setAttr("imgPath",newFilePath);
+        setAttr("url",newFileUrl);
+        setAttr("name",fileName);
+
+        renderJson();
+    }
+
+    public void file2local(){
+        UploadFile file = getFile();
+        String realFileUploadPath = PropKit.get("realFileUploadPath");
+        String fileDomain = PropKit.get("fileDomain");
+
+        String fn = getPara("fn", "");
+        String originalFileName = file.getOriginalFileName();
+        int i = file.getOriginalFileName().lastIndexOf(".")+1;
+        String fileType = originalFileName.substring(i);
+        String fileName = fn + "_" + System.currentTimeMillis() + "." + fileType;
+        String newFilePath = realFileUploadPath+File.separator+fileName;
+        String newFileUrl = fileDomain+fileName;
+        file.getFile().renameTo(new File(newFilePath));
+
+        setAttr("url",newFileUrl);
+        setAttr("name",fileName);
 
         renderJson();
     }

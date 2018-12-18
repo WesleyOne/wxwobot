@@ -8,15 +8,15 @@
             <input type="text" class="form-control" id="search_unique_key">
         </div>
         <div class="form-group">
-            <label for="search_remark">微信号</label>
-            <input type="text" class="form-control" id="search_remark">
+            <label for="search_remark">备注</label>
+            <input type="text" class="form-control" id="search_remark" placeholder="模糊查询">
         </div>
         <div class="form-group">
             <label for="search_enable">是否已启用</label>
             <select class="form-control" id="search_enable" aria-describedby="search_enable">
                 <option value="" selected="selected">全部</option>
-                <option value="1">是</option>
-                <option value="0">否</option>
+                <option value="true">是</option>
+                <option value="false">否</option>
             </select>
         </div>
         <button type="button" class="btn btn-primary" id="searchPost">
@@ -26,7 +26,7 @@
 </div>
 
 <div class="tableBody">
-    <table id="rob_config" class="table table-hover"></table>
+    <table id="rob_config" class="table table-hover" ></table>
 </div>
 
 <div class="modal fade bs-example-modal-sm" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel">
@@ -59,7 +59,6 @@
     var search_url = "/rob/list";
     // 保存定时器ID
     var tid = null;
-
     $(document)
         .ready(
             function() {
@@ -178,7 +177,7 @@
                                         if (value){
                                             diff = " checked ";
                                         }
-                                        result = "<input name='my-checkbox' type='checkbox' data-nickname='"+row['remark']+"' data-rid='"+row['id']+"' data-type='fromout' data-typename='对外接口开关' "+ diff +" >";
+                                        result = "<input style='width: 130px' name='my-checkbox' type='checkbox' data-nickname='"+row['remark']+"' data-rid='"+row['id']+"' data-type='fromout' data-typename='对外接口开关' "+ diff +" >";
                                         return result;
                                     }
                                 },
@@ -222,10 +221,14 @@
                                     formatter : function(value,
                                                          row, index) {
                                         // 此处应根据需求修改
-                                        var bt_edit = "<button id='btn_edit' type='button' class='btn btn-warning' data-toggle='modal' data-target='#editModal' data-edit='edit' data-rowid='"+row.id+"'>关键字</button>";
+                                        var bt_remark_edit = "<button type='button' class='btn btn-default' onclick='openEditRemark(\""+row.id+"\",\""+row.remark+"\")'>修改备注</button>";
+                                        var bt_key = "<a  type='button' class='btn btn-info' href='/kw?uk="+row.uniqueKey+"'>查看关键字</a>";
+                                        var bt_add_key = "<a  type='button' class='btn btn-primary' href='/kw/editIndex?uk="+row.uniqueKey+"'>新增关键字</a>";
 
-                                        var element = "<div class='btn-group' role='group' aria-label='table_tool'>"
-                                            + bt_edit
+                                        var element = "<div class='btn-group-vertical btn-group-sm' role='group'>"
+                                            + bt_remark_edit
+                                            + bt_key
+                                            + bt_add_key
                                             + "</div>"
                                         return element;
                                     }
@@ -365,6 +368,34 @@
                 url : search_url
             });
         },200);
+    }
+
+    function openEditRemark(id,oldRemark) {
+        bootbox.prompt("修改编号【"+id+"】的备注【"+oldRemark+"】吗?",function (result) {
+            if (result != null){
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url:"/rob/changeRemark",
+                    data:JSON.stringify({
+                        rid : id,
+                        remark : result
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    success:function(result){
+                        if (result.code == '00'){
+                            bootbox.alert(result.message);
+                            refreshTable();
+                        } else{
+                            bootbox.alert("错误！"+result.message);
+                        }
+                    },
+                    error : function() {
+                        bootbox.alert("请求异常");
+                    }
+                });
+            }
+        });
     }
 
 </script>

@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * TODO 机器人相关管理接口
+ * 机器人相关管理接口
  * @author WesleyOne
  * @create 2018/12/16
  */
@@ -38,16 +38,16 @@ public class RobotController extends _BaseController {
         int pageNum = getPageNum(getParaToInt("offset", 1), rows);
         String searchUniqueKey = getPara("uniqueKey");
         String remark = getPara("remark");
-        Integer enable = getParaToInt("enable");
+        Boolean enable = getParaToBoolean("enable");
         String where = " where 1=1 ";
         if (StringUtils.isNotEmpty(searchUniqueKey)){
-            where += " and unique_key = "+searchUniqueKey;
+            where += " and unique_key = '"+searchUniqueKey + "' ";
         }
         if (StringUtils.isNotEmpty(remark)) {
-            where += " and remark = " + remark;
+            where += " and remark like '" + remark + "%' ";
         }
         if (enable != null){
-            where += " and enable = " + enable;
+            where += " and enable = " + (enable?1:0);
         }
 
         Page<WxRobConfig> page = WxRobConfig.dao.paginate(pageNum, rows, "select * ",
@@ -86,7 +86,7 @@ public class RobotController extends _BaseController {
         }
 
         Record remarkRecord = Db.findFirst("SELECT TOP 1 remark FROM wx_rob_config with(nolock) WHERE remark = ?", remark);
-        if (validatorParamNull(remarkRecord != null,"微信号已存在")){
+        if (validatorParamNull(remarkRecord != null,"备注已存在")){
             return;
         }
         WxRobConfig bean = new WxRobConfig();
@@ -146,8 +146,37 @@ public class RobotController extends _BaseController {
         }else{
             setData(update);
         }
-        render(new JsonRender().forIE());
+        renderJson();
     }
 
+    /**
+     * 修改备注
+     */
+    public void changeRemark(){
+        JSONObject postParam = getPostParam();
+        Integer id = postParam.getInteger("rid");
+        String remark = postParam.getString("remark");
+        if (validatorParamNull(id,"ID不能为空")){
+            return;
+        }
+        if (validatorParamNull(remark,"备注不能为空")){
+            return;
+        }
+
+        Record remarkRecord = Db.findFirst("SELECT TOP 1 remark FROM wx_rob_config with(nolock) WHERE remark = ?", remark);
+        if (validatorParamNull(remarkRecord != null,"备注已存在")){
+            return;
+        }
+        WxRobConfig config = new WxRobConfig();
+        config.setId(id);
+        config.setRemark(remark);
+        boolean update = config.update();
+        if (!update){
+            setOperateErr();
+        }else{
+            setData(update);
+        }
+        renderJson();
+    }
 
 }

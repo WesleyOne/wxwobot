@@ -38,7 +38,7 @@ public class RobotWorkController extends _BaseController {
      */
     public void getQr() throws BaseException, IOException {
         String coreKey = getCoreKey();
-        String realUploadPath = PropKit.get("realUploadPath");
+        String realUploadPath = PropKit.get("realImgUploadPath");
         //先清除下旧二维码
         FileUtil.delFile(realUploadPath,"QR.jpg");
 

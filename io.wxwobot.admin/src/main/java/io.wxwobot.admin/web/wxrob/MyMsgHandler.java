@@ -50,13 +50,13 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
             }else if (answer.startsWith(KeyMsgValueType.FILE.toValue())) {
                 String filePath = answer.substring(KeyMsgValueType.FILE.toValue().length()).trim();
                 MessageTools.sendFileMsgByUserId(fromUserName, filePath, coreKey);
-            }else if(answer.startsWith(KeyMsgValueType.CASH.toValue())){
-                String cashImgFilePath = config.getCashImg();
-                if (StringUtils.isNotEmpty(cashImgFilePath)){
-                    MessageTools.sendPicMsgByUserId(fromUserName,cashImgFilePath,coreKey);
-                }else{
-                    LOG.warn("未设置收款码：{}",coreKey);
-                }
+//            }else if(answer.startsWith(KeyMsgValueType.CASH.toValue())){
+//                String cashImgFilePath = config.getCashImg();
+//                if (StringUtils.isNotEmpty(cashImgFilePath)){
+//                    MessageTools.sendPicMsgByUserId(fromUserName,cashImgFilePath,coreKey);
+//                }else{
+//                    LOG.warn("未设置收款码：{}",coreKey);
+//                }
             }else{
                 MessageTools.sendMsgById(answer, fromUserName,coreKey);
             }

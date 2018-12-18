@@ -1,8 +1,8 @@
 package io.wxwobot.admin.web.enums;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
+import com.jfinal.plugin.activerecord.Record;
+
+import java.util.*;
 
 /**
  * @author WesleyOne
@@ -10,10 +10,9 @@ import java.util.Map;
  */
 public enum KeyMsgValueType {
 
-    IMG("*IMG*","图片"),
-    FILE("*FILE*","文件"),
-    CASH("*CASH*","收款码"),
-    TEXT("*TEXT*","文本")
+    IMG("IMG","图片"),
+    FILE("FILE","文件"),
+    TEXT("TEXT","纯文本")
     ;
 
     private String value;
@@ -26,11 +25,14 @@ public enum KeyMsgValueType {
 
 
     private static final Map<String, KeyMsgValueType> lookup = new HashMap<>();
+    public static List<Record> LIST_KV = new ArrayList<>();
     static {
         for (KeyMsgValueType s : EnumSet.allOf(KeyMsgValueType.class)){
             lookup.put(s.toValue(), s);
+            LIST_KV.add(new Record().set("v",s.toValue()).set("n",s.toName()));
         }
     }
+
 
     /**
      * 获取枚举的值（整数值、字符串值等）

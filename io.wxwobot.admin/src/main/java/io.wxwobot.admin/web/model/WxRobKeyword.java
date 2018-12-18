@@ -7,5 +7,5 @@ import io.wxwobot.admin.web.model.base.BaseWxRobKeyword;
  */
 @SuppressWarnings("serial")
 public class WxRobKeyword extends BaseWxRobKeyword<WxRobKeyword> {
-	
+    public static final WxRobKeyword dao = new WxRobKeyword().dao();
 }

@@ -42,8 +42,10 @@
     <log.file.path>/home/www/output/logs/hyagent/wxrobot</log.file.path>
     <pro.cookie.domain>devrob.com</pro.cookie.domain>
     <pro.upload.cachpath>E:\home\www\images\rob\cache</pro.upload.cachpath>
-    <pro.upload.realpath>E:\home\www\images\rob</pro.upload.realpath>
-    <pro.domain.img>http://devrob.com/</pro.domain.img>
+    <pro.upload.img.realpath>E:\home\www\images\rob\img</pro.upload.img.realpath>
+    <pro.upload.file.realpath>E:\home\www\images\rob\file</pro.upload.file.realpath>
+    <pro.domain.img>http://devrob.com/img/</pro.domain.img>
+    <pro.domain.file>http://devrob.com/file/</pro.domain.file>
   </properties>
 
 

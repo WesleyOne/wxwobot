@@ -1,0 +1,301 @@
+#@layout()
+
+#define main()
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">#if(isEdit)修改#else添加#end关键字</h3>
+    </div>
+    <div class="panel-body">
+        <div class="well" ><span style="color: red">预防封号，谨慎填写内容！</span></div>
+        <div class="well" >
+            <form class="form-horizontal"  role="form" id="addKwForm">
+                <div class="form-group">
+                    <label for="kid" class="col-sm-2 control-label"  #if(!isEdit) hidden #end>记录ID:</label>
+                    <div class="col-sm-4"  #if(!isEdit) hidden #end>
+                        <input type="text" class="form-control" id="kid" name="kid" value="#(form.id ??)" readonly>
+                    </div>
+                    <label for="uniqueKey" class="col-sm-2 control-label">机器唯一码:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="uniqueKey" name="uniqueKey" readonly value="#(form.uniqueKey ??)">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="keyData" class="col-sm-2 control-label">关键字:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="keyData" name="keyData" value="#(form.keyData ??)">
+                    </div>
+                    <div class="col-sm-6">
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="toGroup" class="col-sm-2 control-label">群聊/好友:</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" id="toGroup" name="toGroup">
+                            #set(fg = from.toGroup ?? true)
+                            <option value="1" #if(fg) selected #end>群聊</option>
+                            <option value="0" #if(!fg) selected #end>好友</option>
+                        </select>
+                    </div>
+                    <label for="nickName" class="col-sm-2 control-label">目标微信昵称:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="nickName" name="nickName" value="#(form.nickName ??)">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="valueData" class="col-sm-2 control-label">内容类型:</label>
+                    <div class="col-sm-10">
+                        <ul class="nav nav-pills nav-justified">
+                            #set(ft = form.typeData)
+                            <li #if(!ft || ft == "TEXT" ) class="active" #end><a data-toggle="tab" href="#TEXT" data-value="TEXT">纯文本</a></li>
+                            <li #if(ft && ft == "FILE" ) class="active" #end><a data-toggle="tab" href="#FILE" data-value="FILE">文件</a></li>
+                            <li #if(ft && ft == "IMG" ) class="active" #end><a data-toggle="tab" href="#IMG" data-value="IMG">图片</a></li>
+                        </ul>
+                        <input type="hidden" class="form-control" id="typeData" name="typeData" value="#(form.typeData ??)">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="valueData" class="col-sm-2 control-label">具体内容:</label>
+                    <div class="col-sm-10">
+                        <div class="tab-content">
+                            <div class="tab-pane fade #if(!ft || ft == "TEXT" ) in active #end" id="TEXT">
+                                <textarea class="form-control" rows="5" maxlength="250" id="valueData" name="valueData" style="resize: none;">#(form.valueData ??)</textarea>
+                            </div>
+                            <div class="tab-pane fade #if(ft && ft == "FILE" ) in active #end" id="FILE">
+                                <div class="file-loading">
+                                    <input id="f_upload" type="file" />
+                                </div>
+                            </div>
+                            <div class="tab-pane fade #if(ft && ft == "IMG" ) in active #end" id="IMG">
+                                #set(imgurl = form.valueData ? imgdomain+form.valueData :'#')
+                                <div class="file-loading">
+                                    <input id="img_upload" type="file" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-8 col-sm-2">
+                        <button type="reset" class="btn btn-default btn-lg btn-block" #if(isEdit) disabled #end>重置</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-lg btn-block" onclick="openAddModel()">提交</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="addPostModal" tabindex="-1" role="dialog" aria-labelledby="addPostModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="addPostModalLabel">确认#if(isEdit)修改#else添加#end关键词</h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addPost()">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+#end
+
+#define css()
+<link href="/assets/css/bootstrapValidator.min.css" rel="stylesheet">
+<link href="/assets/fileinput/css/fileinput.min.css" rel="stylesheet">
+#end
+
+#define js()
+<script src="/assets/js/bootstrapValidator.min.js"></script>
+<script src="/assets/js/lang/bootstrapValidator_zh_CN.js"></script>
+<script src="/assets/fileinput/js/fileinput.min.js"></script>
+<script src="/assets/fileinput/js/locales/zh.js"></script>
+<script type="text/javascript">
+    var addFormValid;
+
+    $(function () {
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            // 获取已激活的标签页的名称
+            var activeTypeName = e.currentTarget.dataset.value;
+            $('#typeData').val(activeTypeName);
+        });
+
+
+        $("#f_upload")
+            .fileinput(
+                {
+                    language : 'zh', //设置语言
+                    uploadUrl : "/upload/file2local", //上传的地址
+                    allowedFileType : ['image', 'text', 'video', 'audio', 'flash'],
+                    // allowedFileExtensions : [ 'jpg','gif', 'png', 'txt', 'pdf', 'excel', 'doc', 'docx' ],//接收的文件后缀
+                    uploadExtraData:{"fn": "#(form.uniqueKey ?? 'err')"},//其他参数
+                    uploadAsync : true, //默认异步上传
+                    showUpload : true, //是否显示上传按钮
+                    showRemove : true, //显示移除按钮
+                    showPreview : true, //是否显示预览
+                    showCaption : true,//是否显示标题
+                    browseClass : "btn btn-primary", //按钮样式
+                    dropZoneEnabled : false,//是否显示拖拽区域
+                    maxFileSize : 1024,//单位为kb，如果为0表示不限制文件大小
+                    maxFileCount : 1, //表示允许同时上传的最大文件个数
+                    enctype : 'multipart/form-data',
+                    validateInitialCount : true,
+                    autoReplace : true,//替代当前文件
+                    previewFileIcon : "<iclass='glyphicon glyphicon-king'></i>",
+                    msgFilesTooMany : "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+                })
+            .on("fileuploaded",function(event, data, previewId, index) {
+                console.log(event);
+                console.log(data);
+                if (data.response.code == "00") {
+                    $('#valueData').text(data.response.name);
+                } else {
+                    bootbox.alert("文件上传失败,请重试:"
+                        + data.response.message);
+                }
+            });
+
+        $("#img_upload")
+            .fileinput(
+                {
+                    language : 'zh', //设置语言
+                    uploadUrl : "/upload/img2local", //上传的地址
+    #if(ft && ft == "IMG" && imgurl != '#')
+                    initialPreview: [
+                        "<img src='#(imgurl)' class='img-thumbnail file-preview-image'>"
+                    ],
+    #end
+                    allowedFileExtensions : [ 'jpg','gif', 'png' ],//接收的文件后缀
+                    uploadExtraData:{"fn": "#(form.uniqueKey ?? 'err')"},//其他参数
+                    uploadAsync : true, //默认异步上传
+                    showUpload : true, //是否显示上传按钮
+                    showRemove : true, //显示移除按钮
+                    showPreview : true, //是否显示预览
+                    showCaption : true,//是否显示标题
+                    browseClass : "btn btn-primary", //按钮样式
+                    dropZoneEnabled : false,//是否显示拖拽区域
+                    maxFileSize : 1024,//单位为kb，如果为0表示不限制文件大小
+                    maxFileCount : 1, //表示允许同时上传的最大文件个数
+                    enctype : 'multipart/form-data',
+                    validateInitialCount : true,
+                    autoReplace : true,//替代当前文件
+                    previewFileIcon : "<iclass='glyphicon glyphicon-king'></i>",
+                    msgFilesTooMany : "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+                })
+            .on("fileuploaded",function(event, data, previewId, index) {
+                if (data.response.code == "00") {
+                    $('#valueData').text(data.response.name);
+                    $('#showDataImg').attr("src",data.response.url);
+                } else {
+                    bootbox.alert("图片上传失败,请重试:"
+                        + data.response.message);
+                }
+            });
+
+
+        addFormValid = $('#addKwForm').bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                uniqueKey: {
+                    validators: {
+                        notEmpty: {
+                            message: '页面失效,关闭后重新进入'
+                        }
+                    }
+                },
+                keyData: {
+                    validators: {
+                        notEmpty: {
+                            message: '关键字不能为空'
+                        }
+                    }
+                },
+                toGroup: {
+                    validators: {
+                        notEmpty: {
+                            message: '未选择对象类型'
+                        }
+                    }
+                },
+                nickName: {
+                    validators: {
+                        notEmpty: {
+                            message: '目标昵称不能为空'
+                        }
+                    }
+                },
+                valueData: {
+                    validators: {
+                        notEmpty: {
+                            message: '内容不能为空'
+                        }
+                    }
+                }
+            }
+        });
+
+    });
+
+    function openAddModel() {
+        addFormValid.bootstrapValidator('validate');
+        if ( $("#addKwForm").data('bootstrapValidator').isValid()){
+            // 显示模态框
+            $('#addPostModal').modal('show');
+        }
+    }
+
+    // 保存定时器ID
+    var tid = null;
+    //延迟执行函数
+    function debounce(fn,wait){
+        //设定默认的延迟时间
+        wait=wait||500;
+        //清除定时器
+        tid && clearTimeout(tid);
+        //定时器执行
+        tid=setTimeout(fn,wait);
+    };
+
+    function addPost() {
+        addFormValid.bootstrapValidator('validate');
+        if ( $("#addKwForm").data('bootstrapValidator').isValid()){
+
+            var fv = $('#addKwForm').serializeObject();
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/kw/editKeyWord" ,
+                data: JSON.stringify(fv),
+                contentType: "application/json",
+                success: function (result) {
+                    $('#addPostModal').modal('hide');
+                    if (result.code == '00'){
+                        bootbox.alert(result.message);
+                        debounce(function () {
+                            window.location.reload();
+                        },1500);
+                    } else{
+                        bootbox.alert("请求异常:"+result.message);
+                    }
+                },
+                error : function() {
+                    $('#addPostModal').modal('hide');
+                    bootbox.alert("请求异常!");
+                }
+            });
+        }
+    }
+
+
+</script>
+#end

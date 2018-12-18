@@ -73,7 +73,7 @@ public class MyConfig extends JFinalConfig {
 		// 所有映射在 MappingKit 中自动化搞定
 		_MappingKit.mapping(arp);
 		arp.setDialect(new NewSqlServerDialect());
-		arp.setShowSql(PropKit.getBoolean("devMode", false));
+		arp.setShowSql(PropKit.use("appConfig.properties").getBoolean("devMode", false));
 		arp.getEngine().setSourceFactory(new ClassPathSourceFactory());
 		me.add(arp);
 	}
