@@ -23,6 +23,7 @@ public enum StorageLoginInfoEnum {
 
 
     InviteStartCount("InviteStartCount",new Integer(0)),
+    // 登录用户登录时信息
     User("User",new JSONObject()),
     SyncKey("SyncKey",new JSONObject()),
     synckey("synckey",new String()),

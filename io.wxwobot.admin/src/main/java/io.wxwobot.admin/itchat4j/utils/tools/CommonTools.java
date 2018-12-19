@@ -189,7 +189,8 @@ public class CommonTools {
 	 * @param k
 	 */
 	public static void emojiFormatter(JSONObject d, String k) {
-		Matcher matcher = getMatcher("<span class=\"emoji emoji(.{1,10})\"></span>", d.getString(k));
+//		Matcher matcher = getMatcher("<span class=\"emoji emoji(.{1,10})\"></span>", d.getString(k));
+		Matcher matcher = getMatcher("<span class=\"emoji emoji(.+?)\"></span>", d.getString(k));
 		StringBuilder sb = new StringBuilder();
 		String content = d.getString(k);
 		int lastStart = 0;

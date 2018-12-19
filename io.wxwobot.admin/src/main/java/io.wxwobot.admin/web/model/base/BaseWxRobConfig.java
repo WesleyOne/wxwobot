@@ -36,15 +36,6 @@ public abstract class BaseWxRobConfig<M extends BaseWxRobConfig<M>> extends Mode
 		return getStr("remark");
 	}
 
-	public M setWhiteList(java.lang.String whiteList) {
-		set("white_list", whiteList);
-		return (M)this;
-	}
-	
-	public java.lang.String getWhiteList() {
-		return getStr("white_list");
-	}
-
 	public M setCreateTime(java.util.Date createTime) {
 		set("create_time", createTime);
 		return (M)this;
@@ -97,6 +88,24 @@ public abstract class BaseWxRobConfig<M extends BaseWxRobConfig<M>> extends Mode
 	
 	public java.lang.Boolean getFromOut() {
 		return get("from_out");
+	}
+
+	public M setDefaultFriend(java.lang.Boolean defaultFriend) {
+		set("default_friend", defaultFriend);
+		return (M)this;
+	}
+	
+	public java.lang.Boolean getDefaultFriend() {
+		return get("default_friend");
+	}
+
+	public M setDefaultGroup(java.lang.Boolean defaultGroup) {
+		set("default_group", defaultGroup);
+		return (M)this;
+	}
+	
+	public java.lang.Boolean getDefaultGroup() {
+		return get("default_group");
 	}
 
 }

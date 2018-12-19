@@ -55,4 +55,11 @@ public enum KeyMsgValueType {
     public static KeyMsgValueType fromValue(String value) {
         return lookup.get(value);
     }
+
+    public boolean equal(KeyMsgValueType type){
+        if (type != null && this.toValue().equals(type.toValue())){
+            return true;
+        }
+        return false;
+    }
 }

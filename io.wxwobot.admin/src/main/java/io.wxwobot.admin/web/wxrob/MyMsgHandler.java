@@ -7,10 +7,11 @@ import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
-import io.wxwobot.admin.web.beans.CoreDefaultConfig;
-import io.wxwobot.admin.web.common.MyCache;
-import io.wxwobot.admin.web.enums.KeyMsgValueType;
-import org.apache.commons.lang3.StringUtils;
+import io.wxwobot.admin.web.constant.ConfigKeys;
+import io.wxwobot.admin.web.model.WxRobConfig;
+import io.wxwobot.admin.web.model.WxRobKeyword;
+
+import java.lang.reflect.Type;
 
 /**
  * @author WesleyOne
@@ -18,51 +19,83 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
 
-    private String coreKey;
+    private String uniqueKey;
     private Core core;
 
-    public MyMsgHandler(String coreKey){
-        this.coreKey = coreKey;
-        this.core = CoreManage.getInstance(coreKey);
+    public MyMsgHandler(String uniqueKey){
+        this.uniqueKey = uniqueKey;
+        this.core = CoreManage.getInstance(uniqueKey);
     }
 
     @Override
     public String textMsgHandle(BaseMsg msg) {
-        CoreDefaultConfig config = MyCache.getCoreConfig(coreKey);
-        if (config.isNoGroup() && msg.isGroupMsg()){
-            return null;
-        }
 
-        if (config.isNoFriend() && !msg.isGroupMsg()){
-            return null;
-        }
-
-        // 关键字业务
         String text = msg.getText();
-        String answer = config.getKeywords().get(text);
+        String fromNickName = msg.getFromNickName();
         String fromUserName = msg.getFromUserName();
-        if (StringUtils.isNotEmpty(answer)){
+        /**
+         * 规则
+         * 1.查看机器人配置开关
+         * 2.优先昵称关键字，没有则查看默认全局关键字
+         * 3.同个关键字只发最新创建的
+         */
 
-            // TODO 以下是为了外接做的测试
-          if (answer.startsWith(KeyMsgValueType.IMG.toValue())){
-                String filePath = answer.substring(KeyMsgValueType.IMG.toValue().length()).trim();
-                MessageTools.sendPicMsgByUserId(fromUserName,filePath,coreKey);
-            }else if (answer.startsWith(KeyMsgValueType.FILE.toValue())) {
-                String filePath = answer.substring(KeyMsgValueType.FILE.toValue().length()).trim();
-                MessageTools.sendFileMsgByUserId(fromUserName, filePath, coreKey);
-//            }else if(answer.startsWith(KeyMsgValueType.CASH.toValue())){
-//                String cashImgFilePath = config.getCashImg();
-//                if (StringUtils.isNotEmpty(cashImgFilePath)){
-//                    MessageTools.sendPicMsgByUserId(fromUserName,cashImgFilePath,coreKey);
-//                }else{
-//                    LOG.warn("未设置收款码：{}",coreKey);
-//                }
-            }else{
-                MessageTools.sendMsgById(answer, fromUserName,coreKey);
+        WxRobConfig robConfig = WxRobConfig.dao.findFirst("SELECT TOP 1 * FROM wx_rob_config WHERE unique_key = ?", uniqueKey);
+        if(robConfig != null && robConfig.getEnable()){
+            // 判断是否要回复
+            boolean isOpen = false;
+            // 判断是群聊的话是否允许回复 昵称关键字
+            if (robConfig.getToGroup() && msg.isGroupMsg()){
+                isOpen = true;
+            }
+            // 判断不是群聊的话是否允许回复 昵称关键字
+            if (!isOpen && robConfig.getToFriend() && !msg.isGroupMsg()){
+                isOpen = true;
+            }
+            if (isOpen){
+                WxRobKeyword robKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, text,fromNickName,msg.isGroupMsg()?1:0);
+                if (sendDataByType(fromUserName, robKeyword)) {
+                    return null;
+                }
+            }
+
+            // 没有昵称关键字，则使用默认关键字
+            isOpen = false;
+            // 判断是群聊的话是否允许回复 昵称关键字
+            if (robConfig.getDefaultGroup() && msg.isGroupMsg()){
+                isOpen = true;
+            }
+            // 判断不是群聊的话是否允许回复 昵称关键字
+            if (!isOpen && robConfig.getDefaultFriend() && !msg.isGroupMsg()){
+                isOpen = true;
+            }
+
+            if (isOpen){
+                WxRobKeyword defaultRobKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, text,ConfigKeys.DEAFAULT_KEYWORD,msg.isGroupMsg()?1:0);
+                if (sendDataByType(fromUserName, defaultRobKeyword)) {
+                    return null;
+                }
             }
         }
-
         return null;
+    }
+
+    private boolean sendDataByType(String fromUserName, WxRobKeyword robKeyword) {
+        String data;
+        String type;
+        if (robKeyword != null){
+            data = robKeyword.getValueData();
+            type = robKeyword.getTypeData();
+            MessageTools.send(fromUserName,uniqueKey,data,type);
+            return true;
+        }
+        return false;
+    }
+
+
+    @Override
+    public void sysMsgHandle(BaseMsg msg) {
+        //TODO 了解下
     }
 
     @Override
@@ -105,10 +138,6 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
     @Override
     public String nameCardMsgHandle(BaseMsg msg) {
         return null;
-    }
-
-    @Override
-    public void sysMsgHandle(BaseMsg msg) {
     }
 
     @Override

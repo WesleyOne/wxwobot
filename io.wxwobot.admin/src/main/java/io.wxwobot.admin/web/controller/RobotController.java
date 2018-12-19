@@ -90,18 +90,20 @@ public class RobotController extends _BaseController {
             return;
         }
         WxRobConfig bean = new WxRobConfig();
-        bean.setWhiteList("")
-                .setRemark(remark)
+        bean.setRemark(remark)
                 .setCreateTime(new Date())
                 .setUpdateTime(new Date())
                 .setToFriend(false)
                 .setToGroup(true)
-                .setFromOut(false);
+                .setFromOut(false)
+                .setDefaultFriend(false)
+                .setDefaultGroup(false);
+
         boolean isSuccess = false;
         int maxTime = 5;
         while (!isSuccess && maxTime >0){
             String uniKey = UUIDShortUtil.generateShortUuid();
-            bean.setUniqueKey(UUIDShortUtil.generateShortUuid());
+            bean.setUniqueKey(uniKey);
             isSuccess = bean.save();
             maxTime--;
         }
@@ -131,8 +133,12 @@ public class RobotController extends _BaseController {
             config.setToFriend(state);
         }else if ("togrp".equals(type)){
             config.setToGroup(state);
-        }else if ("fromout".equals(type)){
+        }else if ("fromout".equals(type)) {
             config.setFromOut(state);
+        }else if ("default_group".equals(type)){
+            config.setDefaultGroup(state);
+        }else if ("default_friend".equals(type)){
+            config.setDefaultFriend(state);
         }else {
             setOperateErr("非法操作");
             render(new JsonRender().forIE());

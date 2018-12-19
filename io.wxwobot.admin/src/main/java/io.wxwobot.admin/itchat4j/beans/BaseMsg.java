@@ -46,10 +46,13 @@ public class BaseMsg implements Serializable {
 	private String mediaId;
 	private String content;
 	private String statusNotifyUserName;
+	// 发送者群昵称
+	private String memberNickname;
 	/** 消息发送者ID **/
 	private String fromUserName;
 	private String oriContent;
 	private String fileSize;
+	private String fromNickName;
 
 	public int getSubMsgType() {
 		return subMsgType;
@@ -289,5 +292,21 @@ public class BaseMsg implements Serializable {
 
 	public void setFileSize(String fileSize) {
 		this.fileSize = fileSize;
+	}
+
+	public String getMemberNickname() {
+		return memberNickname;
+	}
+
+	public void setMemberNickname(String memberNickname) {
+		this.memberNickname = memberNickname;
+	}
+
+	public String getFromNickName() {
+		return fromNickName;
+	}
+
+	public void setFromNickName(String fromNickName) {
+		this.fromNickName = fromNickName;
 	}
 }

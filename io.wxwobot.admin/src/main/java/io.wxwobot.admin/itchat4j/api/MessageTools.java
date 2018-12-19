@@ -1,5 +1,6 @@
 package io.wxwobot.admin.itchat4j.api;
 
+import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
 import io.wxwobot.admin.itchat4j.beans.RecommendInfo;
 import io.wxwobot.admin.itchat4j.core.Core;
@@ -11,6 +12,7 @@ import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.VerifyFriendEnum;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import io.wxwobot.admin.web.enums.KeyMsgValueType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -34,6 +36,25 @@ import java.util.*;
  */
 public class MessageTools implements LogInterface {
 
+	public static String realImgUploadPath = PropKit.use("appConfig.properties").get("realImgUploadPath")+ File.separator;
+	public static String realFileUploadPath = PropKit.use("appConfig.properties").get("realFileUploadPath")+ File.separator;
+
+
+	public static boolean send(String toUserName, String uniqueKey, String data, String type){
+		if (KeyMsgValueType.TEXT.toValue().equals(type)){
+			MessageTools.sendMsgById(data,toUserName,uniqueKey);
+			return true;
+		}else if (KeyMsgValueType.IMG.toValue().equals(type)){
+			MessageTools.sendPicMsgByUserId(toUserName,realImgUploadPath+data,uniqueKey);
+			return true;
+		}else if (KeyMsgValueType.FILE.toValue().equals(type)){
+			MessageTools.sendFileMsgByUserId(toUserName,realFileUploadPath+data,uniqueKey);
+			return true;
+		}
+		return false;
+	}
+
+
 	/**
 	 * 根据UserName发送文本消息
 	 * 
@@ -41,14 +62,14 @@ public class MessageTools implements LogInterface {
 	 * @date 2017年5月4日 下午11:17:38
 	 * @param text
 	 * @param toUserName
-	 * @param coreKey
+	 * @param uniqueKey
 	 */
-	private static void sendMsg(String text, String toUserName, String coreKey) {
+	private static void sendMsg(String text, String toUserName, String uniqueKey) {
 		if (text == null) {
 			return;
 		}
-		LOG.info(String.format("【 %s 】发送消息 %s: %s", coreKey, toUserName, text));
-		webWxSendMsg(1, text, toUserName, coreKey);
+		LOG.info(String.format("【 %s 】发送消息 %s: %s", uniqueKey, toUserName, text));
+		webWxSendMsg(1, text, toUserName, uniqueKey);
 	}
 
 	/**
@@ -58,13 +79,13 @@ public class MessageTools implements LogInterface {
 	 * @date 2017年5月6日 上午11:45:51
 	 * @param text
 	 * @param id
-	 * @param coreKey
+	 * @param uniqueKey
 	 */
-	public static void sendMsgById(String text, String id, String coreKey) {
+	public static void sendMsgById(String text, String id, String uniqueKey) {
 		if (text == null) {
 			return;
 		}
-		sendMsg(text, id, coreKey);
+		sendMsg(text, id, uniqueKey);
 	}
 
 	/**
@@ -75,11 +96,11 @@ public class MessageTools implements LogInterface {
 	 * @param text
 	 * @param nickName
 	 */
-	public static boolean sendMsgByNickName(String text, String nickName, String coreKey) {
+	public static boolean sendMsgByNickName(String text, String nickName, String uniqueKey) {
 		if (nickName != null) {
-			String toUserName = WechatTools.getContactUserNameByNickName(nickName,coreKey);
+			String toUserName = WechatTools.getContactUserNameByNickName(nickName,uniqueKey);
 			if (toUserName != null) {
-				webWxSendMsg(1, text, toUserName, coreKey);
+				webWxSendMsg(1, text, toUserName, uniqueKey);
 				return true;
 			}
 		}
@@ -87,19 +108,27 @@ public class MessageTools implements LogInterface {
 
 	}
 
+	public static boolean sendMsgByNickNameApi(String text, String nickName, String uniqueKey, boolean isGroup){
+		if (isGroup){
+			return sendGroupMsgByNickName(text,nickName,uniqueKey);
+		}else{
+			return sendMsgByNickName(text,nickName,uniqueKey);
+		}
+	}
+
 
 	/**
 	 * 根据NickName发送群文本消息
 	 * @param text
 	 * @param nickName
-	 * @param coreKey
+	 * @param uniqueKey
 	 * @return
 	 */
-	public static boolean sendGroupMsgByNickName(String text, String nickName, String coreKey) {
+	public static boolean sendGroupMsgByNickName(String text, String nickName, String uniqueKey) {
 		if (nickName != null) {
-			String toUserName = WechatTools.getGroupUserNameByNickName(nickName,coreKey);
+			String toUserName = WechatTools.getGroupUserNameByNickName(nickName,uniqueKey);
 			if (toUserName != null) {
-				webWxSendMsg(1, text, toUserName, coreKey);
+				webWxSendMsg(1, text, toUserName, uniqueKey);
 				return true;
 			}
 		}
@@ -116,8 +145,8 @@ public class MessageTools implements LogInterface {
 	 * @param content
 	 * @param toUserName
 	 */
-	public static void webWxSendMsg(int msgType, String content, String toUserName, String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static void webWxSendMsg(int msgType, String content, String toUserName, String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		String url = String.format(URLEnum.WEB_WX_SEND_MSG.getUrl(), core.getLoginInfo().get("url"));
 		Map<String, Object> msgMap = new HashMap<String, Object>(12);
 		msgMap.put("Type", msgType);
@@ -146,8 +175,8 @@ public class MessageTools implements LogInterface {
 	 * @param filePath
 	 * @return
 	 */
-	private static JSONObject webWxUploadMedia(String filePath, String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	private static JSONObject webWxUploadMedia(String filePath, String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		File f = new File(filePath);
 		if (!f.exists() || !f.isFile()) {
 			LOG.info("file is not exist");
@@ -207,6 +236,15 @@ public class MessageTools implements LogInterface {
 		return null;
 	}
 
+
+	public static boolean sendPicMsgByNickNameApi(String nickName, String filePath, String uniqueKey,boolean isGroup){
+		if (isGroup){
+			return sendGroupPicMsgByNickName(nickName, filePath, uniqueKey);
+		}else {
+			return sendPicMsgByNickName(nickName, filePath, uniqueKey);
+		}
+	}
+
 	/**
 	 * 根据NickName发送图片消息
 	 * 
@@ -216,10 +254,25 @@ public class MessageTools implements LogInterface {
 	 * @param filePath
 	 * @return
 	 */
-	public static boolean sendPicMsgByNickName(String nickName, String filePath, String coreKey) {
-		String toUserName = WechatTools.getContactUserNameByNickName(nickName,coreKey);
+	public static boolean sendPicMsgByNickName(String nickName, String filePath, String uniqueKey) {
+		String toUserName = WechatTools.getContactUserNameByNickName(nickName,uniqueKey);
 		if (toUserName != null) {
-			return sendPicMsgByUserId(toUserName, filePath, coreKey);
+			return sendPicMsgByUserId(toUserName, filePath, uniqueKey);
+		}
+		return false;
+	}
+
+	/**
+	 * 根据群的NickName发送图片消息到群
+	 * @param nickName
+	 * @param filePath
+	 * @param uniqueKey
+	 * @return
+	 */
+	public static boolean sendGroupPicMsgByNickName(String nickName, String filePath, String uniqueKey) {
+		String toUserName = WechatTools.getGroupUserNameByNickName(nickName,uniqueKey);
+		if (toUserName != null) {
+			return sendPicMsgByUserId(toUserName, filePath, uniqueKey);
 		}
 		return false;
 	}
@@ -231,15 +284,15 @@ public class MessageTools implements LogInterface {
 	 * @date 2017年5月7日 下午10:34:24
 	 * @param userId
 	 * @param filePath
-	 * @param coreKey
+	 * @param uniqueKey
 	 * @return
 	 */
-	public static boolean sendPicMsgByUserId(String userId, String filePath, String coreKey) {
-		JSONObject responseObj = webWxUploadMedia(filePath, coreKey);
+	public static boolean sendPicMsgByUserId(String userId, String filePath, String uniqueKey) {
+		JSONObject responseObj = webWxUploadMedia(filePath, uniqueKey);
 		if (responseObj != null) {
 			String mediaId = responseObj.getString("MediaId");
 			if (mediaId != null) {
-				return webWxSendMsgImg(userId, mediaId, coreKey);
+				return webWxSendMsgImg(userId, mediaId, uniqueKey);
 			}
 		}
 		return false;
@@ -252,8 +305,8 @@ public class MessageTools implements LogInterface {
 	 * @date 2017年5月7日 下午10:38:55
 	 * @return
 	 */
-	private static boolean webWxSendMsgImg(String userId, String mediaId, String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	private static boolean webWxSendMsgImg(String userId, String mediaId, String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		String url = String.format("%s/webwxsendmsgimg?fun=async&f=json&pass_ticket=%s", core.getLoginInfo().get("url"),
 				core.getLoginInfo().get("pass_ticket"));
 		Map<String, Object> msgMap = new HashMap<String, Object>(8);
@@ -291,7 +344,7 @@ public class MessageTools implements LogInterface {
 	 * @param filePath
 	 * @return
 	 */
-	public static boolean sendFileMsgByUserId(String userId, String filePath, String coreKey) {
+	public static boolean sendFileMsgByUserId(String userId, String filePath, String uniqueKey) {
 		String title = new File(filePath).getName();
 		Map<String, String> data = new HashMap<String, String>(12);
 		data.put("appid", Config.API_WXAPPID);
@@ -300,15 +353,24 @@ public class MessageTools implements LogInterface {
 		data.put("attachid", "");
 		data.put("type", "6"); // APPMSGTYPE_ATTACH
 		data.put("fileext", title.split("\\.")[1]); // 文件后缀
-		JSONObject responseObj = webWxUploadMedia(filePath, coreKey);
+		JSONObject responseObj = webWxUploadMedia(filePath, uniqueKey);
 		if (responseObj != null) {
 			data.put("totallen", responseObj.getString("StartPos"));
 			data.put("attachid", responseObj.getString("MediaId"));
 		} else {
 			LOG.error("sednFileMsgByUserId 错误: ", data);
 		}
-		return webWxSendAppMsg(userId, data, coreKey);
+		return webWxSendAppMsg(userId, data, uniqueKey);
 	}
+
+	public static boolean sendFileMsgByNickNameApi(String nickName, String filePath, String uniqueKey, boolean isGroup){
+		if (isGroup){
+			return sendGroupFileMsgByNickName(nickName,filePath,uniqueKey);
+		}else {
+			return sendFileMsgByNickName(nickName,filePath,uniqueKey);
+		}
+	}
+
 
 	/**
 	 * 根据用户昵称发送文件消息
@@ -319,10 +381,25 @@ public class MessageTools implements LogInterface {
 	 * @param filePath
 	 * @return
 	 */
-	public static boolean sendFileMsgByNickName(String nickName, String filePath, String coreKey) {
-		String toUserName = WechatTools.getContactUserNameByNickName(nickName,coreKey);
+	public static boolean sendFileMsgByNickName(String nickName, String filePath, String uniqueKey) {
+		String toUserName = WechatTools.getContactUserNameByNickName(nickName,uniqueKey);
 		if (toUserName != null) {
-			return sendFileMsgByUserId(toUserName, filePath, coreKey);
+			return sendFileMsgByUserId(toUserName, filePath, uniqueKey);
+		}
+		return false;
+	}
+
+	/**
+	 * 根据群昵称发送文件消息
+	 * @param nickName
+	 * @param filePath
+	 * @param uniqueKey
+	 * @return
+	 */
+	public static boolean sendGroupFileMsgByNickName(String nickName, String filePath, String uniqueKey) {
+		String toUserName = WechatTools.getGroupUserNameByNickName(nickName,uniqueKey);
+		if (toUserName != null) {
+			return sendFileMsgByUserId(toUserName, filePath, uniqueKey);
 		}
 		return false;
 	}
@@ -334,11 +411,11 @@ public class MessageTools implements LogInterface {
 	 * @date 2017年5月10日 上午12:21:28
 	 * @param userId
 	 * @param data
-	 * @param coreKey
+	 * @param uniqueKey
 	 * @return
 	 */
-	private static boolean webWxSendAppMsg(String userId, Map<String, String> data, String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	private static boolean webWxSendAppMsg(String userId, Map<String, String> data, String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		String url = String.format("%s/webwxsendappmsg?fun=async&f=json&pass_ticket=%s", core.getLoginInfo().get("url"),
 				core.getLoginInfo().get("pass_ticket"));
 		String clientMsgId = String.valueOf(System.currentTimeMillis())
@@ -387,8 +464,8 @@ public class MessageTools implements LogInterface {
 	 * @param accept
 	 *            true 接受 false 拒绝
 	 */
-	public static void addFriend(BaseMsg msg, boolean accept, String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static void addFriend(BaseMsg msg, boolean accept, String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		if (!accept) { // 不添加
 			return;
 		}

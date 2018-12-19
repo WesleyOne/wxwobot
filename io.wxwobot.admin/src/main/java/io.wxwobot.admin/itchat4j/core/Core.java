@@ -34,15 +34,15 @@ public class Core {
 //		return instance;
 //	}
 
-	private Core(String coreKey) {
-		this.coreKey = coreKey;
-		this.myHttpClient = HttpClientManage.getInstance(coreKey);
+	private Core(String uniqueKey) {
+		this.uniqueKey = uniqueKey;
+		this.myHttpClient = HttpClientManage.getInstance(uniqueKey);
 	}
 
 	protected static Core getInstance(String coreKey) {
 		return new Core(coreKey);
 	}
-	private String coreKey;
+	private String uniqueKey;
 
 	boolean alive = false;
 	private int memberCount = 0;
@@ -96,8 +96,8 @@ public class Core {
 		};
 	}
 
-	public String getCoreKey() {
-		return coreKey;
+	public String getUniqueKey() {
+		return uniqueKey;
 	}
 
 	public boolean isAlive() {

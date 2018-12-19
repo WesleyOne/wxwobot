@@ -30,7 +30,7 @@
                 </div>
                 <div class="form-group">
                     <label for="toGroup" class="col-sm-2 control-label">群聊/好友:</label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-2">
                         <select class="form-control" id="toGroup" name="toGroup">
                             #set(fg = from.toGroup ?? true)
                             <option value="1" #if(fg) selected #end>群聊</option>
@@ -38,8 +38,13 @@
                         </select>
                     </div>
                     <label for="nickName" class="col-sm-2 control-label">目标微信昵称:</label>
-                    <div class="col-sm-4">
-                        <input type="text" class="form-control" id="nickName" name="nickName" value="#(form.nickName ??)">
+                    <div class="col-sm-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="nickName" name="nickName" value="#(form.nickName ??)">
+                            <span class="input-group-addon">
+                                <input id="useDefaultNickName" type="checkbox" autocomplete="off">机器全局默认
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -126,12 +131,26 @@
         });
 
 
+        $("#useDefaultNickName").on('click',function(){
+            console.log("ckkkk");
+            var flag = $(this).is(':checked');
+            console.log(flag);
+            if(flag){
+                $('#nickName').val('#(io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_KEYWORD)');
+                $('#nickName').attr("readonly",true);
+            }else{
+                $('#nickName').val('');
+                $('#nickName').attr("readonly",false);
+            }
+        });
+
+
         $("#f_upload")
             .fileinput(
                 {
                     language : 'zh', //设置语言
                     uploadUrl : "/upload/file2local", //上传的地址
-                    allowedFileType : ['image', 'text', 'video', 'audio', 'flash'],
+                    allowedFileType : [ 'text', 'video', 'audio', 'flash'],
                     // allowedFileExtensions : [ 'jpg','gif', 'png', 'txt', 'pdf', 'excel', 'doc', 'docx' ],//接收的文件后缀
                     uploadExtraData:{"fn": "#(form.uniqueKey ?? 'err')"},//其他参数
                     uploadAsync : true, //默认异步上传
@@ -281,8 +300,9 @@
                     $('#addPostModal').modal('hide');
                     if (result.code == '00'){
                         bootbox.alert(result.message);
+                        var outKey = result.data;
                         debounce(function () {
-                            window.location.reload();
+                            window.top.location.reload();
                         },1500);
                     } else{
                         bootbox.alert("请求异常:"+result.message);

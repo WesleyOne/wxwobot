@@ -46,10 +46,10 @@ public class KeyWordController extends _BaseController{
             where += " and unique_key = '"+uniqueKey + "' ";
         }
         if (StringUtils.isNotEmpty(keyData)) {
-            where += " and key_data = '" + keyData + "' ";
+            where += " and key_data LIKE '" + keyData + "%' ";
         }
         if (StringUtils.isNotEmpty(nickName)) {
-            where += " and nick_name = '" + nickName + "' ";
+            where += " and nick_name LIKE '" + nickName + "%' ";
         }
         if (KeyMsgValueType.fromValue(typeData) != null){
             where += " and type_data = '" + typeData + "' ";

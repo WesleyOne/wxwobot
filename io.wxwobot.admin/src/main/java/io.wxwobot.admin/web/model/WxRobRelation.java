@@ -7,5 +7,5 @@ import io.wxwobot.admin.web.model.base.BaseWxRobRelation;
  */
 @SuppressWarnings("serial")
 public class WxRobRelation extends BaseWxRobRelation<WxRobRelation> {
-	
+    public static final WxRobRelation dao = new WxRobRelation().dao();
 }

@@ -3,25 +3,24 @@
 #define main()
 <div>
     <form class="form-inline" >
+        <div class="form-group">
+            <label for="search_out_key">外部唯一码</label>
+            <input type="text" class="form-control" id="search_out_key" value="#(search_ok ??)">
+        </div>
         <div class="form-group" >
-            <label for="search_unique_key">唯一码</label>
-            <input type="text" class="form-control" id="search_unique_key" value="#(search_uk)">
+            <label for="search_unique_key">机器唯一码</label>
+            <input type="text" class="form-control" id="search_unique_key" value="#(search_uk ??)">
         </div>
         <div class="form-group">
-            <label for="search_key_data">关键字</label>
-            <input type="text" class="form-control" id="search_key_data"  placeholder="右模糊查询">
+            <label for="search_nick_name">目标昵称</label>
+            <input type="text" class="form-control" id="search_nick_name" placeholder="右模糊查询">
         </div>
         <div class="form-group">
-            <label for="search_nick_name">昵称</label>
-            <input type="text" class="form-control" id="search_nick_name"  placeholder="右模糊查询">
-        </div>
-        <div class="form-group">
-            <label for="search_type_data">类型</label>
-            <select class="form-control" id="search_type_data" aria-describedby="search_type_data">
+            <label for="search_togrp">是否群聊</label>
+            <select class="form-control" id="search_togrp" aria-describedby="search_togrp">
                 <option value="" selected="selected">全部</option>
-                #for( kw : keys)
-                    <option value="#(kw.v)">#(kw.n)</option>
-                #end
+                <option value="1">群聊</option>
+                <option value="0">好友</option>
             </select>
         </div>
         <div class="form-group">
@@ -33,14 +32,6 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="search_togrp">是否群聊</label>
-            <select class="form-control" id="search_togrp" aria-describedby="search_togrp">
-                <option value="" selected="selected">全部</option>
-                <option value="1">群聊</option>
-                <option value="0">好友</option>
-            </select>
-        </div>
-        <div class="form-group">
             <button type="button" class="btn btn-primary" id="searchPost">
                 <span class="glyphicon glyphicon-search" aria-hidden="true"></span>搜索
             </button>
@@ -49,22 +40,7 @@
 </div>
 
 <div class="tableBody">
-    <table id="kw_config" class="table table-hover"></table>
-</div>
-
-<div class="modal fade bs-example-modal-sm" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="qrModalLabel">请尽快用手机微信扫码确认登录</h4>
-            </div>
-            <div class="modal-body">
-                <h5 id="wxqr_nickname" style="color:red"></h5>
-                <img id="wxqrimg" src="#" class="img-thumbnail">
-            </div>
-        </div>
-    </div>
+    <table id="out_config" class="table table-hover"></table>
 </div>
 #end
 
@@ -79,14 +55,14 @@
 <script src="/assets/js/bootstrap-switch.min.js"></script>
 <script type="text/javascript">
 
-    var search_url = "/kw/list";
+    var search_url = "/relate/list";
 
 
     $(document)
         .ready(
             function() {
 
-                $('#kw_config').bootstrapTable(
+                $('#out_config').bootstrapTable(
                         {
                             method : 'post',// post/get
                             contentType : "application/x-www-form-urlencoded",// 'application/json'
@@ -102,10 +78,9 @@
                             queryParams : function queryParams(
                                 params) {
 
+                                params.outKey = $('#search_out_key').val();
                                 params.uniqueKey = $('#search_unique_key').val();
-                                params.keyData = $('#search_key_data').val();
                                 params.nickName = $('#search_nick_name').val();
-                                params.typeData = $('#search_type_data').val();
                                 params.enable = $('#search_enable').val();
                                 params.togrp = $('#search_togrp').val();
 
@@ -127,7 +102,6 @@
                             // 切换试图（table/card）按钮
                             detailView : false,
                             detailFormatter : function(index, row) {// detailView要改成true时,用于查看更多信息,点击列头加号展开
-
                                 return '';
                             },
                             toolbar : "#toolbar",
@@ -140,39 +114,16 @@
                                     valign : 'middle',
                                 },
                                 {
-                                    field : 'uniqueKey',
-                                    title : '唯一机器码',
+                                    field : 'outKey',
+                                    title : '外接唯一码',
                                     align : 'center',
                                     valign : 'middle',
                                 },
                                 {
-                                    field : 'keyData',
-                                    title : '关键字',
+                                    field : 'uniqueKey',
+                                    title : '唯一机器码',
                                     align : 'center',
                                     valign : 'middle',
-                                    formatter : function(value,
-                                                         row, index) {
-                                        var result = "";
-                                        var typeData = row['typeData'];
-                                        if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::TEXT)') {
-                                            result += "<span class='label label-default'>纯文本</span> ";
-                                        } else if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::FILE)'){
-                                            result += "<span class='label label-info'>文件</span> ";
-                                        } else if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::IMG)'){
-                                            result += "<span class='label label-primary'>图片</span> ";
-                                        } else {
-                                            result += "<span class='label label-danger'>未知</span> ";
-                                        }
-                                        var v_len = value.length;
-                                        var max_len = 10;
-                                        if (v_len > max_len){
-                                            result += "<span title='"+value+"'>"+value.substr(0,max_len-3)+"...</span>";
-                                        } else{
-                                            result += "<span>"+value+"</span>"
-                                        }
-
-                                        return result;
-                                    }
                                 },
                                 {
                                     field : 'nickName',
@@ -188,49 +139,15 @@
                                         } else{
                                             result += "<span class='label label-info'>友</span> ";
                                         }
-                                        if (value == '#(io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_KEYWORD)'){
-                                            result += "<span class='label label-danger'>默认</span> ";
-                                        } else{
-                                            var v_len = value.length;
-                                            var max_len = 20;
-                                            if (v_len > max_len){
-                                                result += "<span title='"+value+"'>"+value.substr(0,max_len-3)+"...</span>";
-                                            } else{
-                                                result += "<span>"+value+"</span>"
-                                            }
-                                        }
-
-
-
+                                        result+= value;
                                         return result;
                                     }
                                 },
                                 {
-                                    field : 'valueData',
-                                    title : '回复内容',
+                                    field : 'whiteList',
+                                    title : 'IP白名单',
                                     align : 'center',
                                     valign : 'middle',
-                                    formatter : function(value,
-                                                         row, index) {
-                                        var result = "";
-                                        var typeData = row['typeData'];
-                                        if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::TEXT)') {
-                                            var v_len = value.length;
-                                            var max_len = 20;
-                                            if (v_len > max_len){
-                                                result = "<span title='"+value+"'>"+value.substr(0,max_len-3)+"...</span>";
-                                            } else{
-                                                result = "<span>"+value+"</span>"
-                                            }
-                                        } else if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::FILE)'){
-                                            result = "<a type='button' class='btn btn-default btn-sm' href='#(filedomain)"+value+"'  title='"+value+"' target='_blank'>文件下载</a>";
-                                        } else if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::IMG)'){
-                                            result = "<img src='#(imgdomain)"+value+"' class='img-responsive img-thumbnail' style='max-width: 100px'>";
-                                        } else {
-                                            result = value;
-                                        }
-                                        return result;
-                                    }
                                 },
                                 {
                                     field : 'enable',
@@ -244,7 +161,7 @@
                                         if (value){
                                             diff = " checked ";
                                         }
-                                        result = "<input name='my-checkbox' type='checkbox' data-nickname='"+row['uniqueKey']+":"+row['keyData']+"' data-rid='"+row['id']+"' data-type='enable' data-typename='启禁开关' "+ diff +" >";
+                                        result = "<input name='my-checkbox' type='checkbox' data-rid='"+row['id']+"' data-type='enable' data-typename='启禁开关' "+ diff +" >";
                                         return result;
                                     }
                                 },
@@ -255,17 +172,12 @@
                                     valign : 'middle',
                                     formatter : function(value,
                                                          row, index) {
-                                        var bt_edit = "<a type='button' class='btn btn-primary' href='/kw/editIndex?kid="+row.id+"'>编辑</a>";
+                                        var bt_edit = "<a type='button' class='btn btn-warning' href='/relate/editIndex?kid="+row.id+"'>编辑</a>";
                                         var bt_del =  "<button type='button' class='btn btn-danger' onclick='delPost(\""+row.id+"\")' >删除</button>";
-                                        var dis_add = "";
-                                        if (row.nickName == '#(io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_KEYWORD)'){
-                                            dis_add = " disabled ";
-                                        }
-                                        var add_out = "<a class='btn btn-warning "+dis_add+"' href='/relate/editIndex?uk="+row.uniqueKey+"&nk="+row.nickName+"'  >外接配置</a>"
-                                        var element = "<div class='btn-group btn-group-sm' role='group' aria-label='table_tool'>"
+
+                                        var element = "<div class='btn-group-vertical btn-group-sm' role='group' aria-label='table_tool'>"
                                             + bt_edit
                                             + bt_del
-                                            + add_out
                                             + "</div>"
                                         return element;
                                     }
@@ -282,7 +194,6 @@
                                     onSwitchChange:function(event,state){
                                         var data_map = event.currentTarget.dataset;
                                         var kid = data_map.rid;
-                                        var nickname = data_map.nickname;
                                         var type = data_map.type;
                                         var typename = data_map.typename;
                                         var statename = "关闭";
@@ -293,12 +204,12 @@
                                         if (type == "enable"){
                                             data.enable = state;
                                         }
-                                        bootbox.confirm("<h4>确定 【"+statename+"】【"+nickname+"】的【"+ typename +"】吗？</h4>",function(result){
+                                        bootbox.confirm("<h4>确定 【"+statename+"】编号【"+kid+"】的【"+ typename +"】吗？</h4>",function(result){
                                             if (result){
                                                 $.ajax({
                                                     type: "POST",
                                                     dataType: "json",
-                                                    url:"/kw/editKeyWord",
+                                                    url:"/relate/editRelate",
                                                     data:JSON.stringify(data),
                                                     contentType: "application/json; charset=utf-8",
                                                     success:function(result){
@@ -327,7 +238,7 @@
 
                 // 查询按钮事件
                 $('#searchPost').click(function() {
-                    $('#kw_config').bootstrapTable('refresh', {
+                    $('#out_config').bootstrapTable('refresh', {
                         url : search_url
                     });
                 });
@@ -335,9 +246,9 @@
 
 
     function delPost(kid) {
-        bootbox.confirm("确定删除编号【"+kid+"】的关键字记录吗？",function (result) {
+        bootbox.confirm("确定删除编号【"+kid+"】的外接配置记录吗？",function (result) {
             if (result){
-                $.get("/kw/delKeyWord",
+                $.get("/relate/delRelation",
                     { kid : kid},
                     function(data,status){
                         if (status == 'success'){

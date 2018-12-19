@@ -5,15 +5,13 @@ import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
 import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.MoreConfig;
 import io.wxwobot.admin.itchat4j.utils.enums.MsgCodeEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.MsgTypeEnum;
 import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import io.wxwobot.admin.itchat4j.core.Core;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -53,18 +51,21 @@ public class MsgCenter implements LogInterface {
 				// 群消息与普通消息不同的是在其消息体（Content）中会包含发送者id及":<br/>"消息，这里需要处理一下，去掉多余信息，只保留消息内容
 				if (m.getString("Content").contains("<br/>")) {
 					String content = m.getString("Content").substring(m.getString("Content").indexOf("<br/>") + 5);
+					String sendMemberId = m.getString("Content").substring(0,m.getString("Content").indexOf("<br/>"));
 					m.put("Content", content);
 					m.put("groupMsg", true);
+					m.put(MoreConfig.SEND_MEMBER_ID,sendMemberId);
 				}
 			} else {
+				// TODO 格式化非群聊消息的正文
 				CommonTools.msgFormatter(m, "Content");
 			}
-			if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_TEXT.getCode())) { // words
-				// 文本消息
+			// 是否打印日志
+			boolean isLog = false;
+			// 1.文本消息
+			if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_TEXT.getCode())) {
 				if (m.getString("Url").length() != 0) {
-//					String regEx = "(.+?\\(.+?\\))";
-//					Matcher matcher = CommonTools.getMatcher(regEx, m.getString("Content"));
-
+					// 1.1分享位置
 					String[] contents = m.getString("Content").split(":");
 					String data = "Map";
 					if (contents.length>0) {
@@ -78,49 +79,72 @@ public class MsgCenter implements LogInterface {
 					 */
 
 				} else {
+					// 1.2 普通文本
 					msg.put("Type", MsgTypeEnum.TEXT.getType());
 					msg.put("Text", m.getString("Content"));
 				}
 				m.put("Type", msg.getString("Type"));
 				m.put("Text", msg.getString("Text"));
+				isLog = true;
 			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_IMAGE.getCode())
-					|| m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_EMOTICON.getCode())) { // 图片消息
+					|| m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_EMOTICON.getCode())) {
+				// 2.图片消息
 				m.put("Type", MsgTypeEnum.PIC.getType());
-			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_VOICE.getCode())) { // 语音消息
+			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_VOICE.getCode())) {
+				// 3.语音消息
 				m.put("Type", MsgTypeEnum.VOICE.getType());
-			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_VERIFYMSG.getCode())) {// friends
-				// 好友确认消息
+			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_VERIFYMSG.getCode())) {
+				// 4.好友确认消息
 				// MessageTools.addFriend(core, userName, 3, ticket); // 确认添加好友
 				m.put("Type", MsgTypeEnum.VERIFYMSG.getType());
-
-			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_SHARECARD.getCode())) { // 共享名片
+			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_SHARECARD.getCode())) {
+				// 5.共享名片
 				m.put("Type", MsgTypeEnum.NAMECARD.getType());
-
 			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_VIDEO.getCode())
-					|| m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_MICROVIDEO.getCode())) {// viedo
+					|| m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_MICROVIDEO.getCode())) {
+				// 6.视频
 				m.put("Type", MsgTypeEnum.VIEDO.getType());
-			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_MEDIA.getCode())) { // 分享链接
+			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_MEDIA.getCode())) {
+				// 7.分享链接
 				m.put("Type", MsgTypeEnum.MEDIA.getType());
-			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_STATUSNOTIFY.getCode())) {// phone
-				// init
-				// 微信初始化消息
-
-			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_SYS.getCode())) {// 系统消息
+			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_STATUSNOTIFY.getCode())) {
+				// 微信初始化消息	系统
 				m.put("Type", MsgTypeEnum.SYS.getType());
-			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_RECALLED.getCode())) { // 撤回消息
-
+			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_SYS.getCode())) {
+				// 系统消息	系统
+				m.put("Type", MsgTypeEnum.SYS.getType());
+				isLog = true;
+			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_RECALLED.getCode())) {
+				// 撤回消息	系统
+				m.put("Type", MsgTypeEnum.SYS.getType());
+				isLog = true;
 			} else {
-				LOG.info("Useless msg: {} \n {}",m.getInteger("MsgType"),m.getString("Content"));
+				LOG.error("Useless msg: {} \n {}",m.getInteger("MsgType"),m.getString("Content"));
 			}
+
+			/**
+			 *	日志
+			 *	显示收到的消息
+ 			 */
 			String nickName;
+			String memberName = "";
 			if (m.getBoolean("groupMsg")){
 				nickName = WechatTools.getGroupNickNameByUserName(m.getString("FromUserName"),coreKey);
+
+				if (m.getString(MoreConfig.SEND_MEMBER_ID) != null){
+					// TODO 获取成员昵称
+					memberName = WechatTools.getMemberNickName(m.getString("FromUserName"),coreKey,m.getString(MoreConfig.SEND_MEMBER_ID));
+					m.put(MoreConfig.SEND_MEMBER_NICKNAMW,memberName);
+				}
 			}else {
 				nickName = WechatTools.getContactNickNameByUserName(m.getString("FromUserName"),coreKey);
 			}
-			LOG.info("收到【{}】消息,来自: {} ,内容: {} " ,
+			m.put("fromNickName",nickName);
+			LOG.info("收到【{}】=>【{}】消息,来自: {} _ {} \n 内容: {} " ,
 					MsgCodeEnum.fromCode(m.getInteger("MsgType"))==null?"未知类型"+m.getInteger("MsgType"):MsgCodeEnum.fromCode(m.getInteger("MsgType")).getType(),
+					m.getString("Type"),
 					nickName,
+					memberName,
 					StringUtils.isNotEmpty(m.getString("Content"))?m.getString("Content"):"");
 			result.add(m);
 		}

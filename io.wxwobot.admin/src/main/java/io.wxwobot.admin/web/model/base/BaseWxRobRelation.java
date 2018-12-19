@@ -72,4 +72,13 @@ public abstract class BaseWxRobRelation<M extends BaseWxRobRelation<M>> extends 
 		return get("to_group");
 	}
 
+	public M setWhiteList(java.lang.String whiteList) {
+		set("white_list", whiteList);
+		return (M)this;
+	}
+	
+	public java.lang.String getWhiteList() {
+		return getStr("white_list");
+	}
+
 }

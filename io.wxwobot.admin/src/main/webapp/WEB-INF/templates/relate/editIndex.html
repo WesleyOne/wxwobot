@@ -1,0 +1,176 @@
+#@layout()
+
+#define main()
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">#if(isEdit)修改#else添加#end外接配置</h3>
+    </div>
+    <div class="panel-body">
+        <div class="well" ><span style="color: red">预防封号，谨慎填写内容！</span></div>
+        <div class="well" >
+            <form class="form-horizontal"  role="form" id="addOutForm">
+                <div class="form-group">
+                    <label for="kid" class="col-sm-2 control-label"  #if(!isEdit) hidden #end>记录ID:</label>
+                    <div class="col-sm-2"  #if(!isEdit) hidden #end>
+                        <input type="text" class="form-control" id="kid" name="kid" value="#(form.id ??)" readonly>
+                    </div>
+                    <label for="outKey" class="col-sm-2 control-label" #if(!isEdit) hidden #end>外接唯一码:</label>
+                    <div class="col-sm-2" #if(!isEdit) hidden #end>
+                        <input type="text" class="form-control" id="outKey" readonly value="#(form.outKey ??)">
+                    </div>
+                    <label for="uniqueKey" class="col-sm-2 control-label">机器唯一码:</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" id="uniqueKey" name="uniqueKey" readonly value="#(form.uniqueKey ??)">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="toGroup" class="col-sm-2 control-label">群聊/好友:</label>
+                    <div class="col-sm-2">
+                        <select class="form-control" id="toGroup" name="toGroup">
+                            #set(fg = from.toGroup ?? true)
+                            <option value="1" #if(fg) selected #end>群聊</option>
+                            <option value="0" #if(!fg) selected #end>好友</option>
+                        </select>
+                    </div>
+                    <label for="nickName" class="col-sm-2 control-label">目标微信昵称:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="nickName" name="nickName" value="#(form.nickName ??)">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="whiteList" class="col-sm-2 control-label">IP白名单<span class="badge" title="0.0.0.0表示对所有IP开放，不填相当禁用,多个IP逗号分隔">?</span>:</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" rows="5" maxlength="250" id="whiteList" name="whiteList" style="resize: none;">#(form.whiteList ??)</textarea>
+                    </div>
+                </div>
+        </div>
+    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-8 col-sm-2">
+                        <button type="reset" class="btn btn-default btn-lg btn-block" #if(isEdit) disabled #end>重置</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-primary btn-lg btn-block" onclick="openAddModel()">提交</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="addPostModal" tabindex="-1" role="dialog" aria-labelledby="addPostModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="addPostModalLabel">确认#if(isEdit)修改#else添加#end外接配置</h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addPost()">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+#end
+
+#define css()
+<link href="/assets/css/bootstrapValidator.min.css" rel="stylesheet">
+#end
+
+#define js()
+<script src="/assets/js/bootstrapValidator.min.js"></script>
+<script src="/assets/js/lang/bootstrapValidator_zh_CN.js"></script>
+<script type="text/javascript">
+    var addFormValid;
+
+    $(function () {
+
+        addFormValid = $('#addOutForm').bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                uniqueKey: {
+                    validators: {
+                        notEmpty: {
+                            message: '页面失效,关闭后重新进入'
+                        }
+                    }
+                },
+                toGroup: {
+                    validators: {
+                        notEmpty: {
+                            message: '未选择对象类型'
+                        }
+                    }
+                },
+                nickName: {
+                    validators: {
+                        notEmpty: {
+                            message: '目标昵称不能为空'
+                        }
+                    }
+                }
+            }
+        });
+
+    });
+
+    function openAddModel() {
+        addFormValid.bootstrapValidator('validate');
+        if ( $("#addOutForm").data('bootstrapValidator').isValid()){
+            // 显示模态框
+            $('#addPostModal').modal('show');
+        }
+    }
+
+    // 保存定时器ID
+    var tid = null;
+    //延迟执行函数
+    function debounce(fn,wait){
+        //设定默认的延迟时间
+        wait=wait||500;
+        //清除定时器
+        tid && clearTimeout(tid);
+        //定时器执行
+        tid=setTimeout(fn,wait);
+    };
+
+    function addPost() {
+        addFormValid.bootstrapValidator('validate');
+        if ( $("#addOutForm").data('bootstrapValidator').isValid()){
+
+            var fv = $('#addOutForm').serializeObject();
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/relate/editRelate" ,
+                data: JSON.stringify(fv),
+                contentType: "application/json",
+                success: function (result) {
+                    $('#addPostModal').modal('hide');
+                    if (result.code == '00'){
+                        bootbox.alert(result.message);
+                        debounce(function () {
+                            window.location.reload();
+                        },1500);
+                    } else{
+                        bootbox.alert("请求异常:"+result.message);
+                    }
+                },
+                error : function() {
+                    $('#addPostModal').modal('hide');
+                    bootbox.alert("请求异常!");
+                }
+            });
+        }
+    }
+
+
+</script>
+#end

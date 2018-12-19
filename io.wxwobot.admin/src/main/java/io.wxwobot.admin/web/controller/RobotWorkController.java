@@ -13,7 +13,9 @@ import io.wxwobot.admin.web.utils.FileUtil;
 import io.wxwobot.admin.web.wxrob.MyMsgHandler;
 
 import javax.servlet.ServletOutputStream;
+import javax.swing.plaf.basic.BasicPopupMenuUI;
 import java.io.*;
+import java.util.List;
 
 /**
  * @author WesleyOne
@@ -93,4 +95,25 @@ public class RobotWorkController extends _BaseController {
         WechatTools.logout(coreKey);
         renderJson();
     }
+
+    /**
+     * 获取群昵称
+     */
+    public void getGroupNickNames() throws BaseException {
+        String coreKey = getCoreKey();
+        List<String> groupNickNameList = WechatTools.getGroupNickNameList(coreKey);
+        setData(groupNickNameList);
+        renderJson();
+    }
+
+    /**
+     * 获取好友昵称
+     */
+    public void getContactNickNames() throws BaseException {
+        String coreKey = getCoreKey();
+        List<String> contactNickNameList = WechatTools.getContactNickNameList(coreKey);
+        setData(contactNickNameList);
+        renderJson();
+    }
+
 }

@@ -13,15 +13,15 @@ public class HttpClientManage {
 
     public static HashMap<String,SingleHttpClient> clientMap = new HashMap<>(32);
 
-    public static SingleHttpClient getInstance(String coreKey) {
-        if (StringUtils.isEmpty(coreKey)){
+    public static SingleHttpClient getInstance(String uniqueKey) {
+        if (StringUtils.isEmpty(uniqueKey)){
             return null;
         }
         SingleHttpClient client;
-        if (!clientMap.containsKey(coreKey)){
-            client = SingleHttpClient.getInstance(coreKey);
-            clientMap.put(coreKey, client);
+        if (!clientMap.containsKey(uniqueKey)){
+            client = SingleHttpClient.getInstance(uniqueKey);
+            clientMap.put(uniqueKey, client);
         }
-        return clientMap.get(coreKey);
+        return clientMap.get(uniqueKey);
     }
 }

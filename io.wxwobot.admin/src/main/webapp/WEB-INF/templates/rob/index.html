@@ -9,7 +9,7 @@
         </div>
         <div class="form-group">
             <label for="search_remark">备注</label>
-            <input type="text" class="form-control" id="search_remark" placeholder="模糊查询">
+            <input type="text" class="form-control" id="search_remark" placeholder="右模糊查询">
         </div>
         <div class="form-group">
             <label for="search_enable">是否已启用</label>
@@ -136,17 +136,37 @@
                                         switch(value)
                                         {
                                             case true:
-                                                var btn = "<button type='button' class='btn btn-danger' onclick='wxlogout(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>登陆中,点击退出</button>";
+                                                var btn = "<span class='label label-success'>在线</span> "+"<button type='button' class='btn btn-danger btn-sm' onclick='wxlogout(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>退出</button>";
                                                 result = btn;
                                                 break;
                                             case false:
-                                                var btn = "<button type='button' class='btn btn-primary' onclick='wxloginPost(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>未登录,点击登录</button>";
+                                                var btn = "<span class='label label-default'>下线</span> "+"<button type='button' class='btn btn-primary btn-sm' onclick='wxloginPost(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>登录</button>";
                                                 result = btn;
                                                 break;
                                             default:
                                                 result = "异常";
                                         }
                                         return result;
+                                    }
+                                },
+                                {
+                                    field : 'tool',
+                                    title : '编辑',
+                                    align : 'center',
+                                    valign : 'middle',
+                                    formatter : function(value,
+                                                         row, index) {
+                                        // 此处应根据需求修改
+                                        var bt_remark_edit = "<button type='button' class='btn btn-default' onclick='openEditRemark(\""+row.id+"\",\""+row.remark+"\")'>修改备注</button>";
+                                        var bt_key = "<a  type='button' class='btn btn-info' href='/kw?uk="+row.uniqueKey+"'>查看关键字</a>";
+                                        var bt_add_key = "<a  type='button' class='btn btn-primary' href='/kw/editIndex?uk="+row.uniqueKey+"'>新增关键字</a>";
+
+                                        var element = "<div class='btn-group-vertical btn-group-xs ' role='group'>"
+                                            + bt_remark_edit
+                                            + bt_key
+                                            + bt_add_key
+                                            + "</div>"
+                                        return element;
                                     }
                                 },
                                 {
@@ -178,6 +198,9 @@
                                             diff = " checked ";
                                         }
                                         result = "<input style='width: 130px' name='my-checkbox' type='checkbox' data-nickname='"+row['remark']+"' data-rid='"+row['id']+"' data-type='fromout' data-typename='对外接口开关' "+ diff +" >";
+                                        if (value){
+                                            result += "<br><a class='btn btn-warning btn-xs' href='/relate/editIndex?uk="+row.uniqueKey+"' >授权外接配置</a>";
+                                        }
                                         return result;
                                     }
                                 },
@@ -214,23 +237,35 @@
                                     }
                                 },
                                 {
-                                    field : 'tool',
-                                    title : '编辑',
+                                    field : 'defaultGroup',
+                                    title : '允许所有群使用默认关键字',
                                     align : 'center',
                                     valign : 'middle',
                                     formatter : function(value,
                                                          row, index) {
-                                        // 此处应根据需求修改
-                                        var bt_remark_edit = "<button type='button' class='btn btn-default' onclick='openEditRemark(\""+row.id+"\",\""+row.remark+"\")'>修改备注</button>";
-                                        var bt_key = "<a  type='button' class='btn btn-info' href='/kw?uk="+row.uniqueKey+"'>查看关键字</a>";
-                                        var bt_add_key = "<a  type='button' class='btn btn-primary' href='/kw/editIndex?uk="+row.uniqueKey+"'>新增关键字</a>";
-
-                                        var element = "<div class='btn-group-vertical btn-group-sm' role='group'>"
-                                            + bt_remark_edit
-                                            + bt_key
-                                            + bt_add_key
-                                            + "</div>"
-                                        return element;
+                                        var result = "";
+                                        var diff = "";
+                                        if (value){
+                                            diff = " checked ";
+                                        }
+                                        result = "<input name='my-checkbox' type='checkbox' data-nickname='"+row['remark']+"' data-rid='"+row['id']+"' data-type='default_group' data-typename='全局群聊默认关键字回复开关' "+ diff +" >";
+                                        return result;
+                                    }
+                                },
+                                {
+                                    field : 'defaultFriend',
+                                    title : '允许所有好友使用默认关键字',
+                                    align : 'center',
+                                    valign : 'middle',
+                                    formatter : function(value,
+                                                         row, index) {
+                                        var result = "";
+                                        var diff = "";
+                                        if (value){
+                                            diff = " checked ";
+                                        }
+                                        result = "<input name='my-checkbox' type='checkbox' data-nickname='"+row['remark']+"' data-rid='"+row['id']+"' data-type='default_friend' data-typename='全局好友默认关键字回复开关' "+ diff +" >";
+                                        return result;
                                     }
                                 }
                             ],
@@ -269,8 +304,8 @@
                                                             bootbox.alert(result.message);
                                                         } else{
                                                             bootbox.alert("错误！"+result.message);
-                                                            refreshTable();
                                                         }
+                                                        refreshTable();
                                                     },
                                                     error : function() {
                                                         bootbox.alert("请求异常");
@@ -278,6 +313,7 @@
                                                     }
                                                 });
                                             }else{
+                                                // 防止显示按钮与数据不统一
                                                 refreshTable();
                                             }
 
@@ -336,7 +372,7 @@
         $('#qrModal').modal('show');
         $('#wxqr_nickname').html("请确保使用该微信账号："+name);
         $("#wxqrimg").attr("src", "/robwk/getQr?_r=" + Math.random() + "&_ck=" + key);
-        // 延时请求
+        // 延时请求,确保二维码已经访问到
         debounce(function () {
             $.ajax({
                 url: "/robwk/init?_ck=" + key,
@@ -352,7 +388,7 @@
                     console.log("请求异常")
                 }
             });
-        },1000);
+        },3000);
     };
 
     function clearQrModel() {

@@ -159,6 +159,10 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		return true;
 	}
 
+	/**
+	 * 获取自身登录信息缓存,更新GroupIdList
+	 * @return
+	 */
 	@Override
 	public boolean webWxInit() {
 		core.setAlive(true);

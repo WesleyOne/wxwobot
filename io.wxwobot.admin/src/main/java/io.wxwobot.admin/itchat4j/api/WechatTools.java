@@ -36,8 +36,8 @@ public class WechatTools  implements LogInterface {
 	 * @date 2017年5月4日 下午11:37:20
 	 * @return
 	 */
-	public static List<String> getContactNickNameList(String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static List<String> getContactNickNameList(String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		List<String> contactNickNameList = new ArrayList<String>();
 		for (JSONObject o : core.getContactList()) {
 			contactNickNameList.add(o.getString("NickName"));
@@ -51,8 +51,8 @@ public class WechatTools  implements LogInterface {
 	 * @date 2017年6月26日 下午9:45:39
 	 * @return
 	 */
-	public static List<JSONObject> getContactList(String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static List<JSONObject> getContactList(String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		return core.getContactList();
 	}
 
@@ -63,8 +63,8 @@ public class WechatTools  implements LogInterface {
 	 * @date 2017年5月5日 下午9:55:21
 	 * @return
 	 */
-	public static List<JSONObject> getGroupList(String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static List<JSONObject> getGroupList(String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		return core.getGroupList();
 	}
 
@@ -74,8 +74,8 @@ public class WechatTools  implements LogInterface {
 	 * @date 2017年6月21日 下午11:43:38
 	 * @return
 	 */
-	public static List<String> getGroupNickNameList(String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static List<String> getGroupNickNameList(String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		return core.getGroupNickNameList();
 	}
 
@@ -86,10 +86,28 @@ public class WechatTools  implements LogInterface {
 	 * @param groupId
 	 * @return
 	 */
-	public static JSONArray getMemberListByGroupId(String groupId, String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static JSONArray getMemberListByGroupId(String groupId, String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		return core.getGroupMemeberMap().get(groupId);
 	}
+
+    /**
+     * TODO 获取群成员昵称
+     * @param groupId
+     * @param uniqueKey
+     * @param memberId
+     * @return
+     */
+	public static String getMemberNickName(String groupId, String uniqueKey, String memberId){
+//		JSONArray members = getMemberListByGroupId(groupId, uniqueKey);
+//        int size = members.size();
+//        if (size>0){
+//            for (int i=0;i<size;i++){
+//                members.getJSONObject(i);
+//            }
+//        }
+        return "";
+    }
 
 	/**
 	 * 退出微信
@@ -97,12 +115,12 @@ public class WechatTools  implements LogInterface {
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月18日 下午11:56:54
 	 */
-	public static void logout(String coreKey) {
-		webWxLogout(coreKey);
+	public static void logout(String uniqueKey) {
+		webWxLogout(uniqueKey);
 	}
 
-	private static boolean webWxLogout(String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	private static boolean webWxLogout(String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		String url = String.format(URLEnum.WEB_WX_LOGOUT.getUrl(),
 				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()));
 		List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -123,8 +141,8 @@ public class WechatTools  implements LogInterface {
 		return false;
 	}
 
-	public static void setUserInfo(String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static void setUserInfo(String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		for (JSONObject o : core.getContactList()) {
 			core.getUserInfoMap().put(o.getString("NickName"), o);
 			core.getUserInfoMap().put(o.getString("UserName"), o);
@@ -139,8 +157,8 @@ public class WechatTools  implements LogInterface {
 	 * @param nickName
 	 * @param remName
 	 */
-	public static void remarkNameByNickName(String nickName, String remName, String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static void remarkNameByNickName(String nickName, String remName, String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		String url = String.format(URLEnum.WEB_WX_REMARKNAME.getUrl(), core.getLoginInfo().get("url"),
 				core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
 		Map<String, Object> msgMap = new HashMap<String, Object>(8);
@@ -169,8 +187,8 @@ public class WechatTools  implements LogInterface {
 	 * @date 2017年6月16日 上午12:47:46
 	 * @return
 	 */
-	public static boolean getWechatStatus(String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static boolean getWechatStatus(String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		return core.isAlive();
 	}
 
@@ -181,8 +199,8 @@ public class WechatTools  implements LogInterface {
 	 * @param nickName
 	 * @return
 	 */
-	private static JSONObject getContactByNickNameAndUserName(String userName, String nickName, String coreKey){
-		Core core = CoreManage.getInstance(coreKey);
+	private static JSONObject getContactByNickNameAndUserName(String userName, String nickName, String uniqueKey){
+		Core core = CoreManage.getInstance(uniqueKey);
 		// 通过userName查询
 		if (StringUtils.isNotEmpty(userName) && StringUtils.isEmpty(nickName)){
 			for (JSONObject contact:core.getContactList()){
@@ -218,8 +236,8 @@ public class WechatTools  implements LogInterface {
 	 * @param userName
 	 * @return
 	 */
-	public static String getContactNickNameByUserName(String userName, String coreKey){
-		JSONObject contact = getContactByNickNameAndUserName(userName,null, coreKey);
+	public static String getContactNickNameByUserName(String userName, String uniqueKey){
+		JSONObject contact = getContactByNickNameAndUserName(userName,null, uniqueKey);
 		if (contact!=null && StringUtils.isNotEmpty(contact.getString("NickName"))){
 			return contact.getString("NickName");
 		}else{
@@ -232,8 +250,8 @@ public class WechatTools  implements LogInterface {
 	 * @param nickName
 	 * @return
 	 */
-	public static String getContactUserNameByNickName(String nickName, String coreKey){
-		JSONObject contact = getContactByNickNameAndUserName(null,nickName,coreKey);
+	public static String getContactUserNameByNickName(String nickName, String uniqueKey){
+		JSONObject contact = getContactByNickNameAndUserName(null,nickName,uniqueKey);
 		if (contact!=null && StringUtils.isNotEmpty(contact.getString("UserName"))){
 			return contact.getString("UserName");
 		}else{
@@ -246,8 +264,8 @@ public class WechatTools  implements LogInterface {
 	 * @param userName
 	 * @return
 	 */
-	private static JSONObject getGroupByNickNameAndUserName(String userName, String nickName, String coreKey){
-		Core core = CoreManage.getInstance(coreKey);
+	private static JSONObject getGroupByNickNameAndUserName(String userName, String nickName, String uniqueKey){
+		Core core = CoreManage.getInstance(uniqueKey);
 		// 通过userName查询
 		if (StringUtils.isNotEmpty(userName) && StringUtils.isEmpty(nickName)){
 			for (JSONObject group:core.getGroupList()){
@@ -283,8 +301,8 @@ public class WechatTools  implements LogInterface {
 	 * @param userName
 	 * @return
 	 */
-	public static String getGroupNickNameByUserName(String userName, String coreKey){
-		JSONObject group = getGroupByNickNameAndUserName(userName,null,coreKey);
+	public static String getGroupNickNameByUserName(String userName, String uniqueKey){
+		JSONObject group = getGroupByNickNameAndUserName(userName,null,uniqueKey);
 		if (group!=null && StringUtils.isNotEmpty(group.getString("NickName"))){
 			return group.getString("NickName");
 		}else{
@@ -297,8 +315,8 @@ public class WechatTools  implements LogInterface {
 	 * @param nickName
 	 * @return
 	 */
-	public static String getGroupUserNameByNickName(String nickName, String coreKey){
-		JSONObject group = getGroupByNickNameAndUserName(null,nickName, coreKey);
+	public static String getGroupUserNameByNickName(String nickName, String uniqueKey){
+		JSONObject group = getGroupByNickNameAndUserName(null,nickName, uniqueKey);
 		if (group!=null && StringUtils.isNotEmpty(group.getString("UserName"))){
 			return group.getString("UserName");
 		}else{
