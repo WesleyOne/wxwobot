@@ -1,27 +1,30 @@
 package io.wxwobot.admin.itchat4j.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
 import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.core.MsgCenter;
 import io.wxwobot.admin.itchat4j.service.ILoginService;
-import io.wxwobot.admin.itchat4j.utils.Config;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
 import io.wxwobot.admin.itchat4j.utils.SleepUtils;
-import io.wxwobot.admin.itchat4j.utils.enums.ResultEnum;
-import io.wxwobot.admin.itchat4j.utils.enums.RetCodeEnum;
-import io.wxwobot.admin.itchat4j.utils.enums.StorageLoginInfoEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.SelectorEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.ResultEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.StorageLoginInfoEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.RetCodeEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.parameters.BaseParaEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.parameters.LoginParaEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.parameters.StatusNotifyParaEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.parameters.UUIDParaEnum;
 import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.w3c.dom.Document;
@@ -64,7 +67,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		long startMillis = System.currentTimeMillis();
 		boolean overTime = false;
 		while (!isLogin && !overTime) {
-			SleepUtils.sleep(1000);
 			long millis = System.currentTimeMillis();
 			params.add(new BasicNameValuePair(LoginParaEnum.R.para(), String.valueOf(millis / 1579L)));
 			params.add(new BasicNameValuePair(LoginParaEnum._.para(), String.valueOf(millis)));
@@ -89,6 +91,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 				LOG.error("微信登陆异常！", e);
 			}
 			// 一分钟超时不再请求
+			SleepUtils.sleep(1000);
 			overTime = (millis - startMillis) > 1000 * 60;
 		}
 		return isLogin;
@@ -160,7 +163,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 	}
 
 	/**
-	 * 获取自身登录信息缓存,更新GroupIdList
+	 * 获取自身登录信息缓存
 	 * @return
 	 */
 	@Override
@@ -179,6 +182,9 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap));
 		try {
 			String result = EntityUtils.toString(entity, Consts.UTF_8);
+            /**
+             * @see io.wxwobot.admin.itchat4j.beans.WebWxInit
+             */
 			JSONObject obj = JSON.parseObject(result);
 
 			JSONObject user = obj.getJSONObject(StorageLoginInfoEnum.User.getKey());
@@ -198,29 +204,15 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			String synckey = sb.toString();
 
 			// 1_661706053|2_661706420|3_661706415|1000_1494151022
-			core.getLoginInfo().put(StorageLoginInfoEnum.synckey.getKey(), synckey.substring(0, synckey.length() - 1));// 1_656161336|2_656161626|3_656161313|11_656159955|13_656120033|201_1492273724|1000_1492265953|1001_1492250432|1004_1491805192
+			core.getLoginInfo().put(StorageLoginInfoEnum.synckey.getKey(), synckey.substring(0, synckey.length() - 1));
 			core.setUserName(user.getString("UserName"));
 			core.setNickName(user.getString("NickName"));
 			core.setUserSelf(obj.getJSONObject("User"));
 
-			String chatSet = obj.getString("ChatSet");
-			String[] chatSetArray = chatSet.split(",");
-			for (int i = 0; i < chatSetArray.length; i++) {
-				if (chatSetArray[i].indexOf("@@") != -1) {
-					// 更新GroupIdList
-					core.getGroupIdList().add(chatSetArray[i]); //
-				}
-			}
-			// JSONArray contactListArray = obj.getJSONArray("ContactList");
-			// for (int i = 0; i < contactListArray.size(); i++) {
-			// JSONObject o = contactListArray.getJSONObject(i);
-			// if (o.getString("UserName").indexOf("@@") != -1) {
-			// core.getGroupIdList().add(o.getString("UserName")); //
-			// // 更新GroupIdList
-			// core.getGroupList().add(o); // 更新GroupList
-			// core.getGroupNickNameList().add(o.getString("NickName"));
-			// }
-			// }
+            /**
+             * ContactList此处只是部分，没必要处理，webwxgetcontact接口统一处理
+             * MPSubscribeMsgList 公众号服务号也不处理
+             */
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -270,52 +262,27 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 							if (retcode.equals(RetCodeEnum.UNKOWN.getCode())) {
 								continue;
 							} else if (retcode.equals(RetCodeEnum.SUCCESS.getCode())) {
-								core.setLastNormalRetcodeTime(System.currentTimeMillis()); // 最后收到正常报文时间
-								JSONObject msgObj = webWxSync();
-								if (selector.equals("2")) {    // 有新消息
-									if (msgObj != null) {
-										try {
-											JSONArray msgList = new JSONArray();
-											msgList = msgObj.getJSONArray("AddMsgList");
-											msgList = MsgCenter.produceMsg(msgList, coreKey);
-											for (int j = 0; j < msgList.size(); j++) {
-												BaseMsg baseMsg = JSON.toJavaObject(msgList.getJSONObject(j),
-														BaseMsg.class);
-												core.getMsgList().add(baseMsg);
-											}
-										} catch (Exception e) {
-											LOG.info(e.getMessage());
-										}
-									}
-								} else if (selector.equals("7")) { // 进入或离开聊天界面
-									webWxSync();
-								} else if (selector.equals("4")) { // 有人修改了自己的昵称或你修改了别人的备注
-									continue;
-								} else if (selector.equals("3")) { //
-									continue;
-								} else if (selector.equals("6")) { // 存在删除或者新增的好友信息
-									if (msgObj != null) {
-										try {
-											JSONArray msgList = new JSONArray();
-											msgList = msgObj.getJSONArray("AddMsgList");
-											JSONArray modContactList = msgObj.getJSONArray("ModContactList");
-											msgList = MsgCenter.produceMsg(msgList, coreKey);
-											for (int j = 0; j < msgList.size(); j++) {
-												JSONObject userInfo = modContactList.getJSONObject(j);
-												// 存在主动加好友之后的同步联系人到本地
-												core.getContactList().add(userInfo);
-											}
-										} catch (Exception e) {
-											LOG.info(e.getMessage());
-										}
-									}
+								// 修改最后收到正常报文时间
+								core.setLastNormalRetcodeTime(System.currentTimeMillis());
 
+								if (selector.equals(SelectorEnum.NEW_MSG.getCode())) {
+									// 有新消息
+									processWebwxSync();
+								} else if (selector.equals(SelectorEnum.ENTER_OR_LEAVE_CHAT.getCode())) {
+									processWebwxSync();
+								} else if (selector.equals(SelectorEnum.MOD_CONTACT.getCode())) {
+									processWebwxSync();
+								} else if (selector.equals("3")) {
+									continue;
+								} else if (selector.equals(SelectorEnum.ADD_OR_DEL_CONTACT.getCode())) {
+									processWebwxSync();
+								} else {
+									LOG.error("UNKNOW SELECTOR CODE {}", selector);
 								}
 							} else {
+								LOG.error(RetCodeEnum.fromCode(retcode).getType());
 								break;
 							}
-						} else {
-							JSONObject obj = webWxSync();
 						}
 					} catch (Exception e) {
 						LOG.info(e.getMessage());
@@ -338,7 +305,68 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		thread.start();
 	}
 
-	@Override
+
+
+    private void processWebwxSync(){
+        JSONObject msgObj = webWxSync();
+        if(msgObj != null){
+        	// 用于通知获取详细详细
+        	List<String> modUserName = new ArrayList<>();
+
+            // 处理新消息
+            try {
+                Integer addMsgCount = msgObj.getInteger("AddMsgCount");
+                if (addMsgCount >0 ){
+                    JSONArray msgList = msgObj.getJSONArray("AddMsgList");
+                    msgList = MsgCenter.produceMsg(msgList, coreKey);
+                    for (int j = 0; j < msgList.size(); j++) {
+                        BaseMsg baseMsg = JSON.toJavaObject(msgList.getJSONObject(j),
+                                BaseMsg.class);
+                        core.getMsgList().add(baseMsg);
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+            // 处理修改联系人或群成员
+			try {
+				Integer addMsgCount = msgObj.getInteger("ModContactCount");
+				if (addMsgCount >0 ){
+					JSONArray list = msgObj.getJSONArray("ModContactList");
+					int size = list.size();
+					for (int j = 0; j < size; j++) {
+						String userName = list.getJSONObject(j).getString("UserName");
+						if (userName.startsWith("@@")){
+							CoreManage.addNewGroup(core,list.getJSONObject(j));
+						}else if (userName.startsWith("@")){
+							CoreManage.addNewContact(core,list.getJSONObject(j));
+						}
+						modUserName.add(userName);
+					}
+				}
+			}catch (Exception e){
+				e.printStackTrace();
+			}
+
+			/**
+			 * 貌似已经没用了
+			 * DelContactCount: 0
+			 * DelContactList: []
+			 * ModChatRoomMemberCount: 0
+			 * ModChatRoomMemberList: []
+			 */
+
+			// 获取详细信息
+			WebWxBatchGetContact(modUserName);
+
+        }
+
+
+    }
+
+
+    @Override
 	public void webWxGetContact() {
 		String url = String.format(URLEnum.WEB_WX_GET_CONTACT.getUrl(),
 				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()));
@@ -351,12 +379,11 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			// 查看seq是否为0，0表示好友列表已全部获取完毕，若大于0，则表示好友列表未获取完毕，当前的字节数（断点续传）
 			long seq = 0;
 			long currentTime = 0L;
-			List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+			List<BasicNameValuePair> params = new ArrayList<>();
 			if (fullFriendsJsonList.get("Seq") != null) {
 				seq = fullFriendsJsonList.getLong("Seq");
 				currentTime = System.currentTimeMillis();
 			}
-			core.setMemberCount(fullFriendsJsonList.getInteger(StorageLoginInfoEnum.MemberCount.getKey()));
 			JSONArray member = fullFriendsJsonList.getJSONArray(StorageLoginInfoEnum.MemberList.getKey());
 			// 循环获取seq直到为0，即获取全部好友列表 ==0：好友获取完毕 >0：好友未获取完毕，此时seq为已获取的字节数
 			while (seq > 0) {
@@ -379,24 +406,52 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 				// 累加好友列表
 				member.addAll(fullFriendsJsonList.getJSONArray(StorageLoginInfoEnum.MemberList.getKey()));
 			}
-			core.setMemberCount(member.size());
 			for (Iterator<?> iterator = member.iterator(); iterator.hasNext();) {
+                /**
+                 * @see io.wxwobot.admin.itchat4j.beans.Member
+                 */
 				JSONObject o = (JSONObject) iterator.next();
-				if ((o.getInteger("VerifyFlag") & 8) != 0) { // 公众号/服务号
-					core.getPublicUsersList().add(o);
-				} else if (Config.API_SPECIAL_USER.contains(o.getString("UserName"))) { // 特殊账号
-					core.getSpecialUsersList().add(o);
-				} else if (o.getString("UserName").indexOf("@@") != -1) { // 群聊
-					if (!core.getGroupIdList().contains(o.getString("UserName"))) {
-						core.getGroupNickNameList().add(o.getString("NickName"));
-						core.getGroupIdList().add(o.getString("UserName"));
-						core.getGroupList().add(o);
-					}
-				} else if (o.getString("UserName").equals(core.getUserSelf().getString("UserName"))) { // 自己
-					core.getContactList().remove(o);
-				} else { // 普通联系人
-					core.getContactList().add(o);
-				}
+
+                String userName = o.getString("UserName");
+                if (StringUtils.isEmpty(userName)){
+                    LOG.error("{} 好友列表存在UserName空",core.getUniqueKey());
+                    continue;
+                }
+                /**
+                 * 自己信息不添加
+                 */
+                if (userName.equals(core.getUserName())){
+                    continue;
+                }
+
+                /**
+                 * 开头@@           => 群聊
+                 * 开头@            => VerifyFlag   ->  == 0    好友
+                 *                                  -> != 0    公众号、服务号
+                 * 不含@开头（其他） => 特殊账号
+                 */
+
+				if (userName.startsWith("@@")){
+				    // 群聊
+                    if (!core.getGroupInfoMap().containsKey(o.getString("UserName"))) {
+                        core.getGroupInfoMap().put(o.getString("UserName"),o);
+                        core.getGroupInfoMap().put(o.getString("NickName"),o);
+                        core.getGroupList().add(o);
+                    }
+
+                } else if (userName.startsWith("@")){
+                    Integer verifyFlag = o.getInteger("VerifyFlag");
+                    if (verifyFlag != null && verifyFlag == 0){
+                        // 好友
+                        core.getContactList().add(o);
+                    }else {
+                        // 公众号
+                        core.getPublicUsersList().add(o);
+                    }
+                } else {
+				    // 特殊账号
+                    core.getSpecialUsersList().add(o);
+                }
 			}
 			return;
 		} catch (Exception e) {
@@ -405,37 +460,131 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		return;
 	}
 
+	/**
+	 * 首次加载用
+	 */
 	@Override
 	public void WebWxBatchGetContact() {
 		String url = String.format(URLEnum.WEB_WX_BATCH_GET_CONTACT.getUrl(),
 				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()), System.currentTimeMillis(),
 				core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
 		Map<String, Object> paramMap = core.getParamMap();
-		paramMap.put("Count", core.getGroupIdList().size());
-		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-		for (int i = 0; i < core.getGroupIdList().size(); i++) {
-			HashMap<String, String> map = new HashMap<String, String>();
-			map.put("UserName", core.getGroupIdList().get(i));
+
+		// 为了获取群成员信息
+        int size = core.getGroupList().size();
+        paramMap.put("Count", size);
+		List<Map<String, String>> list = new ArrayList<>();
+		for (int i = 0; i < size; i++) {
+			HashMap<String, String> map = new HashMap<>(4);
+			map.put("UserName", core.getGroupList().get(i).getString("UserName"));
 			map.put("EncryChatRoomId", "");
 			list.add(map);
 		}
-		paramMap.put("List", list);
-		HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap));
-		try {
-			String text = EntityUtils.toString(entity, Consts.UTF_8);
-			JSONObject obj = JSON.parseObject(text);
-			JSONArray contactList = obj.getJSONArray("ContactList");
-			for (int i = 0; i < contactList.size(); i++) { // 群好友
-				if (contactList.getJSONObject(i).getString("UserName").indexOf("@@") > -1) { // 群
-					core.getGroupNickNameList().add(contactList.getJSONObject(i).getString("NickName")); // 更新群昵称列表
-					core.getGroupList().add(contactList.getJSONObject(i)); // 更新群信息（所有）列表
-					core.getGroupMemeberMap().put(contactList.getJSONObject(i).getString("UserName"),
-							contactList.getJSONObject(i).getJSONArray("MemberList")); // 更新群成员Map
-				}
-			}
-		} catch (Exception e) {
-			LOG.info(e.getMessage());
+
+		int batchSize = 50;
+        int num = size / batchSize;
+        if (size%batchSize >0){
+            num += 1;
+        }
+        List<JSONObject> newGroupArray = new ArrayList<>();
+        List<JSONObject> newContactArray = new ArrayList<>();
+        for (int i = 0;i < num;i++){
+            int startNum = i * batchSize;
+            int endNum = (i+1) * batchSize;
+            if (endNum > size){
+                endNum = size;
+            }
+            paramMap.put("List", list.subList(startNum,endNum));
+            HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap));
+            try {
+                String text = EntityUtils.toString(entity, Consts.UTF_8);
+                JSONObject obj = JSON.parseObject(text);
+                JSONArray contactList = obj.getJSONArray("ContactList");
+                for (int j = 0; j < contactList.size(); j++) {
+                	String nickName = contactList.getJSONObject(j).getString("NickName");
+					String userName = contactList.getJSONObject(j).getString("UserName");
+					if (userName.startsWith("@@")) {
+						if (nickName.contains("<span class=\"emoji emoji")){
+							CommonTools.emojiFormatter(contactList.getJSONObject(j), "NickName");
+						}
+                        core.getGroupInfoMap().put(userName,contactList.getJSONObject(j));
+                        core.getGroupInfoMap().put(nickName,contactList.getJSONObject(j));
+                        newGroupArray.add(contactList.getJSONObject(j));
+                    }else if (userName.startsWith("@")){
+						if (nickName.contains("<span class=\"emoji emoji")){
+							CommonTools.emojiFormatter(contactList.getJSONObject(j), "NickName");
+						}
+						core.getUserInfoMap().put(userName,contactList.getJSONObject(j));
+						core.getUserInfoMap().put(nickName,contactList.getJSONObject(j));
+						newContactArray.add(contactList.getJSONObject(j));
+					}
+                }
+            } catch (Exception e) {
+                LOG.info(e.getMessage());
+            }
+        }
+        // 直接刷新群列表,不用比较
+        core.setGroupList(newGroupArray);
+        core.setContactList(newContactArray);
+
+	}
+
+
+	/**
+	 * 过程中零散查询
+	 */
+	public void WebWxBatchGetContact(List<String> userNameList) {
+
+		if (CollectionUtils.isEmpty(userNameList)){
+			return;
 		}
+
+		String url = String.format(URLEnum.WEB_WX_BATCH_GET_CONTACT.getUrl(),
+				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()), System.currentTimeMillis(),
+				core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
+		Map<String, Object> paramMap = core.getParamMap();
+
+		// 为了获取群成员信息
+		List<Map<String, String>> list = new ArrayList<>();
+		int size = userNameList.size();
+		paramMap.put("Count", size);
+		for (int i = 0; i < size; i++) {
+			HashMap<String, String> map = new HashMap<>(4);
+			map.put("UserName", userNameList.get(i));
+			map.put("EncryChatRoomId", "");
+			list.add(map);
+		}
+
+		int batchSize = 50;
+		int num = size / batchSize;
+		if (size%batchSize >0){
+			num += 1;
+		}
+		List<JSONObject> newGroupArray = new ArrayList<>();
+		for (int i = 0;i < num;i++){
+			int startNum = i * batchSize;
+			int endNum = (i+1) * batchSize;
+			if (endNum > size){
+				endNum = size;
+			}
+			paramMap.put("List", list.subList(startNum,endNum));
+			HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap));
+			try {
+				String text = EntityUtils.toString(entity, Consts.UTF_8);
+				JSONObject obj = JSON.parseObject(text);
+				JSONArray contactList = obj.getJSONArray("ContactList");
+				for (int j = 0; j < contactList.size(); j++) {
+					if (contactList.getJSONObject(j).getString("UserName").startsWith("@@")) {
+						CoreManage.addNewGroup(core,contactList.getJSONObject(j));
+					}else if (contactList.getJSONObject(j).getString("UserName").startsWith("@")){
+						CoreManage.addNewContact(core,contactList.getJSONObject(j));
+					}
+				}
+			} catch (Exception e) {
+				LOG.info(e.getMessage());
+			}
+		}
+
 	}
 
 	/**
@@ -624,6 +773,9 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 							+ syncArray.getJSONObject(i).getString("Val") + "|");
 				}
 				String synckey = sb.toString();
+                /**
+                 * 随着每次获取最新消息（参见9）后的返回值更新，其目的在于每次同步消息后记录一个当前同步的状态
+                 */
 				core.getLoginInfo().put(StorageLoginInfoEnum.synckey.getKey(),
 						synckey.substring(0, synckey.length() - 1));// 1_656161336|2_656161626|3_656161313|11_656159955|13_656120033|201_1492273724|1000_1492265953|1001_1492250432|1004_1491805192
 			}
@@ -656,7 +808,31 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		params.add(new BasicNameValuePair("_", String.valueOf(System.currentTimeMillis())));
 		SleepUtils.sleep(7);
 		try {
-			HttpEntity entity = core.getMyHttpClient().doGet(url, params, true, null);
+
+            /**
+             * 以下部分确保cookie存在header中，重启时需要强制手动添加，
+             * TODO 不强制加重启会cookie失效,还不确定问题
+             */
+			String cookieStr = null;
+			if (core != null && core.getMyHttpClient() != null && core.getMyHttpClient().getCookieStore() != null){
+				List<Cookie> cookies = core.getMyHttpClient().getCookieStore().getCookies();
+				StringBuilder sb = new StringBuilder();
+				if (CollectionUtils.isNotEmpty(cookies)){
+					for (Cookie ck: cookies){
+						sb.append(ck.getName()).append('=').append(ck.getValue()).append(';');
+					}
+					cookieStr = sb.toString().substring(0, sb.toString().length() - 1);
+				}
+
+			}
+			Map<String, String> headerMap = null;
+			if (cookieStr != null){
+				headerMap = new HashMap<>(4);
+				headerMap.put("Cookie",cookieStr);
+			}
+			/* ^-----------------------------------------------^ */
+
+			HttpEntity entity = core.getMyHttpClient().doGet(url, params, true, headerMap);
 			if (entity == null) {
 				resultMap.put("retcode", "9999");
 				resultMap.put("selector", "9999");

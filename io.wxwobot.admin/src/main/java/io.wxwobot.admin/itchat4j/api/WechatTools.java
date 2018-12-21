@@ -31,9 +31,7 @@ public class WechatTools  implements LogInterface {
 
 	/**
 	 * 返回好友昵称列表
-	 *
-	 * @author https://github.com/yaphone
-	 * @date 2017年5月4日 下午11:37:20
+	 * @param uniqueKey
 	 * @return
 	 */
 	public static List<String> getContactNickNameList(String uniqueKey) {
@@ -41,14 +39,16 @@ public class WechatTools  implements LogInterface {
 		List<String> contactNickNameList = new ArrayList<String>();
 		for (JSONObject o : core.getContactList()) {
 			contactNickNameList.add(o.getString("NickName"));
+			// 顺便刷下缓存
+			core.getUserInfoMap().put(o.getString("NickName"),o);
+			core.getUserInfoMap().put(o.getString("UserName"),o);
 		}
 		return contactNickNameList;
 	}
 
 	/**
 	 * 返回好友完整信息列表
-	 *
-	 * @date 2017年6月26日 下午9:45:39
+	 * @param uniqueKey
 	 * @return
 	 */
 	public static List<JSONObject> getContactList(String uniqueKey) {
@@ -58,9 +58,7 @@ public class WechatTools  implements LogInterface {
 
 	/**
 	 * 返回群列表
-	 *
-	 * @author https://github.com/yaphone
-	 * @date 2017年5月5日 下午9:55:21
+	 * @param uniqueKey
 	 * @return
 	 */
 	public static List<JSONObject> getGroupList(String uniqueKey) {
@@ -70,43 +68,51 @@ public class WechatTools  implements LogInterface {
 
 	/**
 	 * 获取群NickName列表
-	 *
-	 * @date 2017年6月21日 下午11:43:38
+	 * @param uniqueKey
 	 * @return
 	 */
 	public static List<String> getGroupNickNameList(String uniqueKey) {
 		Core core = CoreManage.getInstance(uniqueKey);
-		return core.getGroupNickNameList();
+		List<String> groupNickNameList = new ArrayList<String>();
+		for (JSONObject o : core.getGroupList()) {
+			groupNickNameList.add(o.getString("NickName"));
+			// 顺便刷下缓存
+			core.getGroupInfoMap().put(o.getString("NickName"),o);
+			core.getGroupInfoMap().put(o.getString("UserName"),o);
+		}
+		return groupNickNameList;
 	}
 
 	/**
-	 * 根据groupIdList返回群成员列表
-	 *
-	 * @date 2017年6月13日 下午11:12:31
+	 * 获取群所有成员信息
 	 * @param groupId
+	 * @param uniqueKey
 	 * @return
 	 */
-	public static JSONArray getMemberListByGroupId(String groupId, String uniqueKey) {
+	public static JSONArray getGroupMemberByGroupId(String groupId, String uniqueKey){
 		Core core = CoreManage.getInstance(uniqueKey);
-		return core.getGroupMemeberMap().get(groupId);
+		return core.getGroupInfoMap().get(groupId).getJSONArray("MemberList");
 	}
 
     /**
-     * TODO 获取群成员昵称
+     * 通过群成员ID获取昵称
      * @param groupId
      * @param uniqueKey
      * @param memberId
      * @return
      */
 	public static String getMemberNickName(String groupId, String uniqueKey, String memberId){
-//		JSONArray members = getMemberListByGroupId(groupId, uniqueKey);
-//        int size = members.size();
-//        if (size>0){
-//            for (int i=0;i<size;i++){
-//                members.getJSONObject(i);
-//            }
-//        }
-        return "";
+		JSONArray members = getGroupMemberByGroupId(groupId, uniqueKey);
+		int size = members.size();
+		if (size > 0){
+			for (int i=0;i<size;i++){
+				JSONObject jsonObject = members.getJSONObject(i);
+				if (memberId.equals(jsonObject.getString("UserName"))){
+					return jsonObject.getString("NickName");
+				}
+			}
+		}
+		return "";
     }
 
 	/**

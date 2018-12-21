@@ -44,6 +44,7 @@
     <pro.upload.cachpath>E:\home\www\images\rob\cache</pro.upload.cachpath>
     <pro.upload.img.realpath>E:\home\www\images\rob\img</pro.upload.img.realpath>
     <pro.upload.file.realpath>E:\home\www\images\rob\file</pro.upload.file.realpath>
+    <pro.upload.reload.realpath>E:\home\www\images\rob\reload</pro.upload.reload.realpath>
     <pro.domain.img>http://devrob.com/img/</pro.domain.img>
     <pro.domain.file>http://devrob.com/file/</pro.domain.file>
   </properties>

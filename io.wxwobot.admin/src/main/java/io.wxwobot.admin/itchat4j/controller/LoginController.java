@@ -8,6 +8,7 @@ import io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl;
 import io.wxwobot.admin.itchat4j.thread.CheckLoginStatusThread;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
 import io.wxwobot.admin.itchat4j.utils.SleepUtils;
+import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
 
 /**
  * 登陆控制器
@@ -115,6 +116,23 @@ public class LoginController  implements LogInterface {
 		}
 	}
 
+    /**
+     * 获取二维码地址
+     * @return
+     */
+	public String login_1_new(){
+        if (core.isAlive()) {
+            throw new RuntimeException("微信已登陆");
+        }
+        LOG.info("1.获取微信UUID");
+        while (loginService.getUuid() == null) {
+            LOG.warn("1.1. 获取微信UUID失败，两秒后重新获取");
+            SleepUtils.sleep(1000);
+        }
+        LOG.info("2. 获取登陆二维码图片");
+        return URLEnum.QRCODE_URL.getUrl() + core.getUuid();
+    }
+
 	public boolean login_2() {
 
 		boolean result = false;
@@ -161,6 +179,7 @@ public class LoginController  implements LogInterface {
 			Thread thread = new Thread(new CheckLoginStatusThread(coreKey));
 			thread.setName("WXROB-STATUS-"+coreKey);
 			thread.start();
+
 		}
 
 		if (!result){

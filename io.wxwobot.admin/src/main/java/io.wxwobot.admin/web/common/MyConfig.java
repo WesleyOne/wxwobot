@@ -9,6 +9,7 @@ import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.template.Engine;
 import com.jfinal.template.source.ClassPathSourceFactory;
+import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.web.interceptor.ExceptionInterceptor;
 import io.wxwobot.admin.web.model._MappingKit;
 import io.wxwobot.admin.web.utils.NewSqlServerDialect;
@@ -98,7 +99,13 @@ public class MyConfig extends JFinalConfig {
 
 	@Override
 	public void afterJFinalStart() {
-
+		LOG.info("登录数据热加载中");
+		CoreManage.reload();
 	}
 
+	@Override
+	public void beforeJFinalStop() {
+		LOG.info("登录数据持久化中");
+		CoreManage.persistence();
+	}
 }

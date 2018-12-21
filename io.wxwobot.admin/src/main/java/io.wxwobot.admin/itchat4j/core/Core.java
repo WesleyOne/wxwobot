@@ -1,11 +1,11 @@
 package io.wxwobot.admin.itchat4j.core;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
 import io.wxwobot.admin.itchat4j.client.HttpClientManage;
 import io.wxwobot.admin.itchat4j.client.SingleHttpClient;
 import io.wxwobot.admin.itchat4j.utils.enums.parameters.BaseParaEnum;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,21 +22,13 @@ import java.util.Map;
  */
 public class Core {
 
-	// 为了多开实例, 取消一下方法
-//	private static Core instance;
+	private Core(){
 
-//	protected static Core getInstance() {
-//		if (instance == null) {
-//			synchronized (Core.class) {
-//				instance = new Core();
-//			}
-//		}
-//		return instance;
-//	}
+	}
 
 	private Core(String uniqueKey) {
 		this.uniqueKey = uniqueKey;
-		this.myHttpClient = HttpClientManage.getInstance(uniqueKey);
+		this.myHttpClient = HttpClientManage.getInstance(this.uniqueKey);
 	}
 
 	protected static Core getInstance(String coreKey) {
@@ -45,36 +37,126 @@ public class Core {
 	private String uniqueKey;
 
 	boolean alive = false;
-	private int memberCount = 0;
 
+    /**
+	 * webWxInit
+     * 登录接口获取
+     */
 	private String indexUrl;
-
 	private String userName;
 	private String nickName;
-	private List<BaseMsg> msgList = new ArrayList<BaseMsg>();
-
-	private JSONObject userSelf; // 登陆账号自身信息
-	private List<JSONObject> memberList = new ArrayList<JSONObject>(); // 好友+群聊+公众号+特殊账号
-	private List<JSONObject> contactList = new ArrayList<JSONObject>();// 好友
-	private List<JSONObject> groupList = new ArrayList<JSONObject>();; // 群
-	private Map<String, JSONArray> groupMemeberMap = new HashMap<String, JSONArray>(); // 群聊成员字典
-	private List<JSONObject> publicUsersList = new ArrayList<JSONObject>();;// 公众号／服务号
-	private List<JSONObject> specialUsersList = new ArrayList<JSONObject>();;// 特殊账号
-	private List<String> groupIdList = new ArrayList<String>(); // 群ID列表
-	private List<String> groupNickNameList = new ArrayList<String>(); // 群NickName列表
-
-	private Map<String, JSONObject> userInfoMap = new HashMap<String, JSONObject>();
-
-	Map<String, Object> loginInfo = new HashMap<String, Object>();
-	// CloseableHttpClient httpClient = HttpClients.createDefault();
-	SingleHttpClient myHttpClient ;
 	String uuid = null;
+	/**
+	 *
+	 * webWxInit
+	 * 		InviteStartCount
+	 * 		SyncKey
+	 * 		synckey 随着每次获取最新消息后的返回值更新，其目的在于每次同步消息后记录一个当前同步的状态
+	 *
+	 */
+	Map<String, Object> loginInfo = new HashMap<String, Object>();
 
-	boolean useHotReload = false;
-	String hotReloadDir = "itchat.pkl";
+	/**
+	 * webWxInit
+     * 登陆账号自身信息
+	 * @see io.wxwobot.admin.itchat4j.beans.User
+     */
+	private JSONObject userSelf;
+
+
+    /**
+     * 初始化/cgi-bin/mmwebwx-bin/webwxinit
+     * 最后一次收到正常retcode的时间，秒为单位
+	 *
+	 * synccheck刷新
+     */
+    private long lastNormalRetcodeTime;
+
+
+	/**
+	 * synccheck和webWxSync容错次数,超过退出
+	 */
 	int receivingRetryCount = 5;
 
-	private long lastNormalRetcodeTime; // 最后一次收到正常retcode的时间，秒为单位
+
+	@JSONField(serialize=false)
+	SingleHttpClient myHttpClient;
+	public SingleHttpClient getMyHttpClient() {
+		return myHttpClient;
+	}
+
+    /**
+     * 初始话时获取联系人时创建
+     * @see io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl#webWxGetContact()
+     */
+	/**
+	 * memberList长度
+	 */
+	@JSONField(serialize=false)
+	private int memberCount = 0;
+    /**
+     * 好友+群聊+公众号+特殊账号
+	 * 注意：不主动插入,获取时通过其他几个账号集合合并
+     */
+	@JSONField(serialize=false)
+	private List<JSONObject> memberList = new ArrayList<JSONObject>();
+    /**
+     * 好友
+     */
+	@JSONField(serialize=false)
+	private List<JSONObject> contactList = new ArrayList<JSONObject>();
+    /**
+     * 群
+     */
+	@JSONField(serialize=false)
+	private List<JSONObject> groupList = new ArrayList<JSONObject>();
+    /**
+     * 公众号/服务号
+     */
+	@Deprecated
+	@JSONField(serialize=false)
+	private List<JSONObject> publicUsersList = new ArrayList<JSONObject>();
+    /**
+     * 特殊账号
+     */
+	@JSONField(serialize=false)
+	private List<JSONObject> specialUsersList = new ArrayList<JSONObject>();
+
+	/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
+
+	/**
+	 * synccheck和webWxSynct添加
+	 *	异步消息存储
+	 */
+	@JSONField(serialize=false)
+	private List<BaseMsg> msgList = new ArrayList<BaseMsg>();
+
+
+
+	/********************************
+	 * 缓存字段,用于快速查找
+	 ********************************/
+
+	/**
+	 * 微信昵称不能超过16位，而ID比较长，干脆用一个Map
+	 * 群ID或昵称,群信息
+	 * 注意:存在相同昵称会后者覆盖前者
+	 *
+	 * WebWxBatchGetContact之后可以通过
+	 * .getJSONArray("MemberList")获取群成员列表
+	 */
+	@JSONField(serialize=false)
+	private Map<String, JSONObject> groupInfoMap = new HashMap<>(1024);
+
+	/**
+	 * 微信昵称不能超过16位，而ID比较长，干脆用一个Map
+	 * 玩家ID或昵称，玩家信息
+	 * 注意:存在相同昵称会后者覆盖前者
+	 */
+	@JSONField(serialize=false)
+	private Map<String, JSONObject> userInfoMap = new HashMap<String, JSONObject>(1024);
+
+	/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
 
 	/**
 	 * 请求参数
@@ -100,6 +182,10 @@ public class Core {
 		return uniqueKey;
 	}
 
+	public void setUniqueKey(String uniqueKey) {
+		this.uniqueKey = uniqueKey;
+	}
+
 	public boolean isAlive() {
 		return alive;
 	}
@@ -108,20 +194,28 @@ public class Core {
 		this.alive = alive;
 	}
 
-	public List<JSONObject> getMemberList() {
-		return memberList;
+	public String getIndexUrl() {
+		return indexUrl;
 	}
 
-	public void setMemberList(List<JSONObject> memberList) {
-		this.memberList = memberList;
+	public void setIndexUrl(String indexUrl) {
+		this.indexUrl = indexUrl;
 	}
 
-	public Map<String, Object> getLoginInfo() {
-		return loginInfo;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setLoginInfo(Map<String, Object> loginInfo) {
-		this.loginInfo = loginInfo;
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
 	}
 
 	public String getUuid() {
@@ -132,28 +226,28 @@ public class Core {
 		this.uuid = uuid;
 	}
 
-	public int getMemberCount() {
-		return memberCount;
+	public Map<String, Object> getLoginInfo() {
+		return loginInfo;
 	}
 
-	public void setMemberCount(int memberCount) {
-		this.memberCount = memberCount;
+	public void setLoginInfo(Map<String, Object> loginInfo) {
+		this.loginInfo = loginInfo;
 	}
 
-	public boolean isUseHotReload() {
-		return useHotReload;
+	public JSONObject getUserSelf() {
+		return userSelf;
 	}
 
-	public void setUseHotReload(boolean useHotReload) {
-		this.useHotReload = useHotReload;
+	public void setUserSelf(JSONObject userSelf) {
+		this.userSelf = userSelf;
 	}
 
-	public String getHotReloadDir() {
-		return hotReloadDir;
+	public long getLastNormalRetcodeTime() {
+		return lastNormalRetcodeTime;
 	}
 
-	public void setHotReloadDir(String hotReloadDir) {
-		this.hotReloadDir = hotReloadDir;
+	public void setLastNormalRetcodeTime(long lastNormalRetcodeTime) {
+		this.lastNormalRetcodeTime = lastNormalRetcodeTime;
 	}
 
 	public int getReceivingRetryCount() {
@@ -164,28 +258,17 @@ public class Core {
 		this.receivingRetryCount = receivingRetryCount;
 	}
 
-	public SingleHttpClient getMyHttpClient() {
-		return myHttpClient;
+	public int getMemberCount() {
+		return getContactList().size()+getGroupList().size()+getPublicUsersList().size()+getSpecialUsersList().size();
 	}
 
-	public List<BaseMsg> getMsgList() {
-		return msgList;
-	}
-
-	public void setMsgList(List<BaseMsg> msgList) {
-		this.msgList = msgList;
-	}
-
-	public void setMyHttpClient(SingleHttpClient myHttpClient) {
-		this.myHttpClient = myHttpClient;
-	}
-
-	public List<String> getGroupIdList() {
-		return groupIdList;
-	}
-
-	public void setGroupIdList(List<String> groupIdList) {
-		this.groupIdList = groupIdList;
+	public List<JSONObject> getMemberList() {
+		List<JSONObject> memberList = new ArrayList<>();
+		memberList.addAll(this.getContactList());
+		memberList.addAll(this.getGroupList());
+		memberList.addAll(this.getPublicUsersList());
+		memberList.addAll(this.getSpecialUsersList());
+		return memberList;
 	}
 
 	public List<JSONObject> getContactList() {
@@ -220,28 +303,20 @@ public class Core {
 		this.specialUsersList = specialUsersList;
 	}
 
-	public String getUserName() {
-		return userName;
+	public List<BaseMsg> getMsgList() {
+		return msgList;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setMsgList(List<BaseMsg> msgList) {
+		this.msgList = msgList;
 	}
 
-	public String getNickName() {
-		return nickName;
+	public Map<String, JSONObject> getGroupInfoMap() {
+		return groupInfoMap;
 	}
 
-	public void setNickName(String nickName) {
-		this.nickName = nickName;
-	}
-
-	public JSONObject getUserSelf() {
-		return userSelf;
-	}
-
-	public void setUserSelf(JSONObject userSelf) {
-		this.userSelf = userSelf;
+	public void setGroupInfoMap(Map<String, JSONObject> groupInfoMap) {
+		this.groupInfoMap = groupInfoMap;
 	}
 
 	public Map<String, JSONObject> getUserInfoMap() {
@@ -250,37 +325,5 @@ public class Core {
 
 	public void setUserInfoMap(Map<String, JSONObject> userInfoMap) {
 		this.userInfoMap = userInfoMap;
-	}
-
-	public synchronized long getLastNormalRetcodeTime() {
-		return lastNormalRetcodeTime;
-	}
-
-	public synchronized void setLastNormalRetcodeTime(long lastNormalRetcodeTime) {
-		this.lastNormalRetcodeTime = lastNormalRetcodeTime;
-	}
-
-	public List<String> getGroupNickNameList() {
-		return groupNickNameList;
-	}
-
-	public void setGroupNickNameList(List<String> groupNickNameList) {
-		this.groupNickNameList = groupNickNameList;
-	}
-
-	public Map<String, JSONArray> getGroupMemeberMap() {
-		return groupMemeberMap;
-	}
-
-	public void setGroupMemeberMap(Map<String, JSONArray> groupMemeberMap) {
-		this.groupMemeberMap = groupMemeberMap;
-	}
-
-	public String getIndexUrl() {
-		return indexUrl;
-	}
-
-	public void setIndexUrl(String indexUrl) {
-		this.indexUrl = indexUrl;
 	}
 }

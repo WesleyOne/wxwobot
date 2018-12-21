@@ -1,5 +1,7 @@
 package io.wxwobot.admin.itchat4j.client;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONField;
 import io.wxwobot.admin.itchat4j.utils.Config;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -36,7 +38,7 @@ public class SingleHttpClient {
 
     private CookieStore cookieStore;
 
-    private String coreKey;
+    private String uniqueKey;
 
     public String getCookie(String name) {
         List<Cookie> cookies = cookieStore.getCookies();
@@ -49,19 +51,20 @@ public class SingleHttpClient {
 
     }
 
-    private SingleHttpClient(){
-        this.cookieStore = new BasicCookieStore();
-        // 将CookieStore设置到httpClient中
+    private SingleHttpClient(String uniqueKey, CookieStore outCookieStore){
+        if (outCookieStore == null){
+            outCookieStore = new BasicCookieStore();
+        }
+        this.cookieStore = outCookieStore;
         httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
     }
 
-    private SingleHttpClient(String coreKey){
-        this();
-        this.coreKey = coreKey;
+    private SingleHttpClient(String uniqueKey){
+        this(uniqueKey,null);
     }
 
-    public static SingleHttpClient getInstance(String coreKey){
-        return new SingleHttpClient(coreKey);
+    public static SingleHttpClient getInstance(String coreKey,CookieStore outCookieStore){
+        return new SingleHttpClient(coreKey,outCookieStore);
     }
 
     /**
@@ -82,6 +85,7 @@ public class SingleHttpClient {
             if (params != null) {
                 String paramStr = EntityUtils.toString(new UrlEncodedFormEntity(params, Consts.UTF_8));
                 httpGet = new HttpGet(url + "?" + paramStr);
+                System.out.println(url + "?" + paramStr);
             } else {
                 httpGet = new HttpGet(url);
             }
@@ -95,6 +99,7 @@ public class SingleHttpClient {
                 for (Map.Entry<String, String> entry : entries) {
                     httpGet.setHeader(entry.getKey(), entry.getValue());
                 }
+                System.out.println(JSON.toJSONString(headerMap));
             }
             CloseableHttpResponse response = httpClient.execute(httpGet);
             entity = response.getEntity();
@@ -103,7 +108,6 @@ public class SingleHttpClient {
         } catch (IOException e) {
             logger.info(e.getMessage());
         }
-
         return entity;
     }
 
@@ -132,7 +136,6 @@ public class SingleHttpClient {
         } catch (IOException e) {
             logger.info(e.getMessage());
         }
-
         return entity;
     }
 
@@ -160,4 +163,20 @@ public class SingleHttpClient {
         return entity;
     }
 
+
+    public CookieStore getCookieStore() {
+        return this.cookieStore;
+    }
+
+    public void setCookieStore(CookieStore cookieStore) {
+        this.cookieStore = cookieStore;
+    }
+
+    public String getUniqueKey() {
+        return uniqueKey;
+    }
+
+    public void setUniqueKey(String uniqueKey) {
+        this.uniqueKey = uniqueKey;
+    }
 }

@@ -1,5 +1,6 @@
 package io.wxwobot.admin.web.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.itchat4j.Wechat;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
@@ -8,6 +9,7 @@ import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
 import io.wxwobot.admin.itchat4j.utils.SleepUtils;
+import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
 import io.wxwobot.admin.web.base.BaseException;
 import io.wxwobot.admin.web.utils.FileUtil;
 import io.wxwobot.admin.web.wxrob.MyMsgHandler;
@@ -46,25 +48,27 @@ public class RobotWorkController extends _BaseController {
 
         String qrPath = realUploadPath;
         LoginController login = new LoginController(coreKey);
-        login.login_1(qrPath);
-
+        String qrSrc = login.login_1_new();
+        setData(qrSrc);
+        renderJson();
+//        login.login_1(qrPath);
         // TODO 两次流处理,需要优化
 
-        File file = new File(realUploadPath+ File.separator +"QR.jpg");
-        if (file.exists()&&file.isFile()) {
-            InputStream inputStream = new FileInputStream(file);
-            ServletOutputStream outputStream = getResponse().getOutputStream();
-            int length = -1;
-            byte[] buffer = new byte[1024];
-            while ((length=inputStream.read(buffer, 0, 1024))!=-1) {
-                outputStream.write(buffer,0,length);
-            }
-
-            inputStream.close();
-            outputStream.flush();
-            outputStream.close();
-        }
-        renderNull();
+//        File file = new File(realUploadPath+ File.separator +"QR.jpg");
+//        if (file.exists()&&file.isFile()) {
+//            InputStream inputStream = new FileInputStream(file);
+//            ServletOutputStream outputStream = getResponse().getOutputStream();
+//            int length = -1;
+//            byte[] buffer = new byte[1024];
+//            while ((length=inputStream.read(buffer, 0, 1024))!=-1) {
+//                outputStream.write(buffer,0,length);
+//            }
+//
+//            inputStream.close();
+//            outputStream.flush();
+//            outputStream.close();
+//        }
+//        renderNull();
     }
 
 
@@ -113,6 +117,20 @@ public class RobotWorkController extends _BaseController {
         String coreKey = getCoreKey();
         List<String> contactNickNameList = WechatTools.getContactNickNameList(coreKey);
         setData(contactNickNameList);
+        renderJson();
+    }
+
+    public void getGroups() throws BaseException {
+        String coreKey = getCoreKey();
+        List<JSONObject> groupList = WechatTools.getGroupList(coreKey);
+        setData(groupList);
+        renderJson();
+    }
+
+    public void getContacts() throws BaseException {
+        String coreKey = getCoreKey();
+        List<JSONObject> contactList = WechatTools.getContactList(coreKey);
+        setData(contactList);
         renderJson();
     }
 

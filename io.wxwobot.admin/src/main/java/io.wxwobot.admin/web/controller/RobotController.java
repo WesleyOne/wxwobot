@@ -70,7 +70,7 @@ public class RobotController extends _BaseController {
      * 机器人页面
      */
     public void addIndex(){
-        setAttr("active","addrob");
+        setAttr("active","rob");
         renderTemplate("addIndex.html");
     }
 

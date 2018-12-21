@@ -26,6 +26,9 @@
 </div>
 
 <div class="tableBody">
+    <div id="toolbar">
+        <a type="button" class="btn btn-primary" href="/rob/addIndex"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>添加机器人</a>
+    </div>
     <table id="rob_config" class="table table-hover" ></table>
 </div>
 
@@ -38,7 +41,7 @@
             </div>
             <div class="modal-body">
                 <h5 id="wxqr_nickname" style="color:red"></h5>
-                <img id="wxqrimg" src="#" class="img-thumbnail">
+                <img id="wxqrimg" src="/assets/fileinput/img/loading.gif" class="img-thumbnail">
             </div>
         </div>
     </div>
@@ -121,7 +124,7 @@
                                 },
                                 {
                                     field : 'remark',
-                                    title : '微信号',
+                                    title : '备注',
                                     align : 'center',
                                     valign : 'middle',
                                 },
@@ -206,7 +209,7 @@
                                 },
                                 {
                                     field : 'toGroup',
-                                    title : '允许回复群消息',
+                                    title : '回复群',
                                     align : 'center',
                                     valign : 'middle',
                                     formatter : function(value,
@@ -222,7 +225,7 @@
                                 },
                                 {
                                     field : 'toFriend',
-                                    title : '允许回复好友消息',
+                                    title : '回复好友',
                                     align : 'center',
                                     valign : 'middle',
                                     formatter : function(value,
@@ -238,7 +241,7 @@
                                 },
                                 {
                                     field : 'defaultGroup',
-                                    title : '允许所有群使用默认关键字',
+                                    title : '默认回复群',
                                     align : 'center',
                                     valign : 'middle',
                                     formatter : function(value,
@@ -254,7 +257,7 @@
                                 },
                                 {
                                     field : 'defaultFriend',
-                                    title : '允许所有好友使用默认关键字',
+                                    title : '默认回复好友',
                                     align : 'center',
                                     valign : 'middle',
                                     formatter : function(value,
@@ -371,29 +374,42 @@
         // 弹窗二维码
         $('#qrModal').modal('show');
         $('#wxqr_nickname').html("请确保使用该微信账号："+name);
-        $("#wxqrimg").attr("src", "/robwk/getQr?_r=" + Math.random() + "&_ck=" + key);
-        // 延时请求,确保二维码已经访问到
-        debounce(function () {
-            $.ajax({
-                url: "/robwk/init?_ck=" + key,
-                success: function (result) {
-                    if (result.code == '00'){
-                        $('#qrModal').modal('hide');
-                        refreshTable();
-                    }else{
-                        bootbox.alert("错误！"+result.message);
-                    }
-                },
-                error: function () {
-                    console.log("请求异常")
+        $.ajax({
+            url: "/robwk/getQr?_r=" + Math.random() + "&_ck=" + key,
+            success: function (result) {
+                if (result.code == '00'){
+                    $("#wxqrimg").attr("src", result.data);
+                    wxinit(key);
+                }else{
+                    bootbox.alert("错误！"+result.message);
                 }
-            });
-        },3000);
+            },
+            error: function () {
+                console.log("请求异常")
+            }
+        });
+
     };
 
+    function wxinit(key) {
+        $.ajax({
+            url: "/robwk/init?_ck=" + key,
+            success: function (result) {
+                if (result.code == '00'){
+                    $('#qrModal').modal('hide');
+                    refreshTable();
+                }else{
+                    bootbox.alert("错误！"+result.message);
+                }
+            },
+            error: function () {
+                console.log("请求异常")
+            }
+        });
+    }
+
     function clearQrModel() {
-        $("#wxqrimg").attr("src", "#");
-        $("#loginwx_tip").html("");
+        $("#wxqrimg").attr("src", "/assets/fileinput/img/loading.gif");
         $("#wxqr_nickname").html("");
     }
 

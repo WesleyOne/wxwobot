@@ -13,6 +13,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,17 +38,20 @@ public class MsgCenter implements LogInterface {
 	public static JSONArray produceMsg(JSONArray msgList, String coreKey) {
 		Core core = CoreManage.getInstance(coreKey);
 		JSONArray result = new JSONArray();
+		// 用于暂存未知群ID,最后调用webwxbatchgetcontact获取
+		List<String> unknowGroup = new ArrayList<>();
+
 		for (int i = 0; i < msgList.size(); i++) {
 			JSONObject msg = new JSONObject();
 			JSONObject m = msgList.getJSONObject(i);
 			m.put("groupMsg", false);// 是否是群消息
 			if (m.getString("FromUserName").contains("@@") || m.getString("ToUserName").contains("@@")) { // 群聊消息
 				if (m.getString("FromUserName").contains("@@")
-						&& !core.getGroupIdList().contains(m.getString("FromUserName"))) {
-					core.getGroupIdList().add((m.getString("FromUserName")));
+						&& !core.getGroupInfoMap().containsKey(m.getString("FromUserName"))) {
+                    unknowGroup.add(m.getString("FromUserName"));
 				} else if (m.getString("ToUserName").contains("@@")
-						&& !core.getGroupIdList().contains(m.getString("ToUserName"))) {
-					core.getGroupIdList().add((m.getString("ToUserName")));
+						&& !core.getGroupInfoMap().containsKey(m.getString("ToUserName"))) {
+                    unknowGroup.add(m.getString("ToUserName"));
 				}
 				// 群消息与普通消息不同的是在其消息体（Content）中会包含发送者id及":<br/>"消息，这里需要处理一下，去掉多余信息，只保留消息内容
 				if (m.getString("Content").contains("<br/>")) {
@@ -56,8 +61,10 @@ public class MsgCenter implements LogInterface {
 					m.put("groupMsg", true);
 					m.put(MoreConfig.SEND_MEMBER_ID,sendMemberId);
 				}
-			} else {
-				// TODO 格式化非群聊消息的正文
+			}
+
+			// 存在emoji就转换
+			if (m.getString("Content").contains("emoji emoji")){
 				CommonTools.msgFormatter(m, "Content");
 			}
 			// 是否打印日志
