@@ -48,7 +48,20 @@
     <pro.domain.img>http://devrob.com/img/</pro.domain.img>
     <pro.domain.file>http://devrob.com/file/</pro.domain.file>
   </properties>
-
+  <profiles>
+    <profile>
+      <id>mac</id>
+      <properties>
+        <log.file.path>/Users/wesley/output/logs/hyagent/wxrobot</log.file.path>
+        <pro.cookie.domain>localhost</pro.cookie.domain>
+        <pro.upload.cachpath>/Users/wesley/output/images/rob/cache</pro.upload.cachpath>
+        <pro.upload.img.realpath>/Users/wesley/output/images/rob/img</pro.upload.img.realpath>
+        <pro.upload.file.realpath>/Users/wesley/output/images/rob/file</pro.upload.file.realpath>
+        <pro.domain.img>http://devrob.com/img/</pro.domain.img>
+        <pro.domain.file>http://devrob.com/file/</pro.domain.file>
+      </properties>
+    </profile>
+  </profiles>
 
   <dependencies>
     <dependency>
