@@ -82,7 +82,7 @@ public class Core {
 	@JSONField(serialize=false)
 	SingleHttpClient myHttpClient;
 	public SingleHttpClient getMyHttpClient() {
-		return myHttpClient;
+		return HttpClientManage.getInstance(uniqueKey);
 	}
 
     /**

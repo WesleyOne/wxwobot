@@ -91,8 +91,12 @@ public class WechatTools  implements LogInterface {
 	 */
 	public static JSONArray getGroupMemberByGroupId(String groupId, String uniqueKey){
 		Core core = CoreManage.getInstance(uniqueKey);
-		return core.getGroupInfoMap().get(groupId).getJSONArray("MemberList");
-	}
+        JSONObject jsonObject = core.getGroupInfoMap().get(groupId);
+        if (jsonObject == null){
+            return new JSONArray();
+        }
+        return jsonObject.getJSONArray("MemberList");
+    }
 
     /**
      * 通过群成员ID获取昵称
@@ -209,7 +213,7 @@ public class WechatTools  implements LogInterface {
 		Core core = CoreManage.getInstance(uniqueKey);
 		// 通过userName查询
 		if (StringUtils.isNotEmpty(userName) && StringUtils.isEmpty(nickName)){
-			for (JSONObject contact:core.getContactList()){
+		    for (JSONObject contact:core.getContactList()){
 				if (userName.equals(contact.getString("UserName"))){
 					return contact;
 				}
@@ -243,7 +247,7 @@ public class WechatTools  implements LogInterface {
 	 * @return
 	 */
 	public static String getContactNickNameByUserName(String userName, String uniqueKey){
-		JSONObject contact = getContactByNickNameAndUserName(userName,null, uniqueKey);
+        JSONObject contact = getContactByNickNameAndUserName(userName,null, uniqueKey);
 		if (contact!=null && StringUtils.isNotEmpty(contact.getString("NickName"))){
 			return contact.getString("NickName");
 		}else{

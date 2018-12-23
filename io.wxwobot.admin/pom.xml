@@ -57,8 +57,11 @@
         <pro.upload.cachpath>/Users/wesley/output/images/rob/cache</pro.upload.cachpath>
         <pro.upload.img.realpath>/Users/wesley/output/images/rob/img</pro.upload.img.realpath>
         <pro.upload.file.realpath>/Users/wesley/output/images/rob/file</pro.upload.file.realpath>
-        <pro.domain.img>http://devrob.com/img/</pro.domain.img>
-        <pro.domain.file>http://devrob.com/file/</pro.domain.file>
+        <pro.upload.reload.realpath>/Users/wesley/output/images/rob/reload</pro.upload.reload.realpath>
+        <!--<pro.domain.img>http://devrob.com/img/</pro.domain.img>-->
+        <!--<pro.domain.file>http://devrob.com/file/</pro.domain.file>-->
+        <pro.domain.img>file://Users/wesley/output/images/rob/img/</pro.domain.img>
+        <pro.domain.file>file://Users/wesley/output/images/rob/file/</pro.domain.file>
       </properties>
     </profile>
   </profiles>

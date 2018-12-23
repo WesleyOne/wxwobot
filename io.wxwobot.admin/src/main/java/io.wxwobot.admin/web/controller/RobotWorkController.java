@@ -8,6 +8,7 @@ import io.wxwobot.admin.itchat4j.controller.LoginController;
 import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
+import io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl;
 import io.wxwobot.admin.itchat4j.utils.SleepUtils;
 import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
 import io.wxwobot.admin.web.base.BaseException;
@@ -133,5 +134,22 @@ public class RobotWorkController extends _BaseController {
         setData(contactList);
         renderJson();
     }
+
+    public void getCore() throws BaseException {
+        String coreKey = getCoreKey();
+        setData(CoreManage.getInstance(coreKey));
+        renderJson();
+    }
+
+    /**
+     * 模拟个环节
+     */
+    public void gct() throws BaseException {
+        String coreKey = getCoreKey();
+        LoginServiceImpl loginService = new LoginServiceImpl(coreKey);
+        loginService.webWxGetContact();
+        renderJson();
+    }
+
 
 }

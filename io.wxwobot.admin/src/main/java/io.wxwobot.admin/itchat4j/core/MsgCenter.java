@@ -140,8 +140,8 @@ public class MsgCenter implements LogInterface {
 
 				if (m.getString(MoreConfig.SEND_MEMBER_ID) != null){
 					// TODO 获取成员昵称
-					memberName = WechatTools.getMemberNickName(m.getString("FromUserName"),coreKey,m.getString(MoreConfig.SEND_MEMBER_ID));
-					m.put(MoreConfig.SEND_MEMBER_NICKNAMW,memberName);
+//					memberName = WechatTools.getMemberNickName(m.getString("FromUserName"),coreKey,m.getString(MoreConfig.SEND_MEMBER_ID));
+//					m.put(MoreConfig.SEND_MEMBER_NICKNAMW,memberName);
 				}
 			}else {
 				nickName = WechatTools.getContactNickNameByUserName(m.getString("FromUserName"),coreKey);

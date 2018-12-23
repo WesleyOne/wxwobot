@@ -150,6 +150,7 @@ public class CoreManage implements LogInterface {
 //                                }
                                 if (core.isAlive()){
                                     String uniqueKey = core.getUniqueKey();
+                                    CoreManage.coreMap.put(uniqueKey,core);
                                     JSONArray cookiesJsonArray = jsonObject.getJSONArray("cookies");
                                     int arraySize = cookiesJsonArray.size();
                                     if (arraySize<=0){
@@ -188,6 +189,7 @@ public class CoreManage implements LogInterface {
                                     LOG.info("5. 登陆成功，微信初始化");
                                     if (!loginService.webWxInit()) {
                                         LOG.info("6. 微信初始化异常");
+                                        core.setAlive(false);
                                         continue;
                                     }
 
@@ -247,7 +249,7 @@ public class CoreManage implements LogInterface {
         core.getGroupList().removeIf(group->userName.equals(group.getString("UserName")));
 
         core.getGroupList().add(jsonObject);
-        core.getGroupInfoMap().put(nickName, jsonObject);
+        core.getGroupInfoMap().put(jsonObject.getString("NickName"), jsonObject);
         core.getGroupInfoMap().put(userName, jsonObject);
     }
 
@@ -268,7 +270,7 @@ public class CoreManage implements LogInterface {
         core.getContactList().removeIf(contact->userName.equals(contact.getString("UserName")));
 
         core.getContactList().add(jsonObject);
-        core.getUserInfoMap().put(nickName, jsonObject);
+        core.getUserInfoMap().put(jsonObject.getString("NickName"), jsonObject);
         core.getUserInfoMap().put(userName, jsonObject);
     }
 

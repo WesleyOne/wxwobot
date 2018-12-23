@@ -8,6 +8,7 @@ import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.core.MsgCenter;
 import io.wxwobot.admin.itchat4j.service.ILoginService;
+import io.wxwobot.admin.itchat4j.utils.Config;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
 import io.wxwobot.admin.itchat4j.utils.SleepUtils;
 import io.wxwobot.admin.itchat4j.utils.enums.SelectorEnum;
@@ -260,27 +261,41 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 						if (retCodeEnum != null) {
 							LOG.info(retCodeEnum.getType());
 							if (retcode.equals(RetCodeEnum.UNKOWN.getCode())) {
+								// 防止频繁请求
+								SleepUtils.sleep(1000);
 								continue;
 							} else if (retcode.equals(RetCodeEnum.SUCCESS.getCode())) {
 								// 修改最后收到正常报文时间
 								core.setLastNormalRetcodeTime(System.currentTimeMillis());
+                                SelectorEnum selectorEnum = SelectorEnum.fromCode(selector);
+                                if (selectorEnum != null){
+                                    if (selector.equals(SelectorEnum.NORMAL.getCode())) {
+                                        continue;
+                                    }else if (selector.equals(SelectorEnum.NEW_MSG.getCode())) {
+                                        // 有新消息
+                                        processWebwxSync();
+                                    } else if (selector.equals(SelectorEnum.ENTER_OR_LEAVE_CHAT.getCode())) {
+                                        processWebwxSync();
+                                    } else if (selector.equals(SelectorEnum.MOD_CONTACT.getCode())) {
+                                        processWebwxSync();
+                                    } else if (selector.equals(SelectorEnum.SELECTOR_3.getCode())) {
+                                        processWebwxSync();
+                                        continue;
+                                    } else if (selector.equals(SelectorEnum.ADD_OR_DEL_CONTACT.getCode())) {
+                                        processWebwxSync();
+                                    } else {
+                                        LOG.error("UNKNOW SELECTOR CODE {}", selector);
+                                    }
+                                }else{
+                                    // 防止新类型不处理堆积
+                                    processWebwxSync();
+                                }
 
-								if (selector.equals(SelectorEnum.NEW_MSG.getCode())) {
-									// 有新消息
-									processWebwxSync();
-								} else if (selector.equals(SelectorEnum.ENTER_OR_LEAVE_CHAT.getCode())) {
-									processWebwxSync();
-								} else if (selector.equals(SelectorEnum.MOD_CONTACT.getCode())) {
-									processWebwxSync();
-								} else if (selector.equals("3")) {
-									continue;
-								} else if (selector.equals(SelectorEnum.ADD_OR_DEL_CONTACT.getCode())) {
-									processWebwxSync();
-								} else {
-									LOG.error("UNKNOW SELECTOR CODE {}", selector);
-								}
+
 							} else {
 								LOG.error(RetCodeEnum.fromCode(retcode).getType());
+								// 防止频繁请求
+								SleepUtils.sleep(1000);
 								break;
 							}
 						}
@@ -370,47 +385,36 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 	public void webWxGetContact() {
 		String url = String.format(URLEnum.WEB_WX_GET_CONTACT.getUrl(),
 				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()));
-		Map<String, Object> paramMap = core.getParamMap();
-		HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap));
-
 		try {
-			String result = EntityUtils.toString(entity, Consts.UTF_8);
-			JSONObject fullFriendsJsonList = JSON.parseObject(result);
-			// 查看seq是否为0，0表示好友列表已全部获取完毕，若大于0，则表示好友列表未获取完毕，当前的字节数（断点续传）
-			long seq = 0;
-			long currentTime = 0L;
-			List<BasicNameValuePair> params = new ArrayList<>();
-			if (fullFriendsJsonList.get("Seq") != null) {
-				seq = fullFriendsJsonList.getLong("Seq");
-				currentTime = System.currentTimeMillis();
-			}
-			JSONArray member = fullFriendsJsonList.getJSONArray(StorageLoginInfoEnum.MemberList.getKey());
-			// 循环获取seq直到为0，即获取全部好友列表 ==0：好友获取完毕 >0：好友未获取完毕，此时seq为已获取的字节数
-			while (seq > 0) {
-				// 设置seq传参
-				params.add(new BasicNameValuePair("r", String.valueOf(currentTime)));
-				params.add(new BasicNameValuePair("seq", String.valueOf(seq)));
-				entity = core.getMyHttpClient().doGet(url, params, false, null);
 
-				params.remove(new BasicNameValuePair("r", String.valueOf(currentTime)));
-				params.remove(new BasicNameValuePair("seq", String.valueOf(seq)));
+            JSONArray member = fullFriendsJsonList.getJSONArray(StorageLoginInfoEnum.MemberList.getKey());
+            // 循环获取seq直到为0，即获取全部好友列表 ==0：好友获取完毕 >0：好友未获取完毕，此时seq为已获取的字节数
+            Long seq = 0L;
+            do {
+                // 设置seq传参
+                List<BasicNameValuePair> params = new ArrayList<>();
+                params.add(new BasicNameValuePair("r", String.valueOf(System.currentTimeMillis())));
+                params.add(new BasicNameValuePair("seq", String.valueOf(seq)));
+                params.add(new BasicNameValuePair("skey", core.getLoginInfo().get(BaseParaEnum.Skey.value()).toString()));
+                HttpEntity entity = core.getMyHttpClient().doGet(url, params, false, null);
 
-				result = EntityUtils.toString(entity, Consts.UTF_8);
-				fullFriendsJsonList = JSON.parseObject(result);
+                String result = EntityUtils.toString(entity, Consts.UTF_8);
+                JSONObject fullFriendsJsonList = JSON.parseObject(result);
 
-				if (fullFriendsJsonList.get("Seq") != null) {
-					seq = fullFriendsJsonList.getLong("Seq");
-					currentTime = System.currentTimeMillis();
-				}
+                if (fullFriendsJsonList.get("Seq") != null) {
+                    seq = fullFriendsJsonList.getLong("Seq");
+                }
 
-				// 累加好友列表
-				member.addAll(fullFriendsJsonList.getJSONArray(StorageLoginInfoEnum.MemberList.getKey()));
-			}
-			for (Iterator<?> iterator = member.iterator(); iterator.hasNext();) {
+                // 累加好友列表
+                member.addAll(fullFriendsJsonList.getJSONArray(StorageLoginInfoEnum.MemberList.getKey()));
+            }while (seq > 0);
+			System.out.println(member.toJSONString());
+            Iterator<?> iterator = member.iterator();
+            while ( iterator.hasNext()) {
                 /**
                  * @see io.wxwobot.admin.itchat4j.beans.Member
                  */
-				JSONObject o = (JSONObject) iterator.next();
+                JSONObject o = (JSONObject) iterator.next();
 
                 String userName = o.getString("UserName");
                 if (StringUtils.isEmpty(userName)){
@@ -508,14 +512,15 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 							CommonTools.emojiFormatter(contactList.getJSONObject(j), "NickName");
 						}
                         core.getGroupInfoMap().put(userName,contactList.getJSONObject(j));
-                        core.getGroupInfoMap().put(nickName,contactList.getJSONObject(j));
+                        core.getGroupInfoMap().put(contactList.getJSONObject(j).getString("NickName"),contactList.getJSONObject(j));
                         newGroupArray.add(contactList.getJSONObject(j));
-                    }else if (userName.startsWith("@")){
+                    }
+                    else if (userName.startsWith("@")){
 						if (nickName.contains("<span class=\"emoji emoji")){
 							CommonTools.emojiFormatter(contactList.getJSONObject(j), "NickName");
 						}
 						core.getUserInfoMap().put(userName,contactList.getJSONObject(j));
-						core.getUserInfoMap().put(nickName,contactList.getJSONObject(j));
+						core.getUserInfoMap().put(contactList.getJSONObject(j).getString("NickName"),contactList.getJSONObject(j));
 						newContactArray.add(contactList.getJSONObject(j));
 					}
                 }
