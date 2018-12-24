@@ -25,6 +25,7 @@ public class MyRoute extends Routes {
 		add("/kw",KeyWordController.class);
 
 		add("/upload",UploadController.class);
+		add("/tool",ToolController.class);
 
 	}
 }

@@ -1,6 +1,14 @@
 #@layout()
 
 #define main()
+<ol class="breadcrumb">
+    #if(form.uniqueKey ??)
+    <li><a href="/relate?uk=#(form.uniqueKey ??)">#(form.uniqueKey ??)的外接配置</a></li>
+    #else
+    <li><a href="/relate">所有外接配置</a></li>
+    #end
+    <li class="active">#if(isEdit)修改#else添加#end外接配置</li>
+</ol>
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">#if(isEdit)修改#else添加#end外接配置</h3>

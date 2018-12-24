@@ -1,5 +1,6 @@
 package io.wxwobot.admin.itchat4j.core;
 
+import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.itchat4j.api.MessageTools;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
@@ -44,6 +45,10 @@ public class MsgCenter implements LogInterface {
 		for (int i = 0; i < msgList.size(); i++) {
 			JSONObject msg = new JSONObject();
 			JSONObject m = msgList.getJSONObject(i);
+
+			if (PropKit.getBoolean("devMode",false)){
+				LOG.info(m.toJSONString());
+			}
 			m.put("groupMsg", false);// 是否是群消息
 			if (m.getString("FromUserName").contains("@@") || m.getString("ToUserName").contains("@@")) { // 群聊消息
 				if (m.getString("FromUserName").contains("@@")

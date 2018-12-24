@@ -21,6 +21,10 @@ public class RelateController extends _BaseController {
         if (StringUtils.isNotEmpty(outKey)){
             setAttr("search_ok",outKey);
         }
+        String searchUk = getPara("uk");
+        if (StringUtils.isNotEmpty(searchUk)){
+            setAttr("search_uk",searchUk);
+        }
         setAttr("active","relate");
         renderTemplate("index.html");
     }

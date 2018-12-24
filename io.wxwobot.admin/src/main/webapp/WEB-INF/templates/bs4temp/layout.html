@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
     <link rel="shortcut icon" href="#" />
-    <title>WxWobot管理后台</title>
+    <title>机器人管理后台</title>
     <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="/assets/css/navbar-fixed-top.css" rel="stylesheet">
     #@css?()
@@ -25,7 +25,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">WxWobot管理后台</a>
+            <a class="navbar-brand" href="#">机器人管理后台</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -33,6 +33,7 @@
                 <li #if(active == 'rob') class="active" #end><a href="/rob">机器人管理</a></li>
                 <li #if(active == 'kw') class="active" #end><a href="/kw">关键字配置</a></li>
                 <li #if(active == 'relate') class="active" #end><a href="/relate">对外接口配置</a></li>
+                <li #if(active == 'tool') class="active" #end><a href="/tool">公共工具</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li>

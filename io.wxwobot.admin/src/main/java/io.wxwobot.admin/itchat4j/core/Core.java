@@ -31,8 +31,8 @@ public class Core {
 		this.myHttpClient = HttpClientManage.getInstance(this.uniqueKey);
 	}
 
-	protected static Core getInstance(String coreKey) {
-		return new Core(coreKey);
+	protected static Core getInstance(String uniqueKey) {
+		return new Core(uniqueKey);
 	}
 	private String uniqueKey;
 
@@ -161,6 +161,7 @@ public class Core {
 	/**
 	 * 请求参数
 	 */
+	@JSONField(serialize=false)
 	public Map<String, Object> getParamMap() {
 		return new HashMap<String, Object>(1) {
 			/**

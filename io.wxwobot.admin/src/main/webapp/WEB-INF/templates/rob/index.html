@@ -140,7 +140,8 @@
                                         {
                                             case true:
                                                 var btn = "<span class='label label-success'>在线</span> "+"<button type='button' class='btn btn-danger btn-sm' onclick='wxlogout(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>退出</button>";
-                                                result = btn;
+                                                var refresh_1 = "<button type='button' class='btn btn-info btn-sm' onclick='refresh_data(\""+row['uniqueKey']+"\")'>刷新数据</button>";
+                                                result = btn+refresh_1;
                                                 break;
                                             case false:
                                                 var btn = "<span class='label label-default'>下线</span> "+"<button type='button' class='btn btn-primary btn-sm' onclick='wxloginPost(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>登录</button>";
@@ -334,6 +335,35 @@
                     });
                 });
             });
+
+
+    function refresh_data(uniqueKey) {
+        $.ajax({url:"/robwk/gct?_ck="+uniqueKey,
+            success:function(result){
+                if (result.code == '00'){
+                    $.ajax({url:"/robwk/ggp?_ck="+uniqueKey,
+                        success:function(result){
+                            if (result.code == '00'){
+                                bootbox.alert(result.message);
+                            } else{
+                                bootbox.alert("错误！"+result.message);
+                            }
+                        },
+                        error : function() {
+                            bootbox.alert("请求异常");
+                        }
+                    });
+
+
+                } else{
+                    bootbox.alert("错误！"+result.message);
+                }
+            },
+            error : function() {
+                bootbox.alert("请求异常");
+            }
+        });
+    }
 
     // 退出登录
     function wxlogout(key,name) {

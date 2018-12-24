@@ -52,7 +52,8 @@ public class ExtendController extends _BaseController {
 
         JSONObject postParam = getPostParam();
         String outKey = postParam.getString("ok");
-        JSONArray msgs = postParam.getJSONArray("msg");
+        String msgStr = postParam.getString("msg");
+        JSONArray msgs = JSONArray.parseArray(msgStr);
 
         if (StringUtils.isEmpty(outKey)){
             setCode("01");
@@ -69,7 +70,7 @@ public class ExtendController extends _BaseController {
          * 2.存在0.0.0.0不校验
          */
         String whiteList = relationRecord.getWhiteList();
-        if (StringUtils.isEmpty(whiteList) || relationRecord.getEnable()){
+        if (StringUtils.isEmpty(whiteList) || !relationRecord.getEnable()){
             setCode("02");
             setMsg("外接码失效或未配置白名单");
             renderJson();
@@ -119,4 +120,5 @@ public class ExtendController extends _BaseController {
 
         renderJson();
     }
+
 }

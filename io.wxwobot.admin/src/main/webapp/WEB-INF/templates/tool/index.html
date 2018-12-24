@@ -1,0 +1,138 @@
+
+#@layout()
+
+#define main()
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">上传文件</h3>
+    </div>
+    <div class="panel-body">
+        <div class="well" ><span style="color: red">预防封号，谨慎填上传文件！</span></div>
+            <div class="well" >
+                <ul class="nav nav-pills nav-justified">
+                    <li class="active"><a data-toggle="tab" href="#IMG" data-value="IMG">图片</a></li>
+                    <li ><a data-toggle="tab" href="#FILE" data-value="FILE">文件</a></li>
+                </ul>
+            </div>
+            <div class="well" >
+                <label for="prefix_title">文件名前缀(有需要填写):</label>
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon3">文件名前缀:</span>
+                    <input type="text" class="form-control" id="prefix_title">
+                </div>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane fade " id="FILE">
+                    <div class="file-loading">
+                        <input id="f_upload" type="file" />
+                    </div>
+                </div>
+                <div class="tab-pane fade in active" id="IMG">
+                    <div class="file-loading">
+                        <input id="img_upload" type="file" />
+                    </div>
+                </div>
+            </div>
+    </div>
+    <div class="panel-footer">
+        <ul class="list-group">
+            <li class="list-group-item">上传后请保存好下面这串文件名,数据库无记录:</li>
+            <li class="list-group-item"><span id="result_name"></span></li>
+            <li class="list-group-item"><img src="#" id="showDataImg" style="width: 200px;" class="img-thumbnail"></li>
+        </ul>
+    </div>
+</div>
+#end
+
+#define css()
+<link href="/assets/css/bootstrapValidator.min.css" rel="stylesheet">
+<link href="/assets/fileinput/css/fileinput.min.css" rel="stylesheet">
+#end
+
+#define js()
+<script src="/assets/js/bootstrapValidator.min.js"></script>
+<script src="/assets/js/lang/bootstrapValidator_zh_CN.js"></script>
+<script src="/assets/fileinput/js/fileinput.min.js"></script>
+<script src="/assets/fileinput/js/locales/zh.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            // 清空
+            $('#result_name').html("");
+            $('#showDataImg').attr("src","#");
+        });
+
+        $("#f_upload")
+            .fileinput(
+                {
+                    language : 'zh', //设置语言
+                    uploadUrl : "/upload/file2local", //上传的地址
+                    allowedFileType : [ 'text', 'video', 'audio', 'flash'],
+                    // allowedFileExtensions : [ 'jpg','gif', 'png', 'txt', 'pdf', 'excel', 'doc', 'docx' ],//接收的文件后缀
+                    uploadExtraData:function(){
+                        var pre = $('#prefix_title').val();
+                        return {'fn':pre+"_extfile"};
+                    },
+                    uploadAsync : true, //默认异步上传
+                    showUpload : true, //是否显示上传按钮
+                    showRemove : true, //显示移除按钮
+                    showPreview : true, //是否显示预览
+                    showCaption : true,//是否显示标题
+                    browseClass : "btn btn-primary", //按钮样式
+                    dropZoneEnabled : false,//是否显示拖拽区域
+                    maxFileSize : 1024,//单位为kb，如果为0表示不限制文件大小
+                    maxFileCount : 1, //表示允许同时上传的最大文件个数
+                    enctype : 'multipart/form-data',
+                    validateInitialCount : true,
+                    autoReplace : true,//替代当前文件
+                    previewFileIcon : "<iclass='glyphicon glyphicon-king'></i>",
+                    msgFilesTooMany : "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+                }).on("fileuploaded",function(event, data, previewId, index) {
+                    if (data.response.code == "00") {
+                        $('#result_name').html(data.response.name);
+                    } else {
+                        bootbox.alert("文件上传失败,请重试:"
+                            + data.response.message);
+                    }
+                });
+
+        $("#img_upload")
+            .fileinput(
+                {
+                    language : 'zh', //设置语言
+                    uploadUrl : "/upload/img2local", //上传的地址
+                    allowedFileExtensions : [ 'jpg','gif', 'png' ],//接收的文件后缀
+                    uploadExtraData:function(){
+                        var pre = $('#prefix_title').val();
+                        return {'fn':pre+"_extimg"};
+                    },
+                    uploadAsync : true, //默认异步上传
+                    showUpload : true, //是否显示上传按钮
+                    showRemove : true, //显示移除按钮
+                    showPreview : true, //是否显示预览
+                    showCaption : true,//是否显示标题
+                    browseClass : "btn btn-primary", //按钮样式
+                    dropZoneEnabled : false,//是否显示拖拽区域
+                    maxFileSize : 1024,//单位为kb，如果为0表示不限制文件大小
+                    maxFileCount : 1, //表示允许同时上传的最大文件个数
+                    enctype : 'multipart/form-data',
+                    validateInitialCount : true,
+                    autoReplace : true,//替代当前文件
+                    previewFileIcon : "<iclass='glyphicon glyphicon-king'></i>",
+                    msgFilesTooMany : "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+                }).on("fileuploaded",function(event, data, previewId, index) {
+                        if (data.response.code == "00") {
+                            $('#result_name').html(data.response.name);
+                            $('#showDataImg').attr("src",data.response.url);
+                        } else {
+                            bootbox.alert("图片上传失败,请重试:"
+                                + data.response.message);
+                        }
+                    });
+
+    });
+
+
+</script>
+#end

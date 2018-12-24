@@ -64,6 +64,25 @@
         <pro.domain.file>file://Users/wesley/output/images/rob/file/</pro.domain.file>
       </properties>
     </profile>
+    <profile>
+      <id>uat</id>
+      <properties>
+        <pro.jdbc.agent.driver.sqlserve>com.microsoft.sqlserver.jdbc.SQLServerDriver</pro.jdbc.agent.driver.sqlserve>
+        <pro.jdbc.agent.url><![CDATA[jdbc:sqlserver://106.15.249.12:14333;Database=agent]]></pro.jdbc.agent.url>
+        <pro.jdbc.agent.username>sa</pro.jdbc.agent.username>
+        <pro.jdbc.agent.password>xiangyoukeji</pro.jdbc.agent.password>
+        <pro.devMode>true</pro.devMode>
+        <log.level>debug</log.level>
+        <log.file.path>/home/www/output/logs/hyagent/wxrobot</log.file.path>
+        <pro.cookie.domain>robtest.fengying78.com</pro.cookie.domain>
+        <pro.upload.cachpath>/home/www/web-deploy/com.xyagent.admin.images/rob/cache</pro.upload.cachpath>
+        <pro.upload.img.realpath>/home/www/web-deploy/com.xyagent.admin.images/rob/img</pro.upload.img.realpath>
+        <pro.upload.file.realpath>/home/www/web-deploy/com.xyagent.admin.images/rob/file</pro.upload.file.realpath>
+        <pro.upload.reload.realpath>/home/www/web-deploy/com.xyagent.admin.images/rob/reload</pro.upload.reload.realpath>
+        <pro.domain.img>http://robtest.com/img/</pro.domain.img>
+        <pro.domain.file>http://robtest.com/file/</pro.domain.file>
+      </properties>
+    </profile>
   </profiles>
 
   <dependencies>

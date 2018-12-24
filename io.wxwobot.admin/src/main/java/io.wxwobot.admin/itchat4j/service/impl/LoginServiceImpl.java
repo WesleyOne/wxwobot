@@ -3,12 +3,12 @@ package io.wxwobot.admin.itchat4j.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
 import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.core.MsgCenter;
 import io.wxwobot.admin.itchat4j.service.ILoginService;
-import io.wxwobot.admin.itchat4j.utils.Config;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
 import io.wxwobot.admin.itchat4j.utils.SleepUtils;
 import io.wxwobot.admin.itchat4j.utils.enums.SelectorEnum;
@@ -67,6 +67,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		// long time = 4000;
 		long startMillis = System.currentTimeMillis();
 		boolean overTime = false;
+
 		while (!isLogin && !overTime) {
 			long millis = System.currentTimeMillis();
 			params.add(new BasicNameValuePair(LoginParaEnum.R.para(), String.valueOf(millis / 1579L)));
@@ -180,7 +181,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		Map<String, Object> paramMap = core.getParamMap();
 
 		// 请求初始化接口
-		HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap));
+		HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap), getPersistentCookieMap());
 		try {
 			String result = EntityUtils.toString(entity, Consts.UTF_8);
             /**
@@ -236,7 +237,8 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
 		try {
 			HttpEntity entity = core.getMyHttpClient().doPost(url, paramStr);
-			EntityUtils.toString(entity, Consts.UTF_8);
+			String result = EntityUtils.toString(entity, Consts.UTF_8);
+			LOG.info(result);
 		} catch (Exception e) {
 			LOG.error("微信状态通知接口失败！", e);
 		}
@@ -290,8 +292,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                                     // 防止新类型不处理堆积
                                     processWebwxSync();
                                 }
-
-
 							} else {
 								LOG.error(RetCodeEnum.fromCode(retcode).getType());
 								// 防止频繁请求
@@ -325,12 +325,23 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
     private void processWebwxSync(){
         JSONObject msgObj = webWxSync();
         if(msgObj != null){
+			Integer addMsgCount = msgObj.getInteger("AddMsgCount");
+			Integer ModMsgCount = msgObj.getInteger("ModContactCount");
+			Integer DelContactCount = msgObj.getInteger("DelContactCount");
+			Integer ModChatRoomMemberCount = msgObj.getInteger("ModChatRoomMemberCount");
+
+			if (PropKit.getBoolean("devMode",false)){
+				if (addMsgCount > 0 || ModMsgCount > 0 || DelContactCount > 0 || ModChatRoomMemberCount > 0){
+					LOG.info(msgObj.toJSONString());
+				}
+			}
+
         	// 用于通知获取详细详细
         	List<String> modUserName = new ArrayList<>();
 
             // 处理新消息
             try {
-                Integer addMsgCount = msgObj.getInteger("AddMsgCount");
+
                 if (addMsgCount >0 ){
                     JSONArray msgList = msgObj.getJSONArray("AddMsgList");
                     msgList = MsgCenter.produceMsg(msgList, coreKey);
@@ -346,8 +357,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
             // 处理修改联系人或群成员
 			try {
-				Integer addMsgCount = msgObj.getInteger("ModContactCount");
-				if (addMsgCount >0 ){
+				if (ModMsgCount >0 ){
 					JSONArray list = msgObj.getJSONArray("ModContactList");
 					int size = list.size();
 					for (int j = 0; j < size; j++) {
@@ -385,9 +395,9 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 	public void webWxGetContact() {
 		String url = String.format(URLEnum.WEB_WX_GET_CONTACT.getUrl(),
 				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()));
+		JSONArray member = new JSONArray();
 		try {
 
-            JSONArray member = fullFriendsJsonList.getJSONArray(StorageLoginInfoEnum.MemberList.getKey());
             // 循环获取seq直到为0，即获取全部好友列表 ==0：好友获取完毕 >0：好友未获取完毕，此时seq为已获取的字节数
             Long seq = 0L;
             do {
@@ -396,7 +406,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                 params.add(new BasicNameValuePair("r", String.valueOf(System.currentTimeMillis())));
                 params.add(new BasicNameValuePair("seq", String.valueOf(seq)));
                 params.add(new BasicNameValuePair("skey", core.getLoginInfo().get(BaseParaEnum.Skey.value()).toString()));
-                HttpEntity entity = core.getMyHttpClient().doGet(url, params, false, null);
+                HttpEntity entity = core.getMyHttpClient().doGet(url, params, false,  getPersistentCookieMap());
 
                 String result = EntityUtils.toString(entity, Consts.UTF_8);
                 JSONObject fullFriendsJsonList = JSON.parseObject(result);
@@ -408,7 +418,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                 // 累加好友列表
                 member.addAll(fullFriendsJsonList.getJSONArray(StorageLoginInfoEnum.MemberList.getKey()));
             }while (seq > 0);
-			System.out.println(member.toJSONString());
             Iterator<?> iterator = member.iterator();
             while ( iterator.hasNext()) {
                 /**
@@ -457,7 +466,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                     core.getSpecialUsersList().add(o);
                 }
 			}
-			return;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 		}
@@ -499,7 +507,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                 endNum = size;
             }
             paramMap.put("List", list.subList(startNum,endNum));
-            HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap));
+            HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap), getPersistentCookieMap());
             try {
                 String text = EntityUtils.toString(entity, Consts.UTF_8);
                 JSONObject obj = JSON.parseObject(text);
@@ -508,20 +516,10 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                 	String nickName = contactList.getJSONObject(j).getString("NickName");
 					String userName = contactList.getJSONObject(j).getString("UserName");
 					if (userName.startsWith("@@")) {
-						if (nickName.contains("<span class=\"emoji emoji")){
-							CommonTools.emojiFormatter(contactList.getJSONObject(j), "NickName");
-						}
-                        core.getGroupInfoMap().put(userName,contactList.getJSONObject(j));
-                        core.getGroupInfoMap().put(contactList.getJSONObject(j).getString("NickName"),contactList.getJSONObject(j));
-                        newGroupArray.add(contactList.getJSONObject(j));
+						CoreManage.addNewGroup(core,contactList.getJSONObject(j));
                     }
                     else if (userName.startsWith("@")){
-						if (nickName.contains("<span class=\"emoji emoji")){
-							CommonTools.emojiFormatter(contactList.getJSONObject(j), "NickName");
-						}
-						core.getUserInfoMap().put(userName,contactList.getJSONObject(j));
-						core.getUserInfoMap().put(contactList.getJSONObject(j).getString("NickName"),contactList.getJSONObject(j));
-						newContactArray.add(contactList.getJSONObject(j));
+						CoreManage.addNewContact(core,contactList.getJSONObject(j));
 					}
                 }
             } catch (Exception e) {
@@ -530,8 +528,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
         }
         // 直接刷新群列表,不用比较
         core.setGroupList(newGroupArray);
-        core.setContactList(newContactArray);
-
 	}
 
 
@@ -763,7 +759,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		paramMap.put("rr", -System.currentTimeMillis() / 1000);
 		String paramStr = JSON.toJSONString(paramMap);
 		try {
-			HttpEntity entity = core.getMyHttpClient().doPost(url, paramStr);
+			HttpEntity entity = core.getMyHttpClient().doPost(url, paramStr, getPersistentCookieMap());
 			String text = EntityUtils.toString(entity, Consts.UTF_8);
 			JSONObject obj = JSON.parseObject(text);
 			if (obj.getJSONObject("BaseResponse").getInteger("Ret") != 0) {
@@ -813,31 +809,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		params.add(new BasicNameValuePair("_", String.valueOf(System.currentTimeMillis())));
 		SleepUtils.sleep(7);
 		try {
-
-            /**
-             * 以下部分确保cookie存在header中，重启时需要强制手动添加，
-             * TODO 不强制加重启会cookie失效,还不确定问题
-             */
-			String cookieStr = null;
-			if (core != null && core.getMyHttpClient() != null && core.getMyHttpClient().getCookieStore() != null){
-				List<Cookie> cookies = core.getMyHttpClient().getCookieStore().getCookies();
-				StringBuilder sb = new StringBuilder();
-				if (CollectionUtils.isNotEmpty(cookies)){
-					for (Cookie ck: cookies){
-						sb.append(ck.getName()).append('=').append(ck.getValue()).append(';');
-					}
-					cookieStr = sb.toString().substring(0, sb.toString().length() - 1);
-				}
-
-			}
-			Map<String, String> headerMap = null;
-			if (cookieStr != null){
-				headerMap = new HashMap<>(4);
-				headerMap.put("Cookie",cookieStr);
-			}
-			/* ^-----------------------------------------------^ */
-
-			HttpEntity entity = core.getMyHttpClient().doGet(url, params, true, headerMap);
+			HttpEntity entity = core.getMyHttpClient().doGet(url, params, true, getPersistentCookieMap());
 			if (entity == null) {
 				resultMap.put("retcode", "9999");
 				resultMap.put("selector", "9999");
@@ -856,6 +828,32 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			e.printStackTrace();
 		}
 		return resultMap;
+	}
+
+	private Map<String, String> getPersistentCookieMap() {
+		/**
+		 * 以下部分确保cookie存在header中，重启时需要强制手动添加，
+		 * TODO 不强制加重启会cookie失效,还不确定问题
+		 */
+		String cookieStr = null;
+		if (core != null && core.getMyHttpClient() != null && core.getMyHttpClient().getCookieStore() != null){
+			List<Cookie> cookies = core.getMyHttpClient().getCookieStore().getCookies();
+			StringBuilder sb = new StringBuilder();
+			if (CollectionUtils.isNotEmpty(cookies)){
+				for (Cookie ck: cookies){
+					sb.append(ck.getName()).append('=').append(ck.getValue()).append(';');
+				}
+				cookieStr = sb.toString().substring(0, sb.toString().length() - 1);
+			}
+
+		}
+		Map<String, String> headerMap = null;
+		if (cookieStr != null){
+			headerMap = new HashMap<>(4);
+			headerMap.put("Cookie",cookieStr);
+		}
+		/* ^-----------------------------------------------^ */
+		return headerMap;
 	}
 
 	/**

@@ -85,7 +85,7 @@ public class SingleHttpClient {
             if (params != null) {
                 String paramStr = EntityUtils.toString(new UrlEncodedFormEntity(params, Consts.UTF_8));
                 httpGet = new HttpGet(url + "?" + paramStr);
-                System.out.println(url + "?" + paramStr);
+//                System.out.println(url + "?" + paramStr);
             } else {
                 httpGet = new HttpGet(url);
             }
@@ -99,7 +99,6 @@ public class SingleHttpClient {
                 for (Map.Entry<String, String> entry : entries) {
                     httpGet.setHeader(entry.getKey(), entry.getValue());
                 }
-                System.out.println(JSON.toJSONString(headerMap));
             }
             CloseableHttpResponse response = httpClient.execute(httpGet);
             entity = response.getEntity();
@@ -121,6 +120,10 @@ public class SingleHttpClient {
      * @return
      */
     public HttpEntity doPost(String url, String paramsStr) {
+       return doPost(url,paramsStr,null);
+    }
+
+    public HttpEntity doPost(String url, String paramsStr, Map<String, String> headerMap) {
         HttpEntity entity = null;
         HttpPost httpPost = new HttpPost();
         try {
@@ -129,6 +132,12 @@ public class SingleHttpClient {
             httpPost.setEntity(params);
             httpPost.setHeader("Content-type", "application/json; charset=utf-8");
             httpPost.setHeader("User-Agent", Config.USER_AGENT);
+            if (headerMap != null) {
+                Set<Map.Entry<String, String>> entries = headerMap.entrySet();
+                for (Map.Entry<String, String> entry : entries) {
+                    httpPost.setHeader(entry.getKey(), entry.getValue());
+                }
+            }
             CloseableHttpResponse response = httpClient.execute(httpPost);
             entity = response.getEntity();
         } catch (ClientProtocolException e) {

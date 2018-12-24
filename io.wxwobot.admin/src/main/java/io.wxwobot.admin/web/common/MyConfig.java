@@ -99,13 +99,11 @@ public class MyConfig extends JFinalConfig {
 
 	@Override
 	public void afterJFinalStart() {
-		LOG.info("登录数据热加载中");
 		CoreManage.reload();
 	}
 
 	@Override
 	public void beforeJFinalStop() {
-		LOG.info("登录数据持久化中");
 		CoreManage.persistence();
 	}
 }

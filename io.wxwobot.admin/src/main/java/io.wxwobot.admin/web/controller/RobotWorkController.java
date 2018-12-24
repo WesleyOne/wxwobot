@@ -19,6 +19,7 @@ import javax.servlet.ServletOutputStream;
 import javax.swing.plaf.basic.BasicPopupMenuUI;
 import java.io.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author WesleyOne
@@ -143,11 +144,43 @@ public class RobotWorkController extends _BaseController {
 
     /**
      * 模拟个环节
+     * 强制刷新联系人
      */
     public void gct() throws BaseException {
         String coreKey = getCoreKey();
         LoginServiceImpl loginService = new LoginServiceImpl(coreKey);
         loginService.webWxGetContact();
+        renderJson();
+    }
+
+    /**
+     * 刷新群组
+     * @throws BaseException
+     */
+    public void ggp() throws BaseException {
+        String coreKey = getCoreKey();
+        LoginServiceImpl loginService = new LoginServiceImpl(coreKey);
+        loginService.WebWxBatchGetContact();
+        renderJson();
+    }
+
+    /**
+     * 获取联系人昵称
+     */
+    public void getContactsNickName() throws BaseException {
+        String coreKey = getCoreKey();
+        Set<String> keySet = CoreManage.getInstance(coreKey).getUserInfoMap().keySet();
+        setData(keySet);
+        renderJson();
+    }
+
+    /**
+     * 获取群昵称
+     */
+    public void getGroupsNickName() throws BaseException {
+        String coreKey = getCoreKey();
+        Set<String> keySet = CoreManage.getInstance(coreKey).getGroupInfoMap().keySet();
+        setData(keySet);
         renderJson();
     }
 

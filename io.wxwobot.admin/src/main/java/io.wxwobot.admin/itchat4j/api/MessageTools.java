@@ -48,6 +48,7 @@ public class MessageTools implements LogInterface {
 			MessageTools.sendPicMsgByUserId(toUserName,realImgUploadPath+data,uniqueKey);
 			return true;
 		}else if (KeyMsgValueType.FILE.toValue().equals(type)){
+			LOG.info("发送文件 {}:{}",toUserName,data);
 			MessageTools.sendFileMsgByUserId(toUserName,realFileUploadPath+data,uniqueKey);
 			return true;
 		}
@@ -68,7 +69,7 @@ public class MessageTools implements LogInterface {
 		if (text == null) {
 			return;
 		}
-		LOG.info(String.format("【 %s 】发送消息 %s: %s", uniqueKey, toUserName, text));
+		LOG.info(String.format("发送文本 %s: %s", toUserName, text));
 		webWxSendMsg(1, text, toUserName, uniqueKey);
 	}
 
@@ -257,6 +258,7 @@ public class MessageTools implements LogInterface {
 	public static boolean sendPicMsgByNickName(String nickName, String filePath, String uniqueKey) {
 		String toUserName = WechatTools.getContactUserNameByNickName(nickName,uniqueKey);
 		if (toUserName != null) {
+			LOG.info("发送图片 {}:{}",nickName,filePath);
 			return sendPicMsgByUserId(toUserName, filePath, uniqueKey);
 		}
 		return false;
@@ -272,6 +274,7 @@ public class MessageTools implements LogInterface {
 	public static boolean sendGroupPicMsgByNickName(String nickName, String filePath, String uniqueKey) {
 		String toUserName = WechatTools.getGroupUserNameByNickName(nickName,uniqueKey);
 		if (toUserName != null) {
+			LOG.info("发送图片 {}:{}",nickName,filePath);
 			return sendPicMsgByUserId(toUserName, filePath, uniqueKey);
 		}
 		return false;
@@ -292,6 +295,7 @@ public class MessageTools implements LogInterface {
 		if (responseObj != null) {
 			String mediaId = responseObj.getString("MediaId");
 			if (mediaId != null) {
+				LOG.info("发送图片 {}:{}",userId,filePath);
 				return webWxSendMsgImg(userId, mediaId, uniqueKey);
 			}
 		}
@@ -384,6 +388,7 @@ public class MessageTools implements LogInterface {
 	public static boolean sendFileMsgByNickName(String nickName, String filePath, String uniqueKey) {
 		String toUserName = WechatTools.getContactUserNameByNickName(nickName,uniqueKey);
 		if (toUserName != null) {
+			LOG.info("发送文件 {}:{}",nickName,filePath);
 			return sendFileMsgByUserId(toUserName, filePath, uniqueKey);
 		}
 		return false;
@@ -399,6 +404,7 @@ public class MessageTools implements LogInterface {
 	public static boolean sendGroupFileMsgByNickName(String nickName, String filePath, String uniqueKey) {
 		String toUserName = WechatTools.getGroupUserNameByNickName(nickName,uniqueKey);
 		if (toUserName != null) {
+			LOG.info("发送文件 {}:{}",nickName,filePath);
 			return sendFileMsgByUserId(toUserName, filePath, uniqueKey);
 		}
 		return false;

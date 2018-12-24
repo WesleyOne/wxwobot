@@ -43,7 +43,8 @@ public class IndexController extends _BaseController {
 
         // TODO 获取真实密码。此处为了方便直接从配置文件里获取
         String truePass = PropKit.use("passport.properties").get(username);
-
+        // 清楚缓存,可以修改配置文件直接修改
+        PropKit.useless("passport.properties");
         if (StringUtils.isNotEmpty(password) && MD5Util.MD5Encrypt(password).equals(truePass)){
             String sid = UUID.randomUUID().toString();
             UserSession.addUserSession(username,sid);

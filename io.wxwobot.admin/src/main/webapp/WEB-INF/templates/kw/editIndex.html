@@ -1,6 +1,14 @@
 #@layout()
 
 #define main()
+<ol class="breadcrumb">
+    #if(form.uniqueKey ??)
+    <li><a href="/kw?uk=#(form.uniqueKey ??)">#(form.uniqueKey ??)的关键字</a></li>
+    #else
+    <li><a href="/kw">所有关键字</a></li>
+    #end
+    <li class="active">#if(isEdit)修改#else添加#end关键字</li>
+</ol>
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">#if(isEdit)修改#else添加#end关键字</h3>
@@ -123,6 +131,27 @@
     var addFormValid;
 
     $(function () {
+
+        // 群聊好友下拉框切换事件
+        // $('#toGroup').change(function(){
+        //     var p1=$(this).children('option:selected').val();
+        //     if (#(form.uniqueKey ??)){
+        //         if (p1 == '1'){
+        //             $.get("/robwk/getGroupsNickName",
+        //                 { _ck : '#(form.uniqueKey ??)'},
+        //                 function(data,status){
+        //                     if (status == 'success'){
+        //
+        //                     } else{
+        //
+        //                     }
+        //                 });
+        //         }
+        //
+        //     }
+        // });
+
+
 
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             // 获取已激活的标签页的名称

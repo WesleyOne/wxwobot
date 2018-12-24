@@ -75,7 +75,7 @@ public class CoreManage implements LogInterface {
         if (size<=0){
             return;
         }
-
+        LOG.info("登录数据持久化中");
         Iterator<Core> iterator = valueCollection.iterator();
         JSONArray jsonArray = new JSONArray();
         while (iterator.hasNext()){
@@ -110,9 +110,9 @@ public class CoreManage implements LogInterface {
      */
     public static void reload(){
         if (USE_HOT_RELOAD){
-
                 File file =new File(HOT_RELOAD_DIR);
                 if (file.exists()){
+                    LOG.info("登录数据热加载中");
                     StringBuilder stringBuilder = new StringBuilder();
                     try {
                         FileReader fr = new FileReader(HOT_RELOAD_DIR);
@@ -227,8 +227,8 @@ public class CoreManage implements LogInterface {
                         }
                     }
 
+                    LOG.info("登录数据热加载完成");
                 }
-            LOG.info("登录数据热加载完成");
         }
     }
 
