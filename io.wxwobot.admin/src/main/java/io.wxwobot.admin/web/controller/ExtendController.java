@@ -91,6 +91,8 @@ public class ExtendController extends _BaseController {
         /**
          * 限制单次消息数量,防封,发送消息短暂间隔
          * 优先发文本，其次图片，最后文件
+         *
+         * 多条消息发送看最后一条成功与否
          */
         Boolean toGroup = relationRecord.getToGroup();
         String uniqueKey = relationRecord.getUniqueKey();
@@ -103,19 +105,24 @@ public class ExtendController extends _BaseController {
         if (msgLength<maxMessages){
             maxMessages = msgLength;
         }
+        boolean result = false;
         for (int i=0;i<maxMessages;i++){
             JSONObject message = msgs.getJSONObject(i);
             String type = message.getString("type");
             String body = message.getString("body");
 
             if (KeyMsgValueType.TEXT.toValue().equals(type)){
-                MessageTools.sendMsgByNickNameApi(body,nickName,uniqueKey,toGroup);
+                result = MessageTools.sendMsgByNickNameApi(body, nickName, uniqueKey, toGroup);
             }else if (KeyMsgValueType.IMG.toValue().equals(type)){
-                MessageTools.sendPicMsgByNickNameApi(nickName,realImgUploadPath+body,uniqueKey,toGroup);
+                result = MessageTools.sendPicMsgByNickNameApi(nickName, realImgUploadPath + body, uniqueKey, toGroup);
             }else if (KeyMsgValueType.FILE.toValue().equals(type)){
-                MessageTools.sendFileMsgByNickNameApi(nickName,realFileUploadPath+body,uniqueKey,toGroup);
+                result = MessageTools.sendFileMsgByNickNameApi(nickName,realFileUploadPath+body,uniqueKey,toGroup);
             }
             SleepUtils.sleep(200);
+        }
+
+        if (!result){
+            setOperateErr();
         }
 
         renderJson();

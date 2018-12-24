@@ -139,18 +139,22 @@
                                         switch(value)
                                         {
                                             case true:
-                                                var btn = "<span class='label label-success'>在线</span> "+"<button type='button' class='btn btn-danger btn-sm' onclick='wxlogout(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>退出</button>";
-                                                var refresh_1 = "<button type='button' class='btn btn-info btn-sm' onclick='refresh_data(\""+row['uniqueKey']+"\")'>刷新数据</button>";
-                                                result = btn+refresh_1;
+                                                var btn = "<button type='button' class='btn btn-danger btn-xs' onclick='wxlogout(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>已在线-退出</button>";
+                                                var refresh_1 = "<button type='button' class='btn btn-info btn-xs' onclick='refresh_data(\""+row['uniqueKey']+"\")'>刷新数据</button>";
+                                                var group_1 = "<button type='button' class='btn btn-warning btn-xs' onclick='openGroup(\""+row['uniqueKey']+"\")'>查看群列表</button>";
+                                                result = btn+refresh_1+group_1;
                                                 break;
                                             case false:
-                                                var btn = "<span class='label label-default'>下线</span> "+"<button type='button' class='btn btn-primary btn-sm' onclick='wxloginPost(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>登录</button>";
+                                                var btn = "<button type='button' class='btn btn-primary btn-xs' onclick='wxloginPost(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>已下线-登录</button>";
                                                 result = btn;
                                                 break;
                                             default:
                                                 result = "异常";
                                         }
-                                        return result;
+                                        var element = "<div class='btn-group-vertical btn-group-xs ' role='group'>"
+                                            + result
+                                            + "</div>";
+                                        return element;
                                     }
                                 },
                                 {
@@ -164,12 +168,14 @@
                                         var bt_remark_edit = "<button type='button' class='btn btn-default' onclick='openEditRemark(\""+row.id+"\",\""+row.remark+"\")'>修改备注</button>";
                                         var bt_key = "<a  type='button' class='btn btn-info' href='/kw?uk="+row.uniqueKey+"'>查看关键字</a>";
                                         var bt_add_key = "<a  type='button' class='btn btn-primary' href='/kw/editIndex?uk="+row.uniqueKey+"'>新增关键字</a>";
+                                        var bt_add_relate = "<a class='btn btn-warning btn-xs' href='/relate/editIndex?uk="+row.uniqueKey+"' >外接配置</a>";
 
                                         var element = "<div class='btn-group-vertical btn-group-xs ' role='group'>"
                                             + bt_remark_edit
                                             + bt_key
                                             + bt_add_key
-                                            + "</div>"
+                                            + bt_add_relate
+                                            + "</div>";
                                         return element;
                                     }
                                 },
@@ -202,9 +208,6 @@
                                             diff = " checked ";
                                         }
                                         result = "<input style='width: 130px' name='my-checkbox' type='checkbox' data-nickname='"+row['remark']+"' data-rid='"+row['id']+"' data-type='fromout' data-typename='对外接口开关' "+ diff +" >";
-                                        if (value){
-                                            result += "<br><a class='btn btn-warning btn-xs' href='/relate/editIndex?uk="+row.uniqueKey+"' >授权外接配置</a>";
-                                        }
                                         return result;
                                     }
                                 },
@@ -336,6 +339,20 @@
                 });
             });
 
+    function openGroup(uniqueKey) {
+        $.ajax({url:"/robwk/getGroupNickNames?_ck="+uniqueKey,
+            success:function(result){
+                if (result.code == '00'){
+                    bootbox.alert("群列表："+result.data);
+                } else{
+                    bootbox.alert("错误！"+result.message);
+                }
+            },
+            error : function() {
+                bootbox.alert("请求异常");
+            }
+        });
+    }
 
     function refresh_data(uniqueKey) {
         $.ajax({url:"/robwk/gct?_ck="+uniqueKey,

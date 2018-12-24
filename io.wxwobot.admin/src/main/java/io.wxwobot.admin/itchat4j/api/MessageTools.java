@@ -146,7 +146,7 @@ public class MessageTools implements LogInterface {
 	 * @param content
 	 * @param toUserName
 	 */
-	public static void webWxSendMsg(int msgType, String content, String toUserName, String uniqueKey) {
+	public static boolean webWxSendMsg(int msgType, String content, String toUserName, String uniqueKey) {
 		Core core = CoreManage.getInstance(uniqueKey);
 		String url = String.format(URLEnum.WEB_WX_SEND_MSG.getUrl(), core.getLoginInfo().get("url"));
 		Map<String, Object> msgMap = new HashMap<String, Object>(12);
@@ -163,8 +163,10 @@ public class MessageTools implements LogInterface {
 			String paramStr = JSON.toJSONString(paramMap);
 			HttpEntity entity = core.getMyHttpClient().doPost(url, paramStr);
 			EntityUtils.toString(entity, Consts.UTF_8);
+			return true;
 		} catch (Exception e) {
 			LOG.error("webWxSendMsg", e);
+			return false;
 		}
 	}
 
