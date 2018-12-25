@@ -1,17 +1,20 @@
 package io.wxwobot.admin.web.wxrob;
 
 
+import com.alibaba.fastjson.JSON;
 import io.wxwobot.admin.itchat4j.api.MessageTools;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
 import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
 import io.wxwobot.admin.web.constant.ConfigKeys;
 import io.wxwobot.admin.web.model.WxRobConfig;
 import io.wxwobot.admin.web.model.WxRobKeyword;
 
 import java.lang.reflect.Type;
+import java.util.regex.Matcher;
 
 /**
  * @author WesleyOne
@@ -95,7 +98,27 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
 
     @Override
     public void sysMsgHandle(BaseMsg msg) {
-        //TODO 了解下
+
+        /**
+         * 群里的系统新人进群消息处理
+         */
+        if (msg.isGroupMsg()){
+            WxRobConfig robConfig = WxRobConfig.dao.findFirst("SELECT TOP 1 * FROM wx_rob_config WHERE unique_key = ?", uniqueKey);
+            if(robConfig != null && robConfig.getEnable()){
+                // 判断是群聊默认回复是否开启
+                if (robConfig.getDefaultGroup()){
+
+                    // 新人进群欢迎
+                    String text = msg.getContent();
+                    Matcher matcher = CommonTools.getMatcher("邀请\"(.+?)\"加入了群聊", text);
+                    if (matcher.find()){
+                        String group = matcher.group(1);
+                        MessageTools.sendMsgById("@"+group+"\n欢迎进入本群",msg.getFromUserName(),uniqueKey);
+                    }
+                }
+            }
+        }
+
     }
 
     @Override

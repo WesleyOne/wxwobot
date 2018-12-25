@@ -3,21 +3,15 @@ package io.wxwobot.admin.itchat4j.core;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jfinal.kit.PropKit;
-import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.client.HttpClientManage;
-import io.wxwobot.admin.itchat4j.client.SingleHttpClient;
+import io.wxwobot.admin.itchat4j.controller.LoginController;
 import io.wxwobot.admin.itchat4j.service.ILoginService;
 import io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl;
-import io.wxwobot.admin.itchat4j.thread.CheckLoginStatusThread;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
 import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.CookieStore;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.impl.cookie.BasicClientCookie2;
 
 import java.io.*;
 import java.util.*;
@@ -186,35 +180,8 @@ public class CoreManage implements LogInterface {
                                     // 启动线程
                                     ILoginService loginService = new LoginServiceImpl(uniqueKey);
 
-                                    LOG.info("5. 登陆成功，微信初始化");
-                                    if (!loginService.webWxInit()) {
-                                        LOG.info("6. 微信初始化异常");
-                                        core.setAlive(false);
-                                        continue;
-                                    }
-
-                                    LOG.info("6. 开启微信状态通知");
-                                    loginService.wxStatusNotify();
-
-                                    LOG.info(String.format("欢迎回来， %s", core.getNickName()));
-
-                                    LOG.info("8. 开始接收消息");
-                                    loginService.startReceiving();
-
-                                    LOG.info("9. 获取联系人信息");
-                                    loginService.webWxGetContact();
-
-                                    LOG.info("10. 获取群好友及群好友列表");
-                                    loginService.WebWxBatchGetContact();
-
-                                    LOG.info("11. 缓存本次登陆好友相关消息");
-                                    // 登陆成功后缓存本次登陆好友相关消息（NickName, UserName）
-                                    WechatTools.setUserInfo(uniqueKey);
-
-                                    LOG.info("12.开启微信状态检测线程");
-                                    Thread thread = new Thread(new CheckLoginStatusThread(uniqueKey));
-                                    thread.setName("WXROB-STATUS-"+uniqueKey);
-                                    thread.start();
+                                    LoginController login = new LoginController(uniqueKey);
+                                    login.login_3();
 
                                 }
                             }catch (Exception e){
@@ -241,10 +208,8 @@ public class CoreManage implements LogInterface {
     public static void addNewGroup(Core core,JSONObject jsonObject){
         String nickName = jsonObject.getString("NickName");
         String userName = jsonObject.getString("UserName");
-        if (nickName.contains("<span class=\"emoji emoji")){
-            CommonTools.emojiFormatter(jsonObject, "NickName");
-        }
 
+        CommonTools.emojiFormatter2(jsonObject, "NickName");
         // 删除重复的
         core.getGroupList().removeIf(group->userName.equals(group.getString("UserName")));
 
@@ -263,9 +228,8 @@ public class CoreManage implements LogInterface {
     public static void addNewContact(Core core,JSONObject jsonObject){
         String nickName = jsonObject.getString("NickName");
         String userName = jsonObject.getString("UserName");
-        if (nickName.contains("<span class=\"emoji emoji")){
-            CommonTools.emojiFormatter(jsonObject, "NickName");
-        }
+
+        CommonTools.emojiFormatter2(jsonObject, "NickName");
         // 删除重复的
         core.getContactList().removeIf(contact->userName.equals(contact.getString("UserName")));
 

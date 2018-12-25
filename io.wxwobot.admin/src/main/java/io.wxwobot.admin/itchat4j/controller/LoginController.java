@@ -3,12 +3,14 @@ package io.wxwobot.admin.itchat4j.controller;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
+import io.wxwobot.admin.itchat4j.core.MsgCenter;
 import io.wxwobot.admin.itchat4j.service.ILoginService;
 import io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl;
 import io.wxwobot.admin.itchat4j.thread.CheckLoginStatusThread;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
 import io.wxwobot.admin.itchat4j.utils.SleepUtils;
 import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
+import io.wxwobot.admin.web.wxrob.MyMsgHandler;
 
 /**
  * 登陆控制器
@@ -21,13 +23,13 @@ import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
 public class LoginController  implements LogInterface {
 
 	private ILoginService loginService;
-	private String coreKey;
+	private String uniqueKey;
 	private Core core;
 
-	public LoginController(String coreKey){
-		this.coreKey = coreKey;
-		this.loginService = new LoginServiceImpl(coreKey);
-		this.core = CoreManage.getInstance(coreKey);
+	public LoginController(String uniqueKey){
+		this.uniqueKey = uniqueKey;
+		this.loginService = new LoginServiceImpl(uniqueKey);
+		this.core = CoreManage.getInstance(uniqueKey);
 	}
 
 	public void login(String qrPath) {
@@ -84,11 +86,11 @@ public class LoginController  implements LogInterface {
 		loginService.WebWxBatchGetContact();
 
 		LOG.info("11. 缓存本次登陆好友相关消息");
-		WechatTools.setUserInfo(coreKey); // 登陆成功后缓存本次登陆好友相关消息（NickName, UserName）
+		WechatTools.setUserInfo(uniqueKey); // 登陆成功后缓存本次登陆好友相关消息（NickName, UserName）
 
 		LOG.info("12.开启微信状态检测线程");
-		Thread thread = new Thread(new CheckLoginStatusThread(coreKey));
-		thread.setName("WXROB-STA-"+coreKey);
+		Thread thread = new Thread(new CheckLoginStatusThread(uniqueKey));
+		thread.setName("WXROB-STA-"+uniqueKey);
 		thread.start();
 	}
 
@@ -133,7 +135,11 @@ public class LoginController  implements LogInterface {
         return URLEnum.QRCODE_URL.getUrl() + core.getUuid();
     }
 
-	public boolean login_2() {
+	/**
+	 * 确认登录
+	 * @return
+	 */
+    public  boolean login_2(){
 
 		boolean result = false;
 
@@ -145,13 +151,21 @@ public class LoginController  implements LogInterface {
 				result = true;
 			}
 		}
+		return result;
+	}
 
-		if (result){
-			LOG.info("5. 登陆成功，微信初始化");
-			if (!loginService.webWxInit()) {
-				LOG.info("6. 微信初始化异常");
-				result = false;
-			}
+	/**
+	 * 加载数据
+	 * @return
+	 */
+	public boolean login_3() {
+
+		boolean result = true;
+
+		LOG.info("5. 登陆成功，微信初始化");
+		if (!loginService.webWxInit()) {
+			LOG.info("6. 微信初始化异常");
+			result = false;
 		}
 
 		if (result){
@@ -173,12 +187,22 @@ public class LoginController  implements LogInterface {
 			loginService.WebWxBatchGetContact();
 
 			LOG.info("11. 缓存本次登陆好友相关消息");
-			WechatTools.setUserInfo(coreKey); // 登陆成功后缓存本次登陆好友相关消息（NickName, UserName）
+//			WechatTools.setUserInfo(uniqueKey); // 登陆成功后缓存本次登陆好友相关消息（NickName, UserName）
 
 			LOG.info("12.开启微信状态检测线程");
-			Thread thread = new Thread(new CheckLoginStatusThread(coreKey));
-			thread.setName("WXROB-STATUS-"+coreKey);
+			Thread thread = new Thread(new CheckLoginStatusThread(uniqueKey));
+			thread.setName("WXROB-STATUS-"+uniqueKey);
 			thread.start();
+
+			LOG.info("13.+++开始消息处理+++++++"+uniqueKey+"+++++++");
+			Thread msgThread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					MsgCenter.handleMsg(new MyMsgHandler(uniqueKey), uniqueKey);
+				}
+			});
+			msgThread.setName("WXBOT-MSG-"+uniqueKey);
+			msgThread.start();
 
 		}
 

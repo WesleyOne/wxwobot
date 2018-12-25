@@ -2,21 +2,13 @@ package io.wxwobot.admin.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jfinal.kit.PropKit;
-import io.wxwobot.admin.itchat4j.Wechat;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.controller.LoginController;
-import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
-import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
 import io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl;
-import io.wxwobot.admin.itchat4j.utils.SleepUtils;
-import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
 import io.wxwobot.admin.web.base.BaseException;
 import io.wxwobot.admin.web.utils.FileUtil;
-import io.wxwobot.admin.web.wxrob.MyMsgHandler;
 
-import javax.servlet.ServletOutputStream;
-import javax.swing.plaf.basic.BasicPopupMenuUI;
 import java.io.*;
 import java.util.List;
 import java.util.Set;
@@ -53,37 +45,27 @@ public class RobotWorkController extends _BaseController {
         String qrSrc = login.login_1_new();
         setData(qrSrc);
         renderJson();
-//        login.login_1(qrPath);
-        // TODO 两次流处理,需要优化
-
-//        File file = new File(realUploadPath+ File.separator +"QR.jpg");
-//        if (file.exists()&&file.isFile()) {
-//            InputStream inputStream = new FileInputStream(file);
-//            ServletOutputStream outputStream = getResponse().getOutputStream();
-//            int length = -1;
-//            byte[] buffer = new byte[1024];
-//            while ((length=inputStream.read(buffer, 0, 1024))!=-1) {
-//                outputStream.write(buffer,0,length);
-//            }
-//
-//            inputStream.close();
-//            outputStream.flush();
-//            outputStream.close();
-//        }
-//        renderNull();
     }
 
+    /**
+     * 登录第二步,确认登录状态
+     * @throws BaseException
+     */
+    public void login() throws BaseException {
+        String coreKey = getCoreKey();
+        LoginController login = new LoginController(coreKey);
+        login.login_2();
+        renderJson();
+    }
 
     /**
-     * 登录第二步，确认登录及初始化信息
+     * 登录第三步，确认登录及初始化信息
      * @throws BaseException
      */
     public void init() throws BaseException {
         String coreKey = getCoreKey();
-        IMsgHandlerFace msgHandler = new MyMsgHandler(coreKey);
-        Wechat wechat = new Wechat(msgHandler,coreKey);
-        boolean loginResult = wechat.wxInit();
-        wechat.start();
+        LoginController login = new LoginController(coreKey);
+        boolean loginResult = login.login_3();
         if (loginResult){
             setMsg("登录成功");
         }else{

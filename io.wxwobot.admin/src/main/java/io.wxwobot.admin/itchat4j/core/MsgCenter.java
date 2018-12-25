@@ -1,5 +1,6 @@
 package io.wxwobot.admin.itchat4j.core;
 
+import com.alibaba.fastjson.JSON;
 import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.itchat4j.api.MessageTools;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
@@ -36,21 +37,19 @@ public class MsgCenter implements LogInterface {
 	 * @param msgList
 	 * @return
 	 */
-	public static JSONArray produceMsg(JSONArray msgList, String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static JSONArray produceMsg(JSONArray msgList, String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		JSONArray result = new JSONArray();
 		// 用于暂存未知群ID,最后调用webwxbatchgetcontact获取
 		List<String> unknowGroup = new ArrayList<>();
 
 		for (int i = 0; i < msgList.size(); i++) {
-			JSONObject msg = new JSONObject();
 			JSONObject m = msgList.getJSONObject(i);
-
-			if (PropKit.getBoolean("devMode",false)){
-				LOG.info(m.toJSONString());
-			}
-			m.put("groupMsg", false);// 是否是群消息
-			if (m.getString("FromUserName").contains("@@") || m.getString("ToUserName").contains("@@")) { // 群聊消息
+			// 是否是群消息
+			m.put("groupMsg", false);
+			if (m.getString("FromUserName").contains("@@") || m.getString("ToUserName").contains("@@")) {
+				// 群聊消息
+				m.put("groupMsg", true);
 				if (m.getString("FromUserName").contains("@@")
 						&& !core.getGroupInfoMap().containsKey(m.getString("FromUserName"))) {
                     unknowGroup.add(m.getString("FromUserName"));
@@ -63,28 +62,22 @@ public class MsgCenter implements LogInterface {
 					String content = m.getString("Content").substring(m.getString("Content").indexOf("<br/>") + 5);
 					String sendMemberId = m.getString("Content").substring(0,m.getString("Content").indexOf("<br/>"));
 					m.put("Content", content);
-					m.put("groupMsg", true);
 					m.put(MoreConfig.SEND_MEMBER_ID,sendMemberId);
 				}
 			}
 
-			// 存在emoji就转换
-			if (m.getString("Content").contains("emoji emoji")){
-				CommonTools.msgFormatter(m, "Content");
-			}
-			// 是否打印日志
-			boolean isLog = false;
 			// 1.文本消息
 			if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_TEXT.getCode())) {
 				if (m.getString("Url").length() != 0) {
-					// 1.1分享位置
-					String[] contents = m.getString("Content").split(":");
-					String data = "Map";
-					if (contents.length>0) {
-						data = contents[0]+":"+m.getString("Url");
-					}
-					msg.put("Type", "Map");
-					msg.put("Text", data);
+					// 1.1分享位置 不处理
+					continue;
+//					String[] contents = m.getString("Content").split(":");
+//					String data = "Map";
+//					if (contents.length>0) {
+//						data = contents[0]+":"+m.getString("Url");
+//					}
+//					m.put("Type", MsgTypeEnum.MAP.getType());
+//					m.put("Text", data);
 //					LOG.warn("MAP_CONTENT: {},URL: {}",m.getString("Content"),m.getString("Url"));
 					/**
 					 *	MAP_CONTENT: 滨兴小区(东区):/cgi-bin/mmwebwx-bin/webwxgetpubliclinkimg?url=xxx&msgid=7525662842661720095&pictype=location,URL: http://apis.map.qq.com/uri/v1/geocoder?coord=30.191660,120.200508
@@ -92,44 +85,47 @@ public class MsgCenter implements LogInterface {
 
 				} else {
 					// 1.2 普通文本
-					msg.put("Type", MsgTypeEnum.TEXT.getType());
-					msg.put("Text", m.getString("Content"));
+					m.put("Type", MsgTypeEnum.TEXT.getType());
+					CommonTools.emojiFormatter2(m, "Content");
+					m.put("Text", m.getString("Content"));
+
 				}
-				m.put("Type", msg.getString("Type"));
-				m.put("Text", msg.getString("Text"));
-				isLog = true;
 			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_IMAGE.getCode())
 					|| m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_EMOTICON.getCode())) {
-				// 2.图片消息
-				m.put("Type", MsgTypeEnum.PIC.getType());
+				// 2.图片消息 不处理
+				continue;
+//				m.put("Type", MsgTypeEnum.PIC.getType());
 			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_VOICE.getCode())) {
-				// 3.语音消息
-				m.put("Type", MsgTypeEnum.VOICE.getType());
+				// 3.语音消息 不处理
+				continue;
+//				m.put("Type", MsgTypeEnum.VOICE.getType());
 			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_VERIFYMSG.getCode())) {
-				// 4.好友确认消息
+				// 4.好友确认消息 不处理
+				continue;
 				// MessageTools.addFriend(core, userName, 3, ticket); // 确认添加好友
-				m.put("Type", MsgTypeEnum.VERIFYMSG.getType());
+//				m.put("Type", MsgTypeEnum.VERIFYMSG.getType());
 			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_SHARECARD.getCode())) {
-				// 5.共享名片
-				m.put("Type", MsgTypeEnum.NAMECARD.getType());
+				// 5.共享名片 不处理
+//				m.put("Type", MsgTypeEnum.NAMECARD.getType());
 			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_VIDEO.getCode())
 					|| m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_MICROVIDEO.getCode())) {
-				// 6.视频
-				m.put("Type", MsgTypeEnum.VIEDO.getType());
+				// 6.视频 不处理
+				continue;
+//				m.put("Type", MsgTypeEnum.VIEDO.getType());
 			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_MEDIA.getCode())) {
-				// 7.分享链接
-				m.put("Type", MsgTypeEnum.MEDIA.getType());
+				// 7.分享链接 不处理
+				continue;
+//				m.put("Type", MsgTypeEnum.MEDIA.getType());
 			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_STATUSNOTIFY.getCode())) {
 				// 微信初始化消息	系统
 				m.put("Type", MsgTypeEnum.SYS.getType());
 			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_SYS.getCode())) {
 				// 系统消息	系统
 				m.put("Type", MsgTypeEnum.SYS.getType());
-				isLog = true;
 			} else if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_RECALLED.getCode())) {
-				// 撤回消息	系统
-				m.put("Type", MsgTypeEnum.SYS.getType());
-				isLog = true;
+				// 撤回消息	系统  不处理
+				continue;
+//				m.put("Type", MsgTypeEnum.SYS.getType());
 			} else {
 				LOG.error("Useless msg: {} \n {}",m.getInteger("MsgType"),m.getString("Content"));
 			}
@@ -141,22 +137,21 @@ public class MsgCenter implements LogInterface {
 			String nickName;
 			String memberName = "";
 			if (m.getBoolean("groupMsg")){
-				nickName = WechatTools.getGroupNickNameByUserName(m.getString("FromUserName"),coreKey);
+				nickName = WechatTools.getGroupNickNameByUserName(m.getString("FromUserName"),uniqueKey);
 
 				if (m.getString(MoreConfig.SEND_MEMBER_ID) != null){
-					// TODO 获取成员昵称
-//					memberName = WechatTools.getMemberNickName(m.getString("FromUserName"),coreKey,m.getString(MoreConfig.SEND_MEMBER_ID));
-//					m.put(MoreConfig.SEND_MEMBER_NICKNAMW,memberName);
+					// 获取成员昵称
+					memberName = WechatTools.getMemberNickName(m.getString("FromUserName"),uniqueKey,m.getString(MoreConfig.SEND_MEMBER_ID));
+					m.put(MoreConfig.SEND_MEMBER_NICKNAMW,memberName);
 				}
 			}else {
-				nickName = WechatTools.getContactNickNameByUserName(m.getString("FromUserName"),coreKey);
+				nickName = WechatTools.getContactNickNameByUserName(m.getString("FromUserName"),uniqueKey);
 			}
 			m.put("fromNickName",nickName);
-			LOG.info("收到【{}】=>【{}】消息,来自: {} _ {} \n 内容: {} " ,
+			LOG.info("收到【{}】=>【{}】消息,来自: {} \n 内容: {} " ,
 					MsgCodeEnum.fromCode(m.getInteger("MsgType"))==null?"未知类型"+m.getInteger("MsgType"):MsgCodeEnum.fromCode(m.getInteger("MsgType")).getType(),
 					m.getString("Type"),
-					nickName,
-					memberName,
+					nickName+" : "+memberName,
 					StringUtils.isNotEmpty(m.getString("Content"))?m.getString("Content"):"");
 			result.add(m);
 		}
@@ -170,11 +165,11 @@ public class MsgCenter implements LogInterface {
 	 * @date 2017年5月14日 上午10:52:34
 	 * @param msgHandler
 	 */
-	public static void handleMsg(IMsgHandlerFace msgHandler, String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static void handleMsg(IMsgHandlerFace msgHandler, String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		while (true) {
 			if (!core.isAlive()){
-				LOG.info("handleMsg_log_out");
+				LOG.info("停止消息处理");
 				break;
 			}
 			if (core.getMsgList().size() > 0 && core.getMsgList().get(0).getContent() != null) {
@@ -185,26 +180,25 @@ public class MsgCenter implements LogInterface {
 							if (msg.getType().equals(MsgTypeEnum.TEXT.getType())) {
 								String result = msgHandler.textMsgHandle(msg);
 							} else if (msg.getType().equals(MsgTypeEnum.PIC.getType())) {
-								String result = msgHandler.picMsgHandle(msg);
-								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),coreKey);
+//								String result = msgHandler.picMsgHandle(msg);
+//								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),uniqueKey);
 							} else if (msg.getType().equals(MsgTypeEnum.VOICE.getType())) {
-								String result = msgHandler.voiceMsgHandle(msg);
-								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),coreKey);
+//								String result = msgHandler.voiceMsgHandle(msg);
+//								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),uniqueKey);
 							} else if (msg.getType().equals(MsgTypeEnum.VIEDO.getType())) {
-								String result = msgHandler.videoMsgHandle(msg);
-								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),coreKey);
+//								String result = msgHandler.videoMsgHandle(msg);
+//								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),uniqueKey);
 							} else if (msg.getType().equals(MsgTypeEnum.NAMECARD.getType())) {
-								String result = msgHandler.nameCardMsgHandle(msg);
-								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),coreKey);
+//								String result = msgHandler.nameCardMsgHandle(msg);
+//								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),uniqueKey);
 							} else if (msg.getType().equals(MsgTypeEnum.SYS.getType())) { // 系统消息
 								msgHandler.sysMsgHandle(msg);
 							} else if (msg.getType().equals(MsgTypeEnum.VERIFYMSG.getType())) { // 确认添加好友消息
-								String result = msgHandler.verifyAddFriendMsgHandle(msg);
-								MessageTools.sendMsgById(result,
-										core.getMsgList().get(0).getRecommendInfo().getUserName(),coreKey);
+//								String result = msgHandler.verifyAddFriendMsgHandle(msg);
+//								MessageTools.sendMsgById(result,core.getMsgList().get(0).getRecommendInfo().getUserName(),uniqueKey);
 							} else if (msg.getType().equals(MsgTypeEnum.MEDIA.getType())) { // 多媒体消息
-								String result = msgHandler.mediaMsgHandle(msg);
-								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),coreKey);
+//								String result = msgHandler.mediaMsgHandle(msg);
+//								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),uniqueKey);
 							} else{
 								LOG.warn("暂未处理信息【{}】", msg.getType());
 							}

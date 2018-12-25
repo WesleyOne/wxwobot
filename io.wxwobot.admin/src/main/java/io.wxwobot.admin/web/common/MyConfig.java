@@ -99,6 +99,7 @@ public class MyConfig extends JFinalConfig {
 
 	@Override
 	public void afterJFinalStart() {
+		System.setProperty("jsse.enableSNIExtension", "false");
 		CoreManage.reload();
 	}
 

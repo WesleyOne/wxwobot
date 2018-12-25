@@ -11,6 +11,7 @@ package io.wxwobot.admin.itchat4j.utils.enums;
  */
 public enum MsgTypeEnum {
 	TEXT("Text", "文本消息"),
+	MAP("MAP", "地理位置"),
 	PIC("Pic", "图片消息"),
 	VOICE("Voice", "语音消息"),
 	VIEDO("Viedo", "小视频消息"),

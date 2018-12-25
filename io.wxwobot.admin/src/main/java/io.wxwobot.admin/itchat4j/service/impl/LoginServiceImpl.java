@@ -94,7 +94,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			}
 			// 一分钟超时不再请求
 			SleepUtils.sleep(1000);
-			overTime = (millis - startMillis) > 1000 * 60;
+			overTime = (millis - startMillis) > 1000 * 180;
 		}
 		return isLogin;
 	}
@@ -184,6 +184,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap), getPersistentCookieMap());
 		try {
 			String result = EntityUtils.toString(entity, Consts.UTF_8);
+//			LOG.info("webWxInit_result: {}",result);
             /**
              * @see io.wxwobot.admin.itchat4j.beans.WebWxInit
              */
@@ -237,8 +238,8 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
 		try {
 			HttpEntity entity = core.getMyHttpClient().doPost(url, paramStr);
-			String result = EntityUtils.toString(entity, Consts.UTF_8);
-			LOG.info(result);
+//			String result = EntityUtils.toString(entity, Consts.UTF_8);
+//			LOG.info(result);
 		} catch (Exception e) {
 			LOG.error("微信状态通知接口失败！", e);
 		}
@@ -253,6 +254,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
 			@Override
 			public void run() {
+				long startTime = System.currentTimeMillis();
 				while (core.isAlive()) {
 					try {
 						Map<String, String> resultMap = syncCheck();
@@ -299,6 +301,9 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 								break;
 							}
 						}
+						if (System.currentTimeMillis() - startTime < 1000 * 1){
+							Thread.sleep(1000);
+						}
 					} catch (Exception e) {
 						LOG.info(e.getMessage());
 						retryCount += 1;
@@ -330,11 +335,11 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			Integer DelContactCount = msgObj.getInteger("DelContactCount");
 			Integer ModChatRoomMemberCount = msgObj.getInteger("ModChatRoomMemberCount");
 
-			if (PropKit.getBoolean("devMode",false)){
-				if (addMsgCount > 0 || ModMsgCount > 0 || DelContactCount > 0 || ModChatRoomMemberCount > 0){
-					LOG.info(msgObj.toJSONString());
-				}
-			}
+//			if (PropKit.getBoolean("devMode",false)){
+//				if (addMsgCount > 0 || ModMsgCount > 0 || DelContactCount > 0 || ModChatRoomMemberCount > 0){
+//					LOG.info(msgObj.toJSONString());
+//				}
+//			}
 
         	// 用于通知获取详细详细
         	List<String> modUserName = new ArrayList<>();
@@ -348,6 +353,8 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                     for (int j = 0; j < msgList.size(); j++) {
                         BaseMsg baseMsg = JSON.toJavaObject(msgList.getJSONObject(j),
                                 BaseMsg.class);
+                        // TODO
+                        LOG.info(JSON.toJSONString(baseMsg));
                         core.getMsgList().add(baseMsg);
                     }
                 }
@@ -426,6 +433,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                 JSONObject o = (JSONObject) iterator.next();
 
                 String userName = o.getString("UserName");
+
                 if (StringUtils.isEmpty(userName)){
                     LOG.error("{} 好友列表存在UserName空",core.getUniqueKey());
                     continue;
@@ -446,17 +454,13 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
 				if (userName.startsWith("@@")){
 				    // 群聊
-                    if (!core.getGroupInfoMap().containsKey(o.getString("UserName"))) {
-                        core.getGroupInfoMap().put(o.getString("UserName"),o);
-                        core.getGroupInfoMap().put(o.getString("NickName"),o);
-                        core.getGroupList().add(o);
-                    }
+					CoreManage.addNewGroup(core,o);
 
                 } else if (userName.startsWith("@")){
                     Integer verifyFlag = o.getInteger("VerifyFlag");
                     if (verifyFlag != null && verifyFlag == 0){
                         // 好友
-                        core.getContactList().add(o);
+						CoreManage.addNewContact(core,o);
                     }else {
                         // 公众号
                         core.getPublicUsersList().add(o);
@@ -481,10 +485,8 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()), System.currentTimeMillis(),
 				core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
 		Map<String, Object> paramMap = core.getParamMap();
-
-		// 为了获取群成员信息
+		// 处理群成员信息
         int size = core.getGroupList().size();
-        paramMap.put("Count", size);
 		List<Map<String, String>> list = new ArrayList<>();
 		for (int i = 0; i < size; i++) {
 			HashMap<String, String> map = new HashMap<>(4);
@@ -492,42 +494,57 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			map.put("EncryChatRoomId", "");
 			list.add(map);
 		}
+		// 处理玩家
+		int sizeUser = core.getContactList().size();
+		for (int i = 0; i < sizeUser; i++) {
+			HashMap<String, String> map = new HashMap<>(4);
+			map.put("UserName", core.getContactList().get(i).getString("UserName"));
+			map.put("EncryChatRoomId", "");
+			list.add(map);
+		}
+
+		int totalSize = list.size();
 
 		int batchSize = 50;
-        int num = size / batchSize;
-        if (size%batchSize >0){
+        int num = totalSize / batchSize;
+        if (totalSize%batchSize >0){
             num += 1;
         }
-        List<JSONObject> newGroupArray = new ArrayList<>();
-        List<JSONObject> newContactArray = new ArrayList<>();
+
         for (int i = 0;i < num;i++){
             int startNum = i * batchSize;
             int endNum = (i+1) * batchSize;
-            if (endNum > size){
-                endNum = size;
+            if (endNum > totalSize){
+                endNum = totalSize;
             }
+//            LOG.info("s:{} e:{} list:{}",startNum,endNum,JSONObject.toJSONString(list.subList(startNum,endNum)));
+			paramMap.put("Count", endNum - startNum);
             paramMap.put("List", list.subList(startNum,endNum));
+//			LOG.info(JSON.toJSONString(paramMap));
             HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap), getPersistentCookieMap());
             try {
                 String text = EntityUtils.toString(entity, Consts.UTF_8);
                 JSONObject obj = JSON.parseObject(text);
+//                LOG.info("BatchGetContact:"+obj.toJSONString());
                 JSONArray contactList = obj.getJSONArray("ContactList");
-                for (int j = 0; j < contactList.size(); j++) {
-                	String nickName = contactList.getJSONObject(j).getString("NickName");
-					String userName = contactList.getJSONObject(j).getString("UserName");
-					if (userName.startsWith("@@")) {
-						CoreManage.addNewGroup(core,contactList.getJSONObject(j));
-                    }
-                    else if (userName.startsWith("@")){
-						CoreManage.addNewContact(core,contactList.getJSONObject(j));
+				int contactSize = contactList.size();
+				if (contactSize > 0){
+					for (int j = 0; j < contactSize; j++) {
+						String nickName = contactList.getJSONObject(j).getString("NickName");
+						String userName = contactList.getJSONObject(j).getString("UserName");
+//						LOG.info("batch: {} {} ",userName,nickName);
+						if (userName.startsWith("@@")) {
+							CoreManage.addNewGroup(core,contactList.getJSONObject(j));
+						}
+						else if (userName.startsWith("@")){
+							CoreManage.addNewContact(core,contactList.getJSONObject(j));
+						}
 					}
-                }
+				}
             } catch (Exception e) {
                 LOG.info(e.getMessage());
             }
         }
-        // 直接刷新群列表,不用比较
-        core.setGroupList(newGroupArray);
 	}
 
 
@@ -544,11 +561,9 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()), System.currentTimeMillis(),
 				core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
 		Map<String, Object> paramMap = core.getParamMap();
-
 		// 为了获取群成员信息
 		List<Map<String, String>> list = new ArrayList<>();
 		int size = userNameList.size();
-		paramMap.put("Count", size);
 		for (int i = 0; i < size; i++) {
 			HashMap<String, String> map = new HashMap<>(4);
 			map.put("UserName", userNameList.get(i));
@@ -561,24 +576,28 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		if (size%batchSize >0){
 			num += 1;
 		}
-		List<JSONObject> newGroupArray = new ArrayList<>();
+
 		for (int i = 0;i < num;i++){
 			int startNum = i * batchSize;
 			int endNum = (i+1) * batchSize;
 			if (endNum > size){
 				endNum = size;
 			}
+			paramMap.put("Count", endNum - startNum);
 			paramMap.put("List", list.subList(startNum,endNum));
 			HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap));
 			try {
 				String text = EntityUtils.toString(entity, Consts.UTF_8);
 				JSONObject obj = JSON.parseObject(text);
 				JSONArray contactList = obj.getJSONArray("ContactList");
-				for (int j = 0; j < contactList.size(); j++) {
-					if (contactList.getJSONObject(j).getString("UserName").startsWith("@@")) {
-						CoreManage.addNewGroup(core,contactList.getJSONObject(j));
-					}else if (contactList.getJSONObject(j).getString("UserName").startsWith("@")){
-						CoreManage.addNewContact(core,contactList.getJSONObject(j));
+				int contactSize = contactList.size();
+				if (contactSize > 0){
+					for (int j = 0; j < contactList.size(); j++) {
+						if (contactList.getJSONObject(j).getString("UserName").startsWith("@@")) {
+							CoreManage.addNewGroup(core,contactList.getJSONObject(j));
+						}else if (contactList.getJSONObject(j).getString("UserName").startsWith("@")){
+							CoreManage.addNewContact(core,contactList.getJSONObject(j));
+						}
 					}
 				}
 			} catch (Exception e) {
@@ -615,7 +634,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		Matcher matcher = CommonTools.getMatcher(regEx, loginContent);
 		if (matcher.find()) {
 			String originalUrl = matcher.group(1);
-			String url = originalUrl.substring(0, originalUrl.lastIndexOf('/')); // https://wx2.qq.com/cgi-bin/mmwebwx-bin
+			String url = originalUrl.substring(0, originalUrl.lastIndexOf('/'));
 			core.getLoginInfo().put("url", url);
 			Map<String, List<String>> possibleUrlMap = this.getPossibleUrlMap();
 			Iterator<Entry<String, List<String>>> iterator = possibleUrlMap.entrySet().iterator();
@@ -849,7 +868,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		}
 		Map<String, String> headerMap = null;
 		if (cookieStr != null){
-			headerMap = new HashMap<>(4);
+			headerMap = new HashMap<>(2);
 			headerMap.put("Cookie",cookieStr);
 		}
 		/* ^-----------------------------------------------^ */

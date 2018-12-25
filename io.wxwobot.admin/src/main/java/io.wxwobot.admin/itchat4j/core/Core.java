@@ -39,7 +39,7 @@ public class Core {
 	boolean alive = false;
 
     /**
-	 * webWxInit
+	 * login,webWxInit
      * 登录接口获取
      */
 	private String indexUrl;
@@ -170,7 +170,7 @@ public class Core {
 			private static final long serialVersionUID = 1L;
 
 			{
-				Map<String, String> map = new HashMap<String, String>();
+				Map<String, String> map = new HashMap<String, String>(16);
 				for (BaseParaEnum baseRequest : BaseParaEnum.values()) {
 					map.put(baseRequest.para(), getLoginInfo().get(baseRequest.value()).toString());
 				}

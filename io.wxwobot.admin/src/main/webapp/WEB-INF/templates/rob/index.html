@@ -343,7 +343,13 @@
         $.ajax({url:"/robwk/getGroupNickNames?_ck="+uniqueKey,
             success:function(result){
                 if (result.code == '00'){
-                    bootbox.alert("群列表："+result.data);
+                    var listData = "<ul class=\"list-group\">";
+                    listData += "<li class=\"list-group-item\">群名列表:</li>";
+                    for(let index in result.data) {
+                        listData += "<li class=\"list-group-item\">"+result.data[index]+"</li>";
+                    };
+                    listData += "</ul>";
+                    bootbox.alert(listData);
                 } else{
                     bootbox.alert("错误！"+result.message);
                 }
@@ -426,17 +432,34 @@
             success: function (result) {
                 if (result.code == '00'){
                     $("#wxqrimg").attr("src", result.data);
-                    wxinit(key);
+                    login(key);
                 }else{
-                    bootbox.alert("错误！"+result.message);
+                    bootbox.alert("错误#getQr！"+result.message);
                 }
             },
             error: function () {
-                console.log("请求异常")
+                console.log("请求异常#getQr")
             }
         });
 
     };
+
+    function login(key) {
+        $.ajax({
+            url: "/robwk/login?_ck=" + key,
+            success: function (result) {
+                if (result.code == '00'){
+                    $('#wxqr_nickname').html("登录成功,正在加载数据");
+                    wxinit();
+                }else{
+                    bootbox.alert("错误#login！"+result.message);
+                }
+            },
+            error: function () {
+                console.log("请求异常#login")
+            }
+        });
+    }
 
     function wxinit(key) {
         $.ajax({
@@ -446,11 +469,11 @@
                     $('#qrModal').modal('hide');
                     refreshTable();
                 }else{
-                    bootbox.alert("错误！"+result.message);
+                    bootbox.alert("错误#wxinit！"+result.message);
                 }
             },
             error: function () {
-                console.log("请求异常")
+                console.log("请求异常#init")
             }
         });
     }

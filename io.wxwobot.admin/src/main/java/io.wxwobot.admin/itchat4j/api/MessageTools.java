@@ -148,6 +148,9 @@ public class MessageTools implements LogInterface {
 	 */
 	public static boolean webWxSendMsg(int msgType, String content, String toUserName, String uniqueKey) {
 		Core core = CoreManage.getInstance(uniqueKey);
+		if (!core.isAlive()){
+			return false;
+		}
 		String url = String.format(URLEnum.WEB_WX_SEND_MSG.getUrl(), core.getLoginInfo().get("url"));
 		Map<String, Object> msgMap = new HashMap<String, Object>(12);
 		msgMap.put("Type", msgType);
@@ -313,6 +316,9 @@ public class MessageTools implements LogInterface {
 	 */
 	private static boolean webWxSendMsgImg(String userId, String mediaId, String uniqueKey) {
 		Core core = CoreManage.getInstance(uniqueKey);
+		if (!core.isAlive()){
+			return false;
+		}
 		String url = String.format("%s/webwxsendmsgimg?fun=async&f=json&pass_ticket=%s", core.getLoginInfo().get("url"),
 				core.getLoginInfo().get("pass_ticket"));
 		Map<String, Object> msgMap = new HashMap<String, Object>(8);
@@ -424,6 +430,9 @@ public class MessageTools implements LogInterface {
 	 */
 	private static boolean webWxSendAppMsg(String userId, Map<String, String> data, String uniqueKey) {
 		Core core = CoreManage.getInstance(uniqueKey);
+		if (!core.isAlive()){
+			return false;
+		}
 		String url = String.format("%s/webwxsendappmsg?fun=async&f=json&pass_ticket=%s", core.getLoginInfo().get("url"),
 				core.getLoginInfo().get("pass_ticket"));
 		String clientMsgId = String.valueOf(System.currentTimeMillis())

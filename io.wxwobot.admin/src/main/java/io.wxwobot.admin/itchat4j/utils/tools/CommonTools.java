@@ -219,6 +219,40 @@ public class CommonTools {
 	}
 
 	/**
+	 * 转化成alias
+	 * @param d
+	 * @param k
+	 */
+	public static void emojiFormatter2(JSONObject d, String k) {
+		Matcher matcher = getMatcher("<span class=\"emoji emoji(.+?)\"></span>", d.getString(k));
+		StringBuilder sb = new StringBuilder();
+		String content = d.getString(k);
+		int lastStart = 0;
+		while (matcher.find()) {
+			String str = matcher.group(1);
+			if (str.length() == 6) {
+
+			} else if (str.length() == 10) {
+
+			} else {
+				str = "&#x" + str + ";";
+				String tmp = content.substring(lastStart, matcher.start());
+				sb.append(tmp + str);
+				lastStart = matcher.end();
+			}
+		}
+		if (lastStart < content.length()) {
+			sb.append(content.substring(lastStart));
+		}
+		if (sb.length() != 0) {
+			d.put(k, EmojiParser.parseToAliases(EmojiParser.parseToUnicode(sb.toString())));
+		} else {
+			d.put(k, content);
+		}
+
+	}
+
+	/**
 	 * 消息格式化
 	 * 
 	 * @author https://github.com/yaphone
@@ -235,7 +269,7 @@ public class CommonTools {
 	}
 
 	public static void main(String[] args) {
-		String str2 = "三生三世<span class=\"emoji emoji1f46f\"></span>十三水<span class=\"emoji emoji1f440\"></span> ";
+		String str2 = "三生三世<span class=\"emoji emoji1f46f\"></span>十三水<span class=\"emoji emoji1f440\"></span>";
 
 		Matcher matcher = getMatcher("<span class=\"emoji emoji(.+?)\"></span>", str2);
 		StringBuilder sb = new StringBuilder();
@@ -257,7 +291,11 @@ public class CommonTools {
 		if (lastStart < content.length()) {
 			sb.append(content.substring(lastStart));
 		}
-		System.out.println(EmojiParser.parseToUnicode(sb.toString()));
+		if (sb.length() != 0) {
+			System.out.println(EmojiParser.parseToUnicode(sb.toString()));
+			System.out.println(EmojiParser.parseToAliases(EmojiParser.parseToUnicode(sb.toString())));
+			System.out.println(EmojiParser.removeAllEmojis(sb.toString()));
+		}
 	}
 
 }

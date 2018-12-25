@@ -76,9 +76,6 @@ public class WechatTools  implements LogInterface {
 		List<String> groupNickNameList = new ArrayList<String>();
 		for (JSONObject o : core.getGroupList()) {
 			groupNickNameList.add(o.getString("NickName"));
-			// 顺便刷下缓存
-			core.getGroupInfoMap().put(o.getString("NickName"),o);
-			core.getGroupInfoMap().put(o.getString("UserName"),o);
 		}
 		return groupNickNameList;
 	}
@@ -140,7 +137,7 @@ public class WechatTools  implements LogInterface {
 				new BasicNameValuePair("skey", (String) core.getLoginInfo().get(StorageLoginInfoEnum.skey.getKey())));
 		try {
 			HttpEntity entity = core.getMyHttpClient().doGet(url, params, false, null);
-			String text = EntityUtils.toString(entity, Consts.UTF_8); // 无消息
+			String text = EntityUtils.toString(entity, Consts.UTF_8);
 			return true;
 		} catch (Exception e) {
 			LOG.debug(e.getMessage());
