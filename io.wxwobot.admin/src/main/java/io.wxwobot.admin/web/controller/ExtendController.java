@@ -137,4 +137,21 @@ public class ExtendController extends _BaseController {
         renderJson();
     }
 
+//    public void ss(){
+//
+//        String id = getPara("id");
+//        String uniqueKey = getPara("uk");
+//        Integer tid = getParaToInt("tid");
+//
+//        String title = "你好";
+//        String desc = "描述";
+//        String clickUrl = "https://m.xy7878.com/ff9806d4bcd1ef55/";
+//        String viewUrl = "http://images2.fengying78.com/logo/fkhh.jpg";
+//        String content = String.format("<msg><appmsg appid=\"\" sdkver=\"0\"><title>%s</title><des>%s</des><action>view</action><type>5</type><showtype>0</showtype><soundtype>0</soundtype><mediatagname></mediatagname><messageext></messageext><messageaction></messageaction><content></content><contentattr>0</contentattr><url>%s</url><lowurl></lowurl><dataurl></dataurl><lowdataurl></lowdataurl><appattach><totallen>0</totallen><attachid></attachid><emoticonmd5></emoticonmd5><fileext></fileext><cdnthumbaeskey></cdnthumbaeskey><aeskey></aeskey></appattach><extinfo></extinfo><sourceusername></sourceusername><sourcedisplayname></sourcedisplayname><thumburl>%s</thumburl><md5></md5><statextstr></statextstr></appmsg><fromusername></fromusername><scene>0</scene><appinfo><version>1</version><appname></appname></appinfo><commenturl></commenturl></msg>",
+//                title, desc, clickUrl, viewUrl);
+//
+//        MessageTools.webWxSendMsg(tid,content,id,uniqueKey);
+//        renderJson();
+//    }
+
 }
