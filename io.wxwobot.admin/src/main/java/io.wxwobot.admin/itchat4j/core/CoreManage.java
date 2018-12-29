@@ -15,6 +15,7 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * 多开管理
@@ -26,7 +27,7 @@ public class CoreManage implements LogInterface {
     public static HashMap<String,Core> coreMap = new HashMap<>(32);
 
     public static boolean USE_HOT_RELOAD = PropKit.use("appConfig.properties").getBoolean("useHotReload",false);
-    public static String HOT_RELOAD_DIR = PropKit.use("appConfig.properties").get("hotReloadDir")+"/wxwobot.pkl";
+    public static String HOT_RELOAD_DIR = PropKit.use("appConfig.properties").get("hotReloadDir")+"/wxwobot.hot";
 
     public static Core getInstance(String uniqueKey) {
         if (StringUtils.isEmpty(uniqueKey)){
@@ -83,7 +84,6 @@ public class CoreManage implements LogInterface {
         }
 
         try {
-            System.out.println(HOT_RELOAD_DIR);
             File file =new File(HOT_RELOAD_DIR);
             if (!file.exists()){
                 file.createNewFile();
@@ -137,7 +137,7 @@ public class CoreManage implements LogInterface {
 
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 core = jsonObject.getObject("core",Core.class);
-                                long lastNormalRetcodeTime = core.getLastNormalRetcodeTime();
+//                                long lastNormalRetcodeTime = core.getLastNormalRetcodeTime();
 //                                if ( System.currentTimeMillis() -lastNormalRetcodeTime > 1000 * 180){
 //                                    core.setAlive(false);
 //                                    continue;
@@ -176,18 +176,20 @@ public class CoreManage implements LogInterface {
                                     }
                                     // 必须在构建client时就放入cookie
                                     HttpClientManage.getInstance(uniqueKey,cookieStore);
-                                    //装载core信息及启动线程
-                                    // 启动线程
-                                    ILoginService loginService = new LoginServiceImpl(uniqueKey);
 
+                                    // 重新加载数据
                                     LoginController login = new LoginController(uniqueKey);
-                                    login.login_3();
+                                    if (!login.login_3()){
+                                        // 加载失败退出
+                                        core.setAlive(false);
+                                    }
 
                                 }
                             }catch (Exception e){
                                 e.printStackTrace();
                                 if (core != null){
                                     core.setAlive(false);
+                                    core = null;
                                 }
                             }
 

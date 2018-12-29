@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.itchat4j.api.MessageTools;
+import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.utils.SleepUtils;
 import io.wxwobot.admin.web.enums.KeyMsgValueType;
 import io.wxwobot.admin.web.model.WxRobRelation;
@@ -94,8 +95,16 @@ public class ExtendController extends _BaseController {
          *
          * 多条消息发送看最后一条成功与否
          */
-        Boolean toGroup = relationRecord.getToGroup();
         String uniqueKey = relationRecord.getUniqueKey();
+        // 查看机器是否加载完成
+        if (!CoreManage.getInstance(uniqueKey).isAlive() || !CoreManage.getInstance(uniqueKey).isFinishInit()){
+            setCode("05");
+            setMsg("机器未准备完成");
+            renderJson();
+            return;
+        }
+
+        Boolean toGroup = relationRecord.getToGroup();
         String nickName = relationRecord.getNickName();
         String realImgUploadPath = PropKit.use("appConfig.properties").get("realImgUploadPath")+ File.separator;
         String realFileUploadPath = PropKit.use("appConfig.properties").get("realFileUploadPath")+ File.separator;
@@ -118,7 +127,7 @@ public class ExtendController extends _BaseController {
             }else if (KeyMsgValueType.FILE.toValue().equals(type)){
                 result = MessageTools.sendFileMsgByNickNameApi(nickName,realFileUploadPath+body,uniqueKey,toGroup);
             }
-            SleepUtils.sleep(200);
+            SleepUtils.sleep(500);
         }
 
         if (!result){

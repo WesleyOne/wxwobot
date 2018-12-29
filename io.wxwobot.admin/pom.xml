@@ -79,8 +79,8 @@
         <pro.upload.img.realpath>/home/www/web-deploy/com.xyagent.admin.images/rob/img</pro.upload.img.realpath>
         <pro.upload.file.realpath>/home/www/web-deploy/com.xyagent.admin.images/rob/file</pro.upload.file.realpath>
         <pro.upload.reload.realpath>/home/www/web-deploy/com.xyagent.admin.images/rob/reload</pro.upload.reload.realpath>
-        <pro.domain.img>http://robtest.com/img/</pro.domain.img>
-        <pro.domain.file>http://robtest.com/file/</pro.domain.file>
+        <pro.domain.img>http://robtest.fengying78.com/img/</pro.domain.img>
+        <pro.domain.file>http://robtest.fengying78.com/file/</pro.domain.file>
       </properties>
     </profile>
   </profiles>

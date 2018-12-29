@@ -3,11 +3,14 @@ package io.wxwobot.admin.web.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.render.JsonRender;
+import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.web.model.WxRobRelation;
 import io.wxwobot.admin.web.utils.UUIDShortUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * TODO 关联配置
@@ -66,6 +69,7 @@ public class RelateController extends _BaseController {
         Integer kid = getParaToInt("kid");
         WxRobRelation wxRobRelation;
         boolean isEdit = true;
+        Set<String> groupNickNames = new HashSet<>();
         if (kid != null){
             wxRobRelation = WxRobRelation.dao.findById(kid);
         }else{
@@ -76,6 +80,7 @@ public class RelateController extends _BaseController {
             Boolean toGroup = getParaToBoolean("tgb");
             if (StringUtils.isNotEmpty(uniqueKey)){
                 wxRobRelation.setUniqueKey(uniqueKey);
+                groupNickNames.addAll(CoreManage.getInstance(uniqueKey).getGroupInfoMap().keySet());
             }
             if (StringUtils.isNotEmpty(nickName)){
                 wxRobRelation.setNickName(nickName);
@@ -88,7 +93,7 @@ public class RelateController extends _BaseController {
         }
         setAttr("isEdit",isEdit);
         setAttr("form",wxRobRelation);
-
+        setAttr("groupNickNames",groupNickNames);
         setAttr("active","relate");
         renderTemplate("editIndex.html");
     }

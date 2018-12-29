@@ -27,5 +27,7 @@ public class MyRoute extends Routes {
 		add("/upload",UploadController.class);
 		add("/tool",ToolController.class);
 
+		add("/qyq",QyqController.class);
+
 	}
 }

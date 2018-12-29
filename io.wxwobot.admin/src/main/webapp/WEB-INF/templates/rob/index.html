@@ -14,20 +14,23 @@
         <div class="form-group">
             <label for="search_enable">是否已启用</label>
             <select class="form-control" id="search_enable" aria-describedby="search_enable">
-                <option value="" selected="selected">全部</option>
-                <option value="true">是</option>
+                <option value="" >全部</option>
+                <option value="true" selected="selected">是</option>
                 <option value="false">否</option>
             </select>
         </div>
-        <button type="button" class="btn btn-primary" id="searchPost">
-            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>搜索
-        </button>
     </form>
 </div>
 
 <div class="tableBody">
     <div id="toolbar">
+        <button type="button" class="btn btn-primary" id="searchPost">
+            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>搜索
+        </button>
         <a type="button" class="btn btn-primary" href="/rob/addIndex"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>添加机器人</a>
+        <button type="button" class="btn btn-primary" id="manualCopy">
+            <span class="glyphicon glyphicon-cloud" aria-hidden="true"></span>持久化热登信息
+        </button>
     </div>
     <table id="rob_config" class="table table-hover" ></table>
 </div>
@@ -142,7 +145,8 @@
                                                 var btn = "<button type='button' class='btn btn-danger btn-xs' onclick='wxlogout(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>已在线-退出</button>";
                                                 var refresh_1 = "<button type='button' class='btn btn-info btn-xs' onclick='refresh_data(\""+row['uniqueKey']+"\")'>刷新数据</button>";
                                                 var group_1 = "<button type='button' class='btn btn-warning btn-xs' onclick='openGroup(\""+row['uniqueKey']+"\")'>查看群列表</button>";
-                                                result = btn+refresh_1+group_1;
+                                                var btn_reboot = "<button type='button' class='btn btn-danger btn-xs' onclick='wxReboot(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>重&nbsp;&nbsp;启</button>";
+                                                result = btn+refresh_1+group_1+btn_reboot;
                                                 break;
                                             case false:
                                                 var btn = "<button type='button' class='btn btn-primary btn-xs' onclick='wxloginPost(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>已下线-登录</button>";
@@ -168,12 +172,14 @@
                                         var bt_remark_edit = "<button type='button' class='btn btn-default' onclick='openEditRemark(\""+row.id+"\",\""+row.remark+"\")'>修改备注</button>";
                                         var bt_key = "<a  type='button' class='btn btn-info' href='/kw?uk="+row.uniqueKey+"'>查看关键字</a>";
                                         var bt_add_key = "<a  type='button' class='btn btn-primary' href='/kw/editIndex?uk="+row.uniqueKey+"'>新增关键字</a>";
-                                        var bt_add_relate = "<a class='btn btn-warning btn-xs' href='/relate/editIndex?uk="+row.uniqueKey+"' >外接配置</a>";
+                                        var bt_relate = "<a class='btn btn-warning btn-xs' href='/relate?uk="+row.uniqueKey+"' >查看外接配置</a>";
+                                        var bt_add_relate = "<a class='btn btn-success btn-xs' href='/relate/editIndex?uk="+row.uniqueKey+"' >新增外接配置</a>";
 
                                         var element = "<div class='btn-group-vertical btn-group-xs ' role='group'>"
                                             + bt_remark_edit
                                             + bt_key
                                             + bt_add_key
+                                            + bt_relate
                                             + bt_add_relate
                                             + "</div>";
                                         return element;
@@ -337,6 +343,26 @@
                         url : search_url
                     });
                 });
+
+                $('#manualCopy').click(function () {
+                    bootbox.confirm("<h4>确定备份登录信息吗？</h4>",function(result){
+                        if (result){
+                            $.ajax({url:"/robwk/manualCopy",
+                                success:function(result){
+                                    if (result.code == '00'){
+                                        bootbox.alert(result.message);
+                                    } else{
+                                        bootbox.alert("错误！"+result.message);
+                                    }
+                                },
+                                error : function() {
+                                    bootbox.alert("请求异常");
+                                }
+                            });
+                        }
+
+                    });
+                })
             });
 
     function openGroup(uniqueKey) {
@@ -361,30 +387,35 @@
     }
 
     function refresh_data(uniqueKey) {
-        $.ajax({url:"/robwk/gct?_ck="+uniqueKey,
-            success:function(result){
-                if (result.code == '00'){
-                    $.ajax({url:"/robwk/ggp?_ck="+uniqueKey,
-                        success:function(result){
-                            if (result.code == '00'){
-                                bootbox.alert(result.message);
-                            } else{
-                                bootbox.alert("错误！"+result.message);
-                            }
-                        },
-                        error : function() {
-                            bootbox.alert("请求异常");
+        bootbox.confirm("<h4>确定刷新【"+uniqueKey+"】吗？</h4>",function(result){
+            if (result){
+                $.ajax({url:"/robwk/gct?_ck="+uniqueKey,
+                    success:function(result){
+                        if (result.code == '00'){
+                            $.ajax({url:"/robwk/ggp?_ck="+uniqueKey,
+                                success:function(result){
+                                    if (result.code == '00'){
+                                        bootbox.alert(result.message);
+                                    } else{
+                                        bootbox.alert("错误！"+result.message);
+                                    }
+                                },
+                                error : function() {
+                                    bootbox.alert("请求异常");
+                                }
+                            });
+
+
+                        } else{
+                            bootbox.alert("错误！"+result.message);
                         }
-                    });
-
-
-                } else{
-                    bootbox.alert("错误！"+result.message);
-                }
-            },
-            error : function() {
-                bootbox.alert("请求异常");
+                    },
+                    error : function() {
+                        bootbox.alert("请求异常");
+                    }
+                });
             }
+
         });
     }
 
@@ -409,6 +440,27 @@
         });
 
     };
+
+    function wxReboot(key,name) {
+        bootbox.confirm("<h4>确定退出【"+name+"】吗？</h4>",function(result){
+            if (result){
+                bootbox.alert("<h4>重启【"+name+"】中,请耐心等待...</h4>");
+                $.ajax({url:"/robwk/reboot?_ck="+key,
+                    success:function(result){
+                        if (result.code == '00'){
+                            refreshTable();
+                        } else{
+                            bootbox.alert("错误！"+result.message);
+                        }
+                    },
+                    error : function() {
+                        bootbox.alert("请求异常");
+                    }
+                });
+            }
+
+        });
+    }
 
     //延迟执行函数
     function debounce(fn,wait){
@@ -450,7 +502,7 @@
             success: function (result) {
                 if (result.code == '00'){
                     $('#wxqr_nickname').html("登录成功,正在加载数据");
-                    wxinit();
+                    wxinit(key);
                 }else{
                     bootbox.alert("错误#login！"+result.message);
                 }

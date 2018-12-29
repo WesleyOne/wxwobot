@@ -37,6 +37,7 @@ public class MyConfig extends JFinalConfig {
 		me.setEncoding("UTF-8");
 		me.setJsonFactory(new FastJsonFactory());
 		me.setBaseUploadPath(PropKit.get("cachUploadPath"));
+		me.setError404View("/WEB-INF/templates/404.html");
 	}
 	
 	/**

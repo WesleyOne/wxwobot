@@ -46,7 +46,9 @@ public class BaseMsg implements Serializable {
 	private String mediaId;
 	private String content;
 	private String statusNotifyUserName;
-	// 发送者群昵称
+	private boolean atMe;
+	// 群发送者ID昵称
+	private String sendMemberId;
 	private String memberNickname;
 	/** 消息发送者ID **/
 	private String fromUserName;
@@ -308,5 +310,21 @@ public class BaseMsg implements Serializable {
 
 	public void setFromNickName(String fromNickName) {
 		this.fromNickName = fromNickName;
+	}
+
+	public String getSendMemberId() {
+		return sendMemberId;
+	}
+
+	public void setSendMemberId(String sendMemberId) {
+		this.sendMemberId = sendMemberId;
+	}
+
+	public boolean isAtMe() {
+		return atMe;
+	}
+
+	public void setAtMe(boolean atMe) {
+		this.atMe = atMe;
 	}
 }

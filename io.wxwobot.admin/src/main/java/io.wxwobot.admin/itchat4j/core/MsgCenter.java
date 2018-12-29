@@ -46,10 +46,11 @@ public class MsgCenter implements LogInterface {
 		for (int i = 0; i < msgList.size(); i++) {
 			JSONObject m = msgList.getJSONObject(i);
 			// 是否是群消息
-			m.put("groupMsg", false);
+			boolean isGroupMsg = false;
+			boolean isAtMe = false;
 			if (m.getString("FromUserName").contains("@@") || m.getString("ToUserName").contains("@@")) {
 				// 群聊消息
-				m.put("groupMsg", true);
+				isGroupMsg = true;
 				if (m.getString("FromUserName").contains("@@")
 						&& !core.getGroupInfoMap().containsKey(m.getString("FromUserName"))) {
                     unknowGroup.add(m.getString("FromUserName"));
@@ -58,14 +59,23 @@ public class MsgCenter implements LogInterface {
                     unknowGroup.add(m.getString("ToUserName"));
 				}
 				// 群消息与普通消息不同的是在其消息体（Content）中会包含发送者id及":<br/>"消息，这里需要处理一下，去掉多余信息，只保留消息内容
-				if (m.getString("Content").contains("<br/>")) {
-					String content = m.getString("Content").substring(m.getString("Content").indexOf("<br/>") + 5);
-					String sendMemberId = m.getString("Content").substring(0,m.getString("Content").indexOf("<br/>"));
+				String splitCode = ":<br/>";
+				if (m.getString("Content").contains(splitCode)) {
+					String source = m.getString("Content");
+					String content = source.substring(source.indexOf(splitCode) + splitCode.length());
+					String sendMemberId = source.substring(0,source.indexOf(splitCode));
+
 					m.put("Content", content);
 					m.put(MoreConfig.SEND_MEMBER_ID,sendMemberId);
-				}
-			}
 
+					if (content.contains("@"+core.getNickName())){
+						isAtMe = true;
+					}
+				}
+
+			}
+			m.put("groupMsg", isGroupMsg);
+			m.put("atMe", isAtMe);
 			// 1.文本消息
 			if (m.getInteger("MsgType").equals(MsgCodeEnum.MSGTYPE_TEXT.getCode())) {
 				if (m.getString("Url").length() != 0) {

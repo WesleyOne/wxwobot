@@ -44,7 +44,7 @@ public class _JFinalDemoGenerator {
 		generator.addExcludedTable("agent","agent_app","agent_bank","agent_percent","agent_withdraw","app"
 				,"app_setting","business_apply","commission_detail","company","custom_config","exchange_activity","exchange_goods"
 				,"exchange_record","goods","goods2","order","order_goods","payment_apply","player"
-				,"privs","privs_player","recharge_record","role","stat_order_day","trade","transfer_record"
+				,"privs","privs_player","recharge_record","role","stat_order_day","trade","transfer_record","wx_player_cash_img"
 				);
 		// 设置是否在 Model 中生成 dao 对象
 		generator.setGenerateDaoInModel(false);

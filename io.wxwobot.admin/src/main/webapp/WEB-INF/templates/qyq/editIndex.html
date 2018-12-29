@@ -2,69 +2,57 @@
 
 #define main()
 <ol class="breadcrumb">
-    #if(form.uniqueKey ??)
-    <li><a href="/relate?uk=#(form.uniqueKey ??)">#(form.uniqueKey ??)的外接配置</a></li>
+    #if(form.outKey ??)
+    <li><a href="/qyq?ok=#(form.outKey ??)">#(form.outKey ??)的配置</a></li>
     #else
-    <li><a href="/relate">所有外接配置</a></li>
+    <li><a href="/qyq">所有关键字</a></li>
     #end
-    <li class="active">#if(isEdit)修改#else添加#end外接配置</li>
+    <li class="active">#if(isEdit)修改#else添加#end配置</li>
 </ol>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">#if(isEdit)修改#else添加#end外接配置</h3>
+        <h3 class="panel-title">#if(isEdit)修改#else添加#end配置</h3>
     </div>
     <div class="panel-body">
-        <div class="well" ><span style="color: red">预防封号，谨慎填写内容！</span></div>
+        <div class="well" ><span style="color: red">预防发错，谨慎填写内容！</span></div>
         <div class="well" >
-            <form class="form-horizontal"  role="form" id="addOutForm">
+            <form class="form-horizontal"  role="form" id="addForm">
                 <div class="form-group">
-                    <label for="kid" class="col-sm-2 control-label"  #if(!isEdit) hidden #end>记录ID:</label>
-                    <div class="col-sm-2"  #if(!isEdit) hidden #end>
-                        <input type="text" class="form-control" id="kid" name="kid" value="#(form.id ??)" readonly>
+                    <label for="id" class="col-sm-2 control-label"  #if(!isEdit) hidden #end>记录ID:</label>
+                    <div class="col-sm-4"  #if(!isEdit) hidden #end>
+                        <input type="text" class="form-control" id="id" name="id" value="#(form.id ??)" readonly>
                     </div>
-                    <label for="outKey" class="col-sm-2 control-label" #if(!isEdit) hidden #end>外接唯一码:</label>
-                    <div class="col-sm-2" #if(!isEdit) hidden #end>
-                        <input type="text" class="form-control" id="outKey" readonly value="#(form.outKey ??)">
-                    </div>
-                    <label for="uniqueKey" class="col-sm-2 control-label">机器唯一码:</label>
-                    <div class="col-sm-2">
-                        <input type="text" class="form-control" id="uniqueKey" name="uniqueKey" readonly value="#(form.uniqueKey ??)">
+                    <label for="outKey" class="col-sm-2 control-label">外接码:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="outKey" name="outKey" value="#(form.outKey ??)" #if(form.outKey ??) readonly #end)>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="toGroup" class="col-sm-2 control-label">群聊/好友:</label>
-                    <div class="col-sm-2">
-                        <select class="form-control" id="toGroup" name="toGroup">
-                            #set(fg = from.toGroup ?? true)
-                            <option value="1" #if(fg) selected #end>群聊</option>
-                            <option value="0" #if(!fg) selected #end>好友</option>
+                    <label for="appId" class="col-sm-2 control-label">应用</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" id="appId" name="appId">
+                            <option value=""></option>
+                            #set(fg = form.appId ??)
+                            #for( app : apps ??)
+                            <option value="#(app.id)" #if(fg == app.id) selected #end>#(app.id ??) #(app.name ??)</option>
+                            #end
                         </select>
                     </div>
-                    <label for="nickName" class="col-sm-2 control-label">目标微信昵称:</label>
+                    <label for="pyqId" class="col-sm-2 control-label">亲友圈ID:</label>
                     <div class="col-sm-4">
-                        <!--<input type="text" class="form-control" id="nickName" name="nickName" value="#(form.nickName ??)">-->
-                        <div class="input-group">
-                            <div class="input-group-btn">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择 <span class="caret"></span></button>
-                                <ul class="dropdown-menu" id="nickNameBox">
-                                    #for( gp : groupNickNames ??)
-                                    <li><a type="buttom" onclick="chooseName('#(gp)')">#(gp)</a></li>
-                                    #end
-                                </ul>
-                            </div>
-                            <input type="text" class="form-control" id="nickName" name="nickName" value="#(form.nickName ??)" >
-                        </div>
+                        <input type="text" class="form-control" id="pyqId" name="pyqId" value="#(form.pyqId ??)">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="whiteList" class="col-sm-2 control-label">IP白名单<span class="badge" title="0.0.0.0表示对所有IP开放，不填相当禁用,多个IP逗号分隔">?</span>:</label>
-                    <div class="col-sm-10">
-                        <textarea class="form-control" rows="5" maxlength="250" id="whiteList" name="whiteList" style="resize: none;">#(form.whiteList ??)</textarea>
+                    <label for="img" class="col-sm-2 control-label" >图片ID</label>
+                    <div class="col-sm-4" >
+                        <input type="text" class="form-control" id="img" name="img" value="#(form.img ??)">
+                    </div>
+                    <div class="col-sm-2">
+                        <button class="btn btn-primary btn-small" onclick="checkImg()">验证图片</button>
                     </div>
                 </div>
-        </div>
-    </div>
-                </div>
+
                 <div class="form-group">
                     <div class="col-sm-offset-8 col-sm-2">
                         <button type="reset" class="btn btn-default btn-lg btn-block" #if(isEdit) disabled #end>重置</button>
@@ -83,7 +71,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="addPostModalLabel">确认#if(isEdit)修改#else添加#end外接配置</h4>
+                <h4 class="modal-title" id="addPostModalLabel">确认#if(isEdit)修改#else添加#end配置吗？</h4>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
@@ -96,17 +84,20 @@
 
 #define css()
 <link href="/assets/css/bootstrapValidator.min.css" rel="stylesheet">
+<link href="/assets/fileinput/css/fileinput.min.css" rel="stylesheet">
 #end
 
 #define js()
 <script src="/assets/js/bootstrapValidator.min.js"></script>
 <script src="/assets/js/lang/bootstrapValidator_zh_CN.js"></script>
+<script src="/assets/fileinput/js/fileinput.min.js"></script>
+<script src="/assets/fileinput/js/locales/zh.js"></script>
 <script type="text/javascript">
     var addFormValid;
 
     $(function () {
 
-        addFormValid = $('#addOutForm').bootstrapValidator({
+        addFormValid = $('#addForm').bootstrapValidator({
             message: 'This value is not valid',
             feedbackIcons: {
                 valid: 'glyphicon glyphicon-ok',
@@ -114,24 +105,31 @@
                 validating: 'glyphicon glyphicon-refresh'
             },
             fields: {
-                uniqueKey: {
+                outKey: {
                     validators: {
                         notEmpty: {
-                            message: '页面失效,关闭后重新进入'
+                            message: '外接码不能为空'
                         }
                     }
                 },
-                toGroup: {
+                appId: {
                     validators: {
                         notEmpty: {
-                            message: '未选择对象类型'
+                            message: '应用不能为空'
                         }
                     }
                 },
-                nickName: {
+                pyqId: {
                     validators: {
                         notEmpty: {
-                            message: '目标昵称不能为空'
+                            message: '亲友圈ID不能为空'
+                        }
+                    }
+                },
+                img: {
+                    validators: {
+                        notEmpty: {
+                            message: '图片ID不能为空'
                         }
                     }
                 }
@@ -140,13 +138,17 @@
 
     });
 
-    function chooseName(nickName) {
-        $('#nickName').val(nickName);
+
+    function checkImg() {
+        var img_src = $('#img').val();
+        if (img_src != ''){
+            bootbox.alert("<img id=\"showImg\" class=\"img-thumbnail\" style=\"width: 300px;\" src=\"#(imgdomain)"+img_src+"\">");
+        }
     }
 
     function openAddModel() {
         addFormValid.bootstrapValidator('validate');
-        if ( $("#addOutForm").data('bootstrapValidator').isValid()){
+        if ( $("#addForm").data('bootstrapValidator').isValid()){
             // 显示模态框
             $('#addPostModal').modal('show');
         }
@@ -166,21 +168,22 @@
 
     function addPost() {
         addFormValid.bootstrapValidator('validate');
-        if ( $("#addOutForm").data('bootstrapValidator').isValid()){
+        if ( $("#addForm").data('bootstrapValidator').isValid()){
 
-            var fv = $('#addOutForm').serializeObject();
+            var fv = $('#addForm').serializeObject();
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: "/relate/editRelate" ,
+                url: "/qyq/editPost" ,
                 data: JSON.stringify(fv),
                 contentType: "application/json",
                 success: function (result) {
                     $('#addPostModal').modal('hide');
                     if (result.code == '00'){
                         bootbox.alert(result.message);
+                        var data = result.data;
                         debounce(function () {
-                            window.location.reload();
+                            window.top.location = '/qyq?ok='+data.outKey;
                         },1500);
                     } else{
                         bootbox.alert("请求异常:"+result.message);

@@ -83,6 +83,11 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 						isLogin = true;
 						core.setAlive(isLogin);
 						break;
+					}else{
+						// 登入失败或异常
+						isLogin = false;
+						core.setAlive(isLogin);
+						break;
 					}
 				}
 				if (ResultEnum.WAIT_CONFIRM.getCode().equals(status)) {
@@ -172,17 +177,16 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 	public boolean webWxInit() {
 		core.setAlive(true);
 		core.setLastNormalRetcodeTime(System.currentTimeMillis());
-		// 组装请求URL和参数
-		String url = String.format(URLEnum.INIT_URL.getUrl(),
-				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()),
-				String.valueOf(System.currentTimeMillis() / 3158L),
-				core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
 
-		Map<String, Object> paramMap = core.getParamMap();
-
-		// 请求初始化接口
-		HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap), getPersistentCookieMap());
 		try {
+			// 组装请求URL和参数
+			String url = String.format(URLEnum.INIT_URL.getUrl(),
+					core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()),
+					String.valueOf(System.currentTimeMillis() / 3158L),
+					core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
+			Map<String, Object> paramMap = core.getParamMap();
+			// 请求初始化接口
+			HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap), getPersistentCookieMap());
 			String result = EntityUtils.toString(entity, Consts.UTF_8);
 //			LOG.info("webWxInit_result: {}",result);
             /**
@@ -218,6 +222,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
              */
 		} catch (Exception e) {
 			e.printStackTrace();
+			core.setAlive(false);
 			return false;
 		}
 		return true;
@@ -254,8 +259,8 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
 			@Override
 			public void run() {
-				long startTime = System.currentTimeMillis();
 				while (core.isAlive()) {
+					long startTime = System.currentTimeMillis();
 					try {
 						Map<String, String> resultMap = syncCheck();
 						LOG.info(JSONObject.toJSONString(resultMap));
@@ -277,30 +282,41 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                                         continue;
                                     }else if (selector.equals(SelectorEnum.NEW_MSG.getCode())) {
                                         // 有新消息
-                                        processWebwxSync();
+//                                        processWebwxSync();
                                     } else if (selector.equals(SelectorEnum.ENTER_OR_LEAVE_CHAT.getCode())) {
-                                        processWebwxSync();
+//                                        processWebwxSync();
                                     } else if (selector.equals(SelectorEnum.MOD_CONTACT.getCode())) {
-                                        processWebwxSync();
+//                                        processWebwxSync();
                                     } else if (selector.equals(SelectorEnum.SELECTOR_3.getCode())) {
-                                        processWebwxSync();
-                                        continue;
+//                                        processWebwxSync();
+//                                        continue;
                                     } else if (selector.equals(SelectorEnum.ADD_OR_DEL_CONTACT.getCode())) {
-                                        processWebwxSync();
+//                                        processWebwxSync();
                                     } else {
                                         LOG.error("UNKNOW SELECTOR CODE {}", selector);
                                     }
                                 }else{
                                     // 防止新类型不处理堆积
-                                    processWebwxSync();
+//                                    processWebwxSync();
                                 }
+							} else if (retcode.equals(RetCodeEnum.NOT_LOGIN_CHECK.getCode()) ||
+									retcode.equals(RetCodeEnum.TICKET_ERROR.getCode()) ||
+									retcode.equals(RetCodeEnum.PARAM_ERROR.getCode()) ||
+									retcode.equals(RetCodeEnum.NOT_LOGIN_WARN.getCode()) ||
+									retcode.equals(RetCodeEnum.COOKIE_INVALID_ERROR.getCode()) ||
+									retcode.equals(RetCodeEnum.LOGIN_ENV_ERROR.getCode()) ){
+								// 状态异常直接退出
+								core.setAlive(false);
+								break;
 							} else {
-								LOG.error(RetCodeEnum.fromCode(retcode).getType());
 								// 防止频繁请求
 								SleepUtils.sleep(1000);
 								break;
 							}
+						}else{
+							LOG.error("特殊retcode： {}" ,retcode);
 						}
+						processWebwxSync();
 						if (System.currentTimeMillis() - startTime < 1000 * 1){
 							Thread.sleep(1000);
 						}
@@ -335,11 +351,11 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			Integer DelContactCount = msgObj.getInteger("DelContactCount");
 			Integer ModChatRoomMemberCount = msgObj.getInteger("ModChatRoomMemberCount");
 
-//			if (PropKit.getBoolean("devMode",false)){
-//				if (addMsgCount > 0 || ModMsgCount > 0 || DelContactCount > 0 || ModChatRoomMemberCount > 0){
-//					LOG.info(msgObj.toJSONString());
-//				}
-//			}
+			if (PropKit.getBoolean("devMode",false)){
+				if (addMsgCount > 0 || ModMsgCount > 0 || DelContactCount > 0 || ModChatRoomMemberCount > 0){
+					LOG.info(msgObj.toJSONString());
+				}
+			}
 
         	// 用于通知获取详细详细
         	List<String> modUserName = new ArrayList<>();
@@ -353,8 +369,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                     for (int j = 0; j < msgList.size(); j++) {
                         BaseMsg baseMsg = JSON.toJavaObject(msgList.getJSONObject(j),
                                 BaseMsg.class);
-                        // TODO
-                        LOG.info(JSON.toJSONString(baseMsg));
                         core.getMsgList().add(baseMsg);
                     }
                 }
@@ -767,6 +781,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 	 */
 	private JSONObject webWxSync() {
 		JSONObject result = null;
+		LOG.info("webWxSync_LoginInfo: {}",JSON.toJSONString(core.getLoginInfo()));
 		String url = String.format(URLEnum.WEB_WX_SYNC_URL.getUrl(),
 				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()),
 				core.getLoginInfo().get(StorageLoginInfoEnum.wxsid.getKey()),
@@ -781,6 +796,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			HttpEntity entity = core.getMyHttpClient().doPost(url, paramStr, getPersistentCookieMap());
 			String text = EntityUtils.toString(entity, Consts.UTF_8);
 			JSONObject obj = JSON.parseObject(text);
+			LOG.info("webWxSync_BaseResponse: {}",obj.getJSONObject("BaseResponse").toJSONString());
 			if (obj.getJSONObject("BaseResponse").getInteger("Ret") != 0) {
 				result = null;
 			} else {

@@ -4,11 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.render.JsonRender;
+import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.web.enums.KeyMsgValueType;
 import io.wxwobot.admin.web.model.WxRobKeyword;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * TODO 关键词操作
@@ -73,6 +74,7 @@ public class KeyWordController extends _BaseController{
         Integer kid = getParaToInt("kid");
         WxRobKeyword kwRecord;
         boolean isEdit = true;
+        Set<String> groupNickNames = new HashSet<>();
         if (kid != null){
             kwRecord = WxRobKeyword.dao.findById(kid);
         }else{
@@ -81,6 +83,7 @@ public class KeyWordController extends _BaseController{
             String uniqueKey = getPara("uk");
             if (StringUtils.isNotEmpty(uniqueKey)){
                 kwRecord.setUniqueKey(uniqueKey);
+                groupNickNames.addAll(CoreManage.getInstance(uniqueKey).getGroupInfoMap().keySet());
             }
             // 默认显示文本
             kwRecord.setTypeData(KeyMsgValueType.TEXT.toValue());
@@ -92,6 +95,7 @@ public class KeyWordController extends _BaseController{
         setAttr("keys",KeyMsgValueType.LIST_KV);
         setAttr("imgdomain",PropKit.get("imgDomain"));
         setAttr("filedomain",PropKit.get("fileDomain"));
+        setAttr("groupNickNames",groupNickNames);
         renderTemplate("editIndex.html");
     }
 

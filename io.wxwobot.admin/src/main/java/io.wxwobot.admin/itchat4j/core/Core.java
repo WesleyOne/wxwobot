@@ -38,6 +38,9 @@ public class Core {
 
 	boolean alive = false;
 
+	@JSONField(serialize=false)
+	boolean isFinishInit = false;
+
     /**
 	 * login,webWxInit
      * 登录接口获取
@@ -193,6 +196,9 @@ public class Core {
 
 	public void setAlive(boolean alive) {
 		this.alive = alive;
+		if (!alive){
+			this.isFinishInit = false;
+		}
 	}
 
 	public String getIndexUrl() {
@@ -326,5 +332,13 @@ public class Core {
 
 	public void setUserInfoMap(Map<String, JSONObject> userInfoMap) {
 		this.userInfoMap = userInfoMap;
+	}
+
+	public boolean isFinishInit() {
+		return isFinishInit;
+	}
+
+	public void setFinishInit(boolean finishInit) {
+		isFinishInit = finishInit;
 	}
 }

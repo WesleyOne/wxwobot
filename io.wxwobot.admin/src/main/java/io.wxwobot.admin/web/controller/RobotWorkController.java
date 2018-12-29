@@ -54,7 +54,12 @@ public class RobotWorkController extends _BaseController {
     public void login() throws BaseException {
         String coreKey = getCoreKey();
         LoginController login = new LoginController(coreKey);
-        login.login_2();
+        boolean result = login.login_2();
+        if (result){
+
+        }else{
+            setOperateErr();
+        }
         renderJson();
     }
 
@@ -166,5 +171,25 @@ public class RobotWorkController extends _BaseController {
         renderJson();
     }
 
+    /**
+     * 重启
+     * @throws BaseException
+     */
+    public void reboot() throws BaseException {
+        String coreKey = getCoreKey();
+        LoginController login = new LoginController(coreKey);
+        boolean loginResult = login.reboot();
+        setData(loginResult);
+        renderJson();
+    }
+
+
+    /**
+     * 手动备份热登录信息
+     */
+    public void manualCopy(){
+        CoreManage.persistence();
+        renderJson();
+    }
 
 }

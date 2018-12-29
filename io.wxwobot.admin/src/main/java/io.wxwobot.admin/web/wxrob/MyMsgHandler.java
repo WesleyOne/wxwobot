@@ -1,7 +1,6 @@
 package io.wxwobot.admin.web.wxrob;
 
 
-import com.alibaba.fastjson.JSON;
 import io.wxwobot.admin.itchat4j.api.MessageTools;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
 import io.wxwobot.admin.itchat4j.core.Core;
@@ -10,10 +9,10 @@ import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
 import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
 import io.wxwobot.admin.web.constant.ConfigKeys;
+import io.wxwobot.admin.web.enums.KeyMsgValueType;
 import io.wxwobot.admin.web.model.WxRobConfig;
 import io.wxwobot.admin.web.model.WxRobKeyword;
 
-import java.lang.reflect.Type;
 import java.util.regex.Matcher;
 
 /**
@@ -99,26 +98,69 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
     @Override
     public void sysMsgHandle(BaseMsg msg) {
 
-        /**
-         * 群里的系统新人进群消息处理
-         */
-        if (msg.isGroupMsg()){
-            WxRobConfig robConfig = WxRobConfig.dao.findFirst("SELECT TOP 1 * FROM wx_rob_config WHERE unique_key = ?", uniqueKey);
-            if(robConfig != null && robConfig.getEnable()){
-                // 判断是群聊默认回复是否开启
-                if (robConfig.getDefaultGroup()){
 
-                    // 新人进群欢迎
-                    String text = msg.getContent();
-                    Matcher matcher = CommonTools.getMatcher("邀请\"(.+?)\"加入了群聊", text);
-                    if (matcher.find()){
-                        String group = matcher.group(1);
-                        MessageTools.sendMsgById("@"+group+"\n欢迎进入本群",msg.getFromUserName(),uniqueKey);
-                    }
-                }
+        String fromNickName = msg.getFromNickName();
+        String fromUserName = msg.getFromUserName();
+        /**
+         * 群里的新人进群消息处理
+         * 优先发专门这个群的欢迎词
+         * 没有发通用的
+         * 欢迎词内容实质就是在最前面加上@昵称\n
+         *
+         * 欢迎词的关键字
+         * @see ConfigKeys#DEAFAULT_WELCOME
+         */
+
+        // 解析新人名字
+        String text = msg.getContent();
+        String newNickName = "";
+        Matcher matcher = CommonTools.getMatcher("邀请\"(.+?)\"加入了群聊", text);
+        if (matcher.find()){
+            newNickName = matcher.group(1);
+        }else{
+            matcher = CommonTools.getMatcher("\"(.+?)\"通过扫描(.+?)分享的二维码加入群聊", text);
+            if (matcher.find()){
+                newNickName = matcher.group(1);
             }
         }
 
+        WxRobConfig robConfig = WxRobConfig.dao.findFirst("SELECT TOP 1 * FROM wx_rob_config WHERE unique_key = ?", uniqueKey);
+        if(robConfig != null && robConfig.getEnable()){
+            // 判断是否要回复
+            boolean isOpen = false;
+            // 判断是群聊的话是否允许回复 昵称关键字
+            if (robConfig.getToGroup() && msg.isGroupMsg()){
+                isOpen = true;
+            }
+            if (isOpen){
+                WxRobKeyword robKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, ConfigKeys.DEAFAULT_WELCOME,fromNickName,msg.isGroupMsg()?1:0);
+                if (sendSysWelcomeMsg(fromUserName, newNickName, robKeyword)){ return;}
+            }
+
+            // 没有专门的关键字，则使用默认关键字
+            isOpen = false;
+            // 判断是群聊的话是否允许回复 昵称关键字
+            if (robConfig.getDefaultGroup() && msg.isGroupMsg()){
+                isOpen = true;
+            }
+            if (isOpen){
+                WxRobKeyword defaultRobKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, ConfigKeys.DEAFAULT_WELCOME, ConfigKeys.DEAFAULT_KEYWORD,msg.isGroupMsg()?1:0);
+                if (sendSysWelcomeMsg(fromUserName, newNickName, defaultRobKeyword)){ return;}
+            }
+        }
+
+    }
+
+    private boolean sendSysWelcomeMsg(String fromUserName, String newNickName, WxRobKeyword robKeyword) {
+        if (robKeyword != null){
+            if (robKeyword.getTypeData().equals(KeyMsgValueType.TEXT.toValue())){
+                robKeyword.setValueData(String.format("@%s\n%s",newNickName,robKeyword.getValueData()));
+            }
+            if (sendDataByType(fromUserName, robKeyword)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

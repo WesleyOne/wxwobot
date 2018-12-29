@@ -31,15 +31,15 @@
                 <option value="0">否</option>
             </select>
         </div>
-        <div class="form-group">
-            <button type="button" class="btn btn-primary" id="searchPost">
-                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>搜索
-            </button>
-        </div>
     </form>
 </div>
 
 <div class="tableBody">
+    <div id="toolbar">
+        <button type="button" class="btn btn-primary" id="searchPost">
+            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>搜索
+        </button>
+    </div>
     <table id="out_config" class="table table-hover"></table>
 </div>
 #end
@@ -174,10 +174,12 @@
                                                          row, index) {
                                         var bt_edit = "<a type='button' class='btn btn-warning' href='/relate/editIndex?kid="+row.id+"'>编辑</a>";
                                         var bt_del =  "<button type='button' class='btn btn-danger' onclick='delPost(\""+row.id+"\")' >删除</button>";
+                                        var bt_relate_qyq =  "<a type='button' class='btn btn-default' href='/qyq?edit=1&ok="+row.outKey+"'>关联亲友圈</a>";
 
                                         var element = "<div class='btn-group btn-group-sm' role='group' aria-label='table_tool'>"
                                             + bt_edit
                                             + bt_del
+                                            + bt_relate_qyq
                                             + "</div>"
                                         return element;
                                     }

@@ -38,7 +38,8 @@
         <ul class="list-group">
             <li class="list-group-item">上传后请保存好下面这串文件名,数据库无记录:</li>
             <li class="list-group-item"><span id="result_name"></span></li>
-            <li class="list-group-item"><img src="#" id="showDataImg" style="width: 200px;" class="img-thumbnail"></li>
+            <li class="list-group-item"><span id="result_url"></span></li>
+            <li class="list-group-item"><img src="#" id="showDataImg" style="width: 200px;display: none;" class="img-thumbnail"></li>
         </ul>
     </div>
 </div>
@@ -59,8 +60,17 @@
 
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             // 清空
-            $('#result_name').html("");
-            $('#showDataImg').attr("src","#");
+            var tabValue = e.currentTarget.dataset.value;
+            if (tabValue == "FILE"){
+                $('#result_name').html("");
+                $('#showDataImg').attr("src","#");
+                $('#showDataImg').hide();
+            }else if (tabValue == "IMG") {
+                $('#result_name').html("");
+                if ($('#showDataImg').attr("src") != "#"){
+                    $('#showDataImg').show();
+                }
+            }
         });
 
         $("#f_upload")
@@ -91,6 +101,7 @@
                 }).on("fileuploaded",function(event, data, previewId, index) {
                     if (data.response.code == "00") {
                         $('#result_name').html(data.response.name);
+                        $('#result_url').html(data.response.url);
                     } else {
                         bootbox.alert("文件上传失败,请重试:"
                             + data.response.message);
@@ -124,7 +135,9 @@
                 }).on("fileuploaded",function(event, data, previewId, index) {
                         if (data.response.code == "00") {
                             $('#result_name').html(data.response.name);
+                            $('#result_url').html(data.response.url);
                             $('#showDataImg').attr("src",data.response.url);
+                            $('#showDataImg').show();
                         } else {
                             bootbox.alert("图片上传失败,请重试:"
                                 + data.response.message);

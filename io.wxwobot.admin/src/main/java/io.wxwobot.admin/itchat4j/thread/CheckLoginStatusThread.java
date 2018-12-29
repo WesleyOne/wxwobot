@@ -37,7 +37,7 @@ public class CheckLoginStatusThread implements Runnable, LogInterface {
 				core.setAlive(false);
 				LOG.info("微信已离线");
 			}
-			SleepUtils.sleep(10 * 1000); // 休眠10秒
+			SleepUtils.sleep(1 * 1000); // 休眠10秒
 		}
 	}
 

@@ -30,7 +30,12 @@
                 <div class="form-group">
                     <label for="keyData" class="col-sm-2 control-label">关键字:</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="keyData" name="keyData" value="#(form.keyData ??)">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="keyData" name="keyData" value="#(form.keyData ??)">
+                            <span class="input-group-addon">
+                                 <input id="welcomeKey" type="checkbox" autocomplete="off" #if(form.keyData == io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_WELCOME ??) checked #end>欢迎加入
+                            </span>
+                        </div>
                     </div>
                     <div class="col-sm-6">
 
@@ -40,18 +45,30 @@
                     <label for="toGroup" class="col-sm-2 control-label">群聊/好友:</label>
                     <div class="col-sm-2">
                         <select class="form-control" id="toGroup" name="toGroup">
-                            #set(fg = from.toGroup ?? true)
+                            #set(fg = form.toGroup ?? true)
                             <option value="1" #if(fg) selected #end>群聊</option>
                             <option value="0" #if(!fg) selected #end>好友</option>
                         </select>
                     </div>
                     <label for="nickName" class="col-sm-2 control-label">目标微信昵称:</label>
                     <div class="col-sm-6">
+                        <!--<div class="input-group">-->
+                            <!--<input type="text" class="form-control" id="nickName" name="nickName" value="#(form.nickName ??)">-->
+                            <!--<span class="input-group-addon">-->
+                                <!--<input id="useDefaultNickName" type="checkbox" autocomplete="off" #if(form.nickName == io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_KEYWORD ??) checked #end>机器全局默认-->
+                            <!--</span>-->
+                        <!--</div>-->
                         <div class="input-group">
-                            <input type="text" class="form-control" id="nickName" name="nickName" value="#(form.nickName ??)">
-                            <span class="input-group-addon">
-                                <input id="useDefaultNickName" type="checkbox" autocomplete="off">机器全局默认
-                            </span>
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择 <span class="caret"></span></button>
+                                <ul class="dropdown-menu" id="nickNameBox">
+                                    <li><a type="buttom" onclick="chooseName('#(io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_KEYWORD)')">机器全局默认</a></li>
+                                    #for( gp : groupNickNames ??)
+                                    <li><a type="buttom" onclick="chooseName('#(gp)')">#(gp)</a></li>
+                                    #end
+                                </ul>
+                            </div>
+                            <input type="text" class="form-control" id="nickName" name="nickName" value="#(form.nickName ??)" >
                         </div>
                     </div>
                 </div>
@@ -132,26 +149,6 @@
 
     $(function () {
 
-        // 群聊好友下拉框切换事件
-        // $('#toGroup').change(function(){
-        //     var p1=$(this).children('option:selected').val();
-        //     if (#(form.uniqueKey ??)){
-        //         if (p1 == '1'){
-        //             $.get("/robwk/getGroupsNickName",
-        //                 { _ck : '#(form.uniqueKey ??)'},
-        //                 function(data,status){
-        //                     if (status == 'success'){
-        //
-        //                     } else{
-        //
-        //                     }
-        //                 });
-        //         }
-        //
-        //     }
-        // });
-
-
 
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             // 获取已激活的标签页的名称
@@ -160,18 +157,32 @@
         });
 
 
-        $("#useDefaultNickName").on('click',function(){
-            console.log("ckkkk");
+        $("#welcomeKey").on('click',function(){
             var flag = $(this).is(':checked');
             console.log(flag);
             if(flag){
-                $('#nickName').val('#(io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_KEYWORD)');
-                $('#nickName').attr("readonly",true);
+                $('#keyData').val('#(io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_WELCOME)');
+                $('#keyData').attr("readonly",true);
+                $('#toGroup').val("1");
+                $('#toGroup').attr("readonly",true);
             }else{
-                $('#nickName').val('');
-                $('#nickName').attr("readonly",false);
+                $('#keyData').val('');
+                $('#keyData').attr("readonly",false);
+                $('#toGroup').attr("readonly",false);
             }
         });
+
+        // $("#useDefaultNickName").on('click',function(){
+        //     var flag = $(this).is(':checked');
+        //     console.log(flag);
+        //     if(flag){
+        //         $('#nickName').val('#(io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_KEYWORD)');
+        //         $('#nickName').attr("readonly",true);
+        //     }else{
+        //         $('#nickName').val('');
+        //         $('#nickName').attr("readonly",false);
+        //     }
+        // });
 
 
         $("#f_upload")
@@ -285,7 +296,7 @@
                 valueData: {
                     validators: {
                         notEmpty: {
-                            message: '内容不能为空'
+                            message: '内容不能为空,文本或图片请先上传'
                         }
                     }
                 }
@@ -293,6 +304,10 @@
         });
 
     });
+
+    function chooseName(nickName) {
+       $('#nickName').val(nickName);
+    }
 
     function openAddModel() {
         addFormValid.bootstrapValidator('validate');
