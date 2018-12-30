@@ -13,6 +13,7 @@ import io.wxwobot.admin.itchat4j.utils.enums.MsgTypeEnum;
 import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import io.wxwobot.admin.web.wxrob.MyMsgHandler;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -173,11 +174,12 @@ public class MsgCenter implements LogInterface {
 	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月14日 上午10:52:34
-	 * @param msgHandler
+	 * @param uniqueKey
 	 */
-	public static void handleMsg(IMsgHandlerFace msgHandler, String uniqueKey) {
+	public static void handleMsg(String uniqueKey) {
 		Core core = CoreManage.getInstance(uniqueKey);
-		while (true) {
+        MyMsgHandler msgHandler = new MyMsgHandler(uniqueKey);
+        while (true) {
 			if (!core.isAlive()){
 				LOG.info("停止消息处理");
 				break;

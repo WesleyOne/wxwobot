@@ -12,7 +12,7 @@ import java.util.HashMap;
  */
 public class HttpClientManage {
 
-    public static HashMap<String,SingleHttpClient> clientMap = new HashMap<>(32);
+    private static HashMap<String,SingleHttpClient> clientMap = new HashMap<>(32);
 
     public static SingleHttpClient getInstance(String uniqueKey){
         return getInstance(uniqueKey,null);
@@ -23,11 +23,10 @@ public class HttpClientManage {
             return null;
         }
         SingleHttpClient client;
-        // TODO outCookieStore不为空时也重新构造
-        if (clientMap.containsKey(uniqueKey) && clientMap.get(uniqueKey) != null && outCookieStore == null){
 
-        }else{
-            client = SingleHttpClient.getInstance(uniqueKey, outCookieStore);
+        // outCookieStore不为空时也重新构造,主要用于热登录
+        if (!clientMap.containsKey(uniqueKey) || clientMap.get(uniqueKey) == null || outCookieStore != null){
+            client = SingleHttpClient.getInstance(outCookieStore);
             clientMap.put(uniqueKey, client);
         }
         return clientMap.get(uniqueKey);

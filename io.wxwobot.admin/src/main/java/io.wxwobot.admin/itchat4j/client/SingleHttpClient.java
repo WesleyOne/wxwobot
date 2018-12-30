@@ -1,7 +1,5 @@
 package io.wxwobot.admin.itchat4j.client;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
 import io.wxwobot.admin.itchat4j.utils.Config;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -51,7 +49,7 @@ public class SingleHttpClient {
 
     }
 
-    private SingleHttpClient(String uniqueKey, CookieStore outCookieStore){
+    private SingleHttpClient(CookieStore outCookieStore){
         if (outCookieStore == null){
             outCookieStore = new BasicCookieStore();
         }
@@ -59,12 +57,12 @@ public class SingleHttpClient {
         httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
     }
 
-    private SingleHttpClient(String uniqueKey){
-        this(uniqueKey,null);
+    private SingleHttpClient(){
+        this(null);
     }
 
-    public static SingleHttpClient getInstance(String coreKey,CookieStore outCookieStore){
-        return new SingleHttpClient(coreKey,outCookieStore);
+    public static SingleHttpClient getInstance(CookieStore outCookieStore){
+        return new SingleHttpClient(outCookieStore);
     }
 
     /**
@@ -181,11 +179,4 @@ public class SingleHttpClient {
         this.cookieStore = cookieStore;
     }
 
-    public String getUniqueKey() {
-        return uniqueKey;
-    }
-
-    public void setUniqueKey(String uniqueKey) {
-        this.uniqueKey = uniqueKey;
-    }
 }

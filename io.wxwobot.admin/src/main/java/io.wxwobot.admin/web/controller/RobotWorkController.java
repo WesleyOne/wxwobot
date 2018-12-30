@@ -1,15 +1,13 @@
 package io.wxwobot.admin.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.controller.LoginController;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl;
 import io.wxwobot.admin.web.base.BaseException;
-import io.wxwobot.admin.web.utils.FileUtil;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -31,18 +29,13 @@ public class RobotWorkController extends _BaseController {
     }
 
     /**
-     * 登录第一步，获取二维码
+     * 登录第一步，获取二维码链接
      * @throws BaseException
      */
     public void getQr() throws BaseException, IOException {
         String coreKey = getCoreKey();
-        String realUploadPath = PropKit.get("realImgUploadPath");
-        //先清除下旧二维码
-        FileUtil.delFile(realUploadPath,"QR.jpg");
-
-        String qrPath = realUploadPath;
         LoginController login = new LoginController(coreKey);
-        String qrSrc = login.login_1_new();
+        String qrSrc = login.login_1();
         setData(qrSrc);
         renderJson();
     }

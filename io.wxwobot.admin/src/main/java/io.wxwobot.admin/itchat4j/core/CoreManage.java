@@ -5,8 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.itchat4j.client.HttpClientManage;
 import io.wxwobot.admin.itchat4j.controller.LoginController;
-import io.wxwobot.admin.itchat4j.service.ILoginService;
-import io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
 import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
 import org.apache.commons.lang3.StringUtils;
@@ -14,8 +12,10 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.cookie.BasicClientCookie;
 
 import java.io.*;
-import java.util.*;
-import java.util.concurrent.ThreadFactory;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * 多开管理
@@ -24,7 +24,8 @@ import java.util.concurrent.ThreadFactory;
  */
 public class CoreManage implements LogInterface {
 
-    public static HashMap<String,Core> coreMap = new HashMap<>(32);
+    static int MAX_CORE_NUM = 50;
+    private static HashMap<String,Core> coreMap = new HashMap<>(MAX_CORE_NUM/3*4+1);
 
     public static boolean USE_HOT_RELOAD = PropKit.use("appConfig.properties").getBoolean("useHotReload",false);
     public static String HOT_RELOAD_DIR = PropKit.use("appConfig.properties").get("hotReloadDir")+"/wxwobot.hot";
@@ -34,13 +35,11 @@ public class CoreManage implements LogInterface {
             return null;
         }
         Core core;
-        if (coreMap.containsKey(uniqueKey) && coreMap.get(uniqueKey) != null ){
-            core = coreMap.get(uniqueKey);
-        }else {
+        if ( !coreMap.containsKey(uniqueKey) || coreMap.get(uniqueKey) == null || !coreMap.get(uniqueKey).isAlive()){
             core = Core.getInstance(uniqueKey);
             coreMap.put(uniqueKey, core);
         }
-        return core;
+        return coreMap.get(uniqueKey);
     }
 
     /**
@@ -49,10 +48,7 @@ public class CoreManage implements LogInterface {
      * @return
      */
     public static boolean isActive(String uniqueKey) {
-        if (StringUtils.isEmpty(uniqueKey)){
-            return false;
-        }
-        if (coreMap.containsKey(uniqueKey) && coreMap.get(uniqueKey).isAlive()){
+        if (StringUtils.isNotEmpty(uniqueKey) && coreMap.containsKey(uniqueKey) && coreMap.get(uniqueKey).isAlive()){
             return true;
         }
         return false;
@@ -134,26 +130,28 @@ public class CoreManage implements LogInterface {
                         for (int i=0;i<size;i++){
                             Core core = null;
                             try {
-
+                                /**
+                                 * 初始化Core,
+                                 * 1.获取登入的状态信息并装入CoreManage
+                                 * 2.构建ThreadGroup
+                                 * 3.获取Cookies并装入HttpClientManage
+                                 * 4.获取信息及启动线程
+                                 */
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 core = jsonObject.getObject("core",Core.class);
-//                                long lastNormalRetcodeTime = core.getLastNormalRetcodeTime();
-//                                if ( System.currentTimeMillis() -lastNormalRetcodeTime > 1000 * 180){
-//                                    core.setAlive(false);
-//                                    continue;
-//                                }
                                 if (core.isAlive()){
                                     String uniqueKey = core.getUniqueKey();
-                                    CoreManage.coreMap.put(uniqueKey,core);
+                                    core.setThreadGroup(new ThreadGroup(uniqueKey));
+                                    coreMap.put(uniqueKey,core);
+
                                     JSONArray cookiesJsonArray = jsonObject.getJSONArray("cookies");
                                     int arraySize = cookiesJsonArray.size();
                                     if (arraySize<=0){
                                         continue;
                                     }
 
-                                    // 装载原cookie信息
+                                    // 装载原cookie信息,json解析cookie异常，干脆手动封装
                                     BasicCookieStore cookieStore = new BasicCookieStore();
-                                    // json解析cookie异常，干脆手动封装
                                     for (int ci=0;ci<arraySize;ci++){
                                         JSONObject cookieJson = cookiesJsonArray.getJSONObject(ci);
                                         String name = cookieJson.getString("name");
@@ -176,8 +174,7 @@ public class CoreManage implements LogInterface {
                                     }
                                     // 必须在构建client时就放入cookie
                                     HttpClientManage.getInstance(uniqueKey,cookieStore);
-
-                                    // 重新加载数据
+                                    //装载core信息及启动线程
                                     LoginController login = new LoginController(uniqueKey);
                                     if (!login.login_3()){
                                         // 加载失败退出

@@ -29,6 +29,7 @@ public class Core {
 	private Core(String uniqueKey) {
 		this.uniqueKey = uniqueKey;
 		this.myHttpClient = HttpClientManage.getInstance(this.uniqueKey);
+		this.threadGroup = new ThreadGroup(this.uniqueKey);
 	}
 
 	protected static Core getInstance(String uniqueKey) {
@@ -37,6 +38,12 @@ public class Core {
 	private String uniqueKey;
 
 	boolean alive = false;
+
+	/**
+	 * 管理当前机器人的所有业务线程
+ 	 */
+	@JSONField(serialize=false)
+	private ThreadGroup threadGroup;
 
 	@JSONField(serialize=false)
 	boolean isFinishInit = false;
@@ -196,9 +203,6 @@ public class Core {
 
 	public void setAlive(boolean alive) {
 		this.alive = alive;
-		if (!alive){
-			this.isFinishInit = false;
-		}
 	}
 
 	public String getIndexUrl() {
@@ -340,5 +344,13 @@ public class Core {
 
 	public void setFinishInit(boolean finishInit) {
 		isFinishInit = finishInit;
+	}
+
+	public ThreadGroup getThreadGroup() {
+		return threadGroup;
+	}
+
+	public void setThreadGroup(ThreadGroup threadGroup) {
+		this.threadGroup = threadGroup;
 	}
 }

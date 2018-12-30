@@ -3,8 +3,6 @@ package io.wxwobot.admin.web.wxrob;
 
 import io.wxwobot.admin.itchat4j.api.MessageTools;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
-import io.wxwobot.admin.itchat4j.core.Core;
-import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
 import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
@@ -16,17 +14,16 @@ import io.wxwobot.admin.web.model.WxRobKeyword;
 import java.util.regex.Matcher;
 
 /**
+ * 消息处理实现 默认方案
  * @author WesleyOne
  * @create 2018/12/11
  */
 public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
 
     private String uniqueKey;
-    private Core core;
 
     public MyMsgHandler(String uniqueKey){
         this.uniqueKey = uniqueKey;
-        this.core = CoreManage.getInstance(uniqueKey);
     }
 
     @Override

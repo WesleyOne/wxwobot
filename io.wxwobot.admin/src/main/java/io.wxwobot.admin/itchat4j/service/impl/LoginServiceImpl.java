@@ -47,11 +47,11 @@ import java.util.regex.Matcher;
  */
 public class LoginServiceImpl implements ILoginService , LogInterface {
 	private Core core ;
-	private String coreKey;
+	private String uniqueKey;
 
-	public LoginServiceImpl(String coreKey) {
-		this.coreKey = coreKey;
-		this.core = CoreManage.getInstance(coreKey);
+	public LoginServiceImpl(String uniqueKey) {
+		this.uniqueKey = uniqueKey;
+		this.core = CoreManage.getInstance(uniqueKey);
 	}
 
 	@Override
@@ -81,11 +81,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 					// 处理结果
 					if (processLoginInfo(result)){
 						isLogin = true;
-						core.setAlive(isLogin);
-						break;
-					}else{
-						// 登入失败或异常
-						isLogin = false;
 						core.setAlive(isLogin);
 						break;
 					}
@@ -188,8 +183,9 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			// 请求初始化接口
 			HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap), getPersistentCookieMap());
 			String result = EntityUtils.toString(entity, Consts.UTF_8);
-//			LOG.info("webWxInit_result: {}",result);
+			LOG.info("webWxInit_result: {}",result);
             /**
+             * 相关返回信息，本项目未做封装
              * @see io.wxwobot.admin.itchat4j.beans.WebWxInit
              */
 			JSONObject obj = JSON.parseObject(result);
@@ -217,7 +213,8 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			core.setUserSelf(obj.getJSONObject("User"));
 
             /**
-             * ContactList此处只是部分，没必要处理，webwxgetcontact接口统一处理
+             * TIP:
+             * ContactList此处只是部分，不做处理，webwxgetcontact接口统一处理
              * MPSubscribeMsgList 公众号服务号也不处理
              */
 		} catch (Exception e) {
@@ -254,15 +251,15 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 	@Override
 	public void startReceiving() {
 		core.setAlive(true);
-		Thread thread = new Thread(new Runnable() {
+		Thread thread = new Thread(core.getThreadGroup(),new Runnable() {
 			int retryCount = 0;
 
 			@Override
 			public void run() {
 				while (core.isAlive()) {
-					long startTime = System.currentTimeMillis();
-					try {
-						Map<String, String> resultMap = syncCheck();
+                    try {
+                        long startTime = System.currentTimeMillis();
+                        Map<String, String> resultMap = syncCheck();
 						LOG.info(JSONObject.toJSONString(resultMap));
 						String retcode = resultMap.get("retcode");
 						String selector = resultMap.get("selector");
@@ -321,7 +318,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 							Thread.sleep(1000);
 						}
 					} catch (Exception e) {
-						LOG.info(e.getMessage());
+						LOG.error(e.getMessage());
 						retryCount += 1;
 						if (core.getReceivingRetryCount() < retryCount) {
 							core.setAlive(false);
@@ -329,15 +326,14 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 							try {
 								Thread.sleep(1000);
 							} catch (InterruptedException e1) {
-								LOG.info(e.getMessage());
+								LOG.error(e.getMessage());
 							}
 						}
 					}
 
 				}
 			}
-		});
-		thread.setName("WXROB-REC-"+coreKey);
+		},"WXROB-REC-"+uniqueKey);
 		thread.start();
 	}
 
@@ -351,9 +347,10 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			Integer DelContactCount = msgObj.getInteger("DelContactCount");
 			Integer ModChatRoomMemberCount = msgObj.getInteger("ModChatRoomMemberCount");
 
+            // TODO 日志
 			if (PropKit.getBoolean("devMode",false)){
 				if (addMsgCount > 0 || ModMsgCount > 0 || DelContactCount > 0 || ModChatRoomMemberCount > 0){
-					LOG.info(msgObj.toJSONString());
+					LOG.info("接收原文:{}",msgObj.toJSONString());
 				}
 			}
 
@@ -365,10 +362,12 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 
                 if (addMsgCount >0 ){
                     JSONArray msgList = msgObj.getJSONArray("AddMsgList");
-                    msgList = MsgCenter.produceMsg(msgList, coreKey);
+                    msgList = MsgCenter.produceMsg(msgList, uniqueKey);
                     for (int j = 0; j < msgList.size(); j++) {
                         BaseMsg baseMsg = JSON.toJavaObject(msgList.getJSONObject(j),
                                 BaseMsg.class);
+                        // TODO 日志
+                        LOG.info("处理后对象:{}",JSON.toJSONString(baseMsg));
                         core.getMsgList().add(baseMsg);
                     }
                 }
@@ -396,7 +395,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			}
 
 			/**
-			 * 貌似已经没用了
+			 * 没有获取过数据，不知道干啥用
 			 * DelContactCount: 0
 			 * DelContactList: []
 			 * ModChatRoomMemberCount: 0
@@ -491,13 +490,12 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 	}
 
 	/**
+     * 获取群和好友详细信息
 	 * 首次加载用
 	 */
 	@Override
 	public void WebWxBatchGetContact() {
-		String url = String.format(URLEnum.WEB_WX_BATCH_GET_CONTACT.getUrl(),
-				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()), System.currentTimeMillis(),
-				core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
+
 		Map<String, Object> paramMap = core.getParamMap();
 		// 处理群成员信息
         int size = core.getGroupList().size();
@@ -517,9 +515,44 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			list.add(map);
 		}
 
-		int totalSize = list.size();
+        WebWxBatchGetContactMain(paramMap, list);
+	}
 
-		int batchSize = 50;
+    /**
+     * 获取群和好友详细信息
+     * 过程中零散查询
+     */
+    public void WebWxBatchGetContact(List<String> userNameList) {
+
+        if (CollectionUtils.isEmpty(userNameList)){
+            return;
+        }
+
+        String url = String.format(URLEnum.WEB_WX_BATCH_GET_CONTACT.getUrl(),
+                core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()), System.currentTimeMillis(),
+                core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
+        Map<String, Object> paramMap = core.getParamMap();
+        // 为了获取群成员信息
+        List<Map<String, String>> list = new ArrayList<>();
+        int size = userNameList.size();
+        for (int i = 0; i < size; i++) {
+            HashMap<String, String> map = new HashMap<>(4);
+            map.put("UserName", userNameList.get(i));
+            map.put("EncryChatRoomId", "");
+            list.add(map);
+        }
+        WebWxBatchGetContactMain(paramMap, list);
+    }
+
+    private void WebWxBatchGetContactMain(Map<String, Object> paramMap, List<Map<String, String>> list) {
+
+        String url = String.format(URLEnum.WEB_WX_BATCH_GET_CONTACT.getUrl(),
+                core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()), System.currentTimeMillis(),
+                core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
+
+        int totalSize = list.size();
+
+        int batchSize = 50;
         int num = totalSize / batchSize;
         if (totalSize%batchSize >0){
             num += 1;
@@ -531,22 +564,17 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
             if (endNum > totalSize){
                 endNum = totalSize;
             }
-//            LOG.info("s:{} e:{} list:{}",startNum,endNum,JSONObject.toJSONString(list.subList(startNum,endNum)));
 			paramMap.put("Count", endNum - startNum);
             paramMap.put("List", list.subList(startNum,endNum));
-//			LOG.info(JSON.toJSONString(paramMap));
             HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap), getPersistentCookieMap());
             try {
                 String text = EntityUtils.toString(entity, Consts.UTF_8);
                 JSONObject obj = JSON.parseObject(text);
-//                LOG.info("BatchGetContact:"+obj.toJSONString());
                 JSONArray contactList = obj.getJSONArray("ContactList");
 				int contactSize = contactList.size();
 				if (contactSize > 0){
 					for (int j = 0; j < contactSize; j++) {
-						String nickName = contactList.getJSONObject(j).getString("NickName");
 						String userName = contactList.getJSONObject(j).getString("UserName");
-//						LOG.info("batch: {} {} ",userName,nickName);
 						if (userName.startsWith("@@")) {
 							CoreManage.addNewGroup(core,contactList.getJSONObject(j));
 						}
@@ -559,67 +587,8 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                 LOG.info(e.getMessage());
             }
         }
-	}
+    }
 
-
-	/**
-	 * 过程中零散查询
-	 */
-	public void WebWxBatchGetContact(List<String> userNameList) {
-
-		if (CollectionUtils.isEmpty(userNameList)){
-			return;
-		}
-
-		String url = String.format(URLEnum.WEB_WX_BATCH_GET_CONTACT.getUrl(),
-				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()), System.currentTimeMillis(),
-				core.getLoginInfo().get(StorageLoginInfoEnum.pass_ticket.getKey()));
-		Map<String, Object> paramMap = core.getParamMap();
-		// 为了获取群成员信息
-		List<Map<String, String>> list = new ArrayList<>();
-		int size = userNameList.size();
-		for (int i = 0; i < size; i++) {
-			HashMap<String, String> map = new HashMap<>(4);
-			map.put("UserName", userNameList.get(i));
-			map.put("EncryChatRoomId", "");
-			list.add(map);
-		}
-
-		int batchSize = 50;
-		int num = size / batchSize;
-		if (size%batchSize >0){
-			num += 1;
-		}
-
-		for (int i = 0;i < num;i++){
-			int startNum = i * batchSize;
-			int endNum = (i+1) * batchSize;
-			if (endNum > size){
-				endNum = size;
-			}
-			paramMap.put("Count", endNum - startNum);
-			paramMap.put("List", list.subList(startNum,endNum));
-			HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap));
-			try {
-				String text = EntityUtils.toString(entity, Consts.UTF_8);
-				JSONObject obj = JSON.parseObject(text);
-				JSONArray contactList = obj.getJSONArray("ContactList");
-				int contactSize = contactList.size();
-				if (contactSize > 0){
-					for (int j = 0; j < contactList.size(); j++) {
-						if (contactList.getJSONObject(j).getString("UserName").startsWith("@@")) {
-							CoreManage.addNewGroup(core,contactList.getJSONObject(j));
-						}else if (contactList.getJSONObject(j).getString("UserName").startsWith("@")){
-							CoreManage.addNewContact(core,contactList.getJSONObject(j));
-						}
-					}
-				}
-			} catch (Exception e) {
-				LOG.info(e.getMessage());
-			}
-		}
-
-	}
 
 	/**
 	 * 检查登陆状态
@@ -781,7 +750,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 	 */
 	private JSONObject webWxSync() {
 		JSONObject result = null;
-		LOG.info("webWxSync_LoginInfo: {}",JSON.toJSONString(core.getLoginInfo()));
 		String url = String.format(URLEnum.WEB_WX_SYNC_URL.getUrl(),
 				core.getLoginInfo().get(StorageLoginInfoEnum.url.getKey()),
 				core.getLoginInfo().get(StorageLoginInfoEnum.wxsid.getKey()),
@@ -796,7 +764,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			HttpEntity entity = core.getMyHttpClient().doPost(url, paramStr, getPersistentCookieMap());
 			String text = EntityUtils.toString(entity, Consts.UTF_8);
 			JSONObject obj = JSON.parseObject(text);
-			LOG.info("webWxSync_BaseResponse: {}",obj.getJSONObject("BaseResponse").toJSONString());
 			if (obj.getJSONObject("BaseResponse").getInteger("Ret") != 0) {
 				result = null;
 			} else {
