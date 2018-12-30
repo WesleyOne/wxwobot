@@ -87,24 +87,18 @@ public class LoginController  implements LogInterface {
 			loginService.wxStatusNotify();
 
 			LOG.info(String.format("欢迎回来， %s", core.getNickName()));
+			LOG.info("6.+++开始消息处理["+uniqueKey+"]+++++++");
+			Thread msgThread = new Thread(core.getThreadGroup(), () -> MsgCenter.handleMsg(uniqueKey),"WXBOT-MSG-"+uniqueKey);
+			msgThread.start();
 
-			LOG.info("6. 开始接收消息");
+			LOG.info("7. 开始接收消息");
 			loginService.startReceiving();
 
-			LOG.info("7. 获取联系人信息");
+			LOG.info("8. 获取联系人信息");
 			loginService.webWxGetContact();
 
-			LOG.info("8. 获取群好友及群好友列表及缓存");
+			LOG.info("9. 获取群好友及群好友列表及缓存");
 			loginService.WebWxBatchGetContact();
-
-			LOG.info("9.+++开始消息处理+++++++"+uniqueKey+"+++++++");
-			Thread msgThread = new Thread(core.getThreadGroup(),new Runnable() {
-				@Override
-				public void run() {
-					MsgCenter.handleMsg(uniqueKey);
-				}
-			},"WXBOT-MSG-"+uniqueKey);
-			msgThread.start();
 
 		}
 

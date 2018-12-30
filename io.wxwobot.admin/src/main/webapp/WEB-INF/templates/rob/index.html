@@ -145,8 +145,8 @@
                                                 var btn = "<button type='button' class='btn btn-danger btn-xs' onclick='wxlogout(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>已在线-退出</button>";
                                                 var refresh_1 = "<button type='button' class='btn btn-info btn-xs' onclick='refresh_data(\""+row['uniqueKey']+"\")'>刷新数据</button>";
                                                 var group_1 = "<button type='button' class='btn btn-warning btn-xs' onclick='openGroup(\""+row['uniqueKey']+"\")'>查看群列表</button>";
-                                                var btn_reboot = "<button type='button' class='btn btn-danger btn-xs' onclick='wxReboot(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>重&nbsp;&nbsp;启</button>";
-                                                result = btn+refresh_1+group_1+btn_reboot;
+                                                // var btn_reboot = "<button type='button' class='btn btn-danger btn-xs' onclick='wxReboot(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>重&nbsp;&nbsp;启</button>";
+                                                result = btn+refresh_1+group_1;
                                                 break;
                                             case false:
                                                 var btn = "<button type='button' class='btn btn-primary btn-xs' onclick='wxloginPost(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>已下线-登录</button>";
@@ -389,11 +389,13 @@
     function refresh_data(uniqueKey) {
         bootbox.confirm("<h4>确定刷新【"+uniqueKey+"】吗？</h4>",function(result){
             if (result){
+                bootbox.dialog({ message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i>加载数据中,请耐心等待...</div>' });
                 $.ajax({url:"/robwk/gct?_ck="+uniqueKey,
                     success:function(result){
                         if (result.code == '00'){
                             $.ajax({url:"/robwk/ggp?_ck="+uniqueKey,
                                 success:function(result){
+                                    bootbox.hideAll();
                                     if (result.code == '00'){
                                         bootbox.alert(result.message);
                                     } else{
@@ -401,16 +403,19 @@
                                     }
                                 },
                                 error : function() {
+                                    bootbox.hideAll();
                                     bootbox.alert("请求异常");
                                 }
                             });
 
 
                         } else{
+                            bootbox.hideAll();
                             bootbox.alert("错误！"+result.message);
                         }
                     },
                     error : function() {
+                        bootbox.hideAll();
                         bootbox.alert("请求异常");
                     }
                 });
@@ -442,24 +447,25 @@
     };
 
     function wxReboot(key,name) {
-        bootbox.confirm("<h4>确定退出【"+name+"】吗？</h4>",function(result){
-            if (result){
-                bootbox.alert("<h4>重启【"+name+"】中,请耐心等待...</h4>");
-                $.ajax({url:"/robwk/reboot?_ck="+key,
-                    success:function(result){
-                        if (result.code == '00'){
-                            refreshTable();
-                        } else{
-                            bootbox.alert("错误！"+result.message);
-                        }
-                    },
-                    error : function() {
-                        bootbox.alert("请求异常");
-                    }
-                });
-            }
-
-        });
+        // bootbox.confirm("<h4>确定退出【"+name+"】吗？</h4>",function(result){
+        //     if (result){
+        //         bootbox.dialog({ message: '<div class="text-center"><i class="fa fa-spin fa-spinner"></i>重启【'+name+'】中,请耐心等待...</div>' })
+        //         $.ajax({url:"/robwk/reboot?_ck="+key,
+        //             success:function(result){
+        //                 if (result.code == '00'){
+        //                     bootbox.hideAll();
+        //                     refreshTable();
+        //                 } else{
+        //                     bootbox.alert("错误！"+result.message);
+        //                 }
+        //             },
+        //             error : function() {
+        //                 bootbox.alert("请求异常");
+        //             }
+        //         });
+        //     }
+        //
+        // });
     }
 
     //延迟执行函数
@@ -504,10 +510,12 @@
                     $('#wxqr_nickname').html("登录成功,正在加载数据");
                     wxinit(key);
                 }else{
+                    $('#qrModal').modal('hide');
                     bootbox.alert("错误#login！"+result.message);
                 }
             },
             error: function () {
+                $('#qrModal').modal('hide');
                 console.log("请求异常#login")
             }
         });
@@ -521,10 +529,12 @@
                     $('#qrModal').modal('hide');
                     refreshTable();
                 }else{
+                    $('#qrModal').modal('hide');
                     bootbox.alert("错误#wxinit！"+result.message);
                 }
             },
             error: function () {
+                $('#qrModal').modal('hide');
                 console.log("请求异常#init")
             }
         });

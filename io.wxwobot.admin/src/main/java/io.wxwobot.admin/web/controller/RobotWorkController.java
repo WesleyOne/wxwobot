@@ -3,6 +3,7 @@ package io.wxwobot.admin.web.controller;
 import com.alibaba.fastjson.JSONObject;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.controller.LoginController;
+import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl;
 import io.wxwobot.admin.web.base.BaseException;
@@ -123,8 +124,7 @@ public class RobotWorkController extends _BaseController {
     }
 
     /**
-     * 模拟个环节
-     * 强制刷新联系人
+     * 强制刷新通讯录
      */
     public void gct() throws BaseException {
         String coreKey = getCoreKey();
@@ -134,33 +134,13 @@ public class RobotWorkController extends _BaseController {
     }
 
     /**
-     * 刷新群组
+     * 刷新通讯录详情
      * @throws BaseException
      */
     public void ggp() throws BaseException {
         String coreKey = getCoreKey();
         LoginServiceImpl loginService = new LoginServiceImpl(coreKey);
         loginService.WebWxBatchGetContact();
-        renderJson();
-    }
-
-    /**
-     * 获取联系人昵称
-     */
-    public void getContactsNickName() throws BaseException {
-        String coreKey = getCoreKey();
-        Set<String> keySet = CoreManage.getInstance(coreKey).getUserInfoMap().keySet();
-        setData(keySet);
-        renderJson();
-    }
-
-    /**
-     * 获取群昵称
-     */
-    public void getGroupsNickName() throws BaseException {
-        String coreKey = getCoreKey();
-        Set<String> keySet = CoreManage.getInstance(coreKey).getGroupInfoMap().keySet();
-        setData(keySet);
         renderJson();
     }
 
@@ -184,5 +164,7 @@ public class RobotWorkController extends _BaseController {
         CoreManage.persistence();
         renderJson();
     }
+
+
 
 }

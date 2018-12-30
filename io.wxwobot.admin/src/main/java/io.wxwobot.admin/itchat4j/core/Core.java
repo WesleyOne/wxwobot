@@ -139,7 +139,7 @@ public class Core {
 	 *	异步消息存储
 	 */
 	@JSONField(serialize=false)
-	private List<BaseMsg> msgList = new ArrayList<BaseMsg>();
+	private List<BaseMsg> msgList = new ArrayList<>();
 
 
 
@@ -164,7 +164,7 @@ public class Core {
 	 * 注意:存在相同昵称会后者覆盖前者
 	 */
 	@JSONField(serialize=false)
-	private Map<String, JSONObject> userInfoMap = new HashMap<String, JSONObject>(1024);
+	private Map<String, JSONObject> userInfoMap = new HashMap<>(1024);
 
 	/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ */
 
@@ -180,7 +180,7 @@ public class Core {
 			private static final long serialVersionUID = 1L;
 
 			{
-				Map<String, String> map = new HashMap<String, String>(16);
+				Map<String, String> map = new HashMap<>(16);
 				for (BaseParaEnum baseRequest : BaseParaEnum.values()) {
 					map.put(baseRequest.para(), getLoginInfo().get(baseRequest.value()).toString());
 				}
@@ -203,6 +203,9 @@ public class Core {
 
 	public void setAlive(boolean alive) {
 		this.alive = alive;
+		if (!alive){
+			this.isFinishInit = false;
+		}
 	}
 
 	public String getIndexUrl() {

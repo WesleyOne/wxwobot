@@ -33,12 +33,13 @@ public interface ILoginService {
 
 	/**
 	 * 获取二维码图片
-	 * 
+	 * (直接获取图片链接,不下载文件)
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月13日 上午12:13:51
 	 * @param qrPath
 	 * @return
 	 */
+	@Deprecated
 	boolean getQR(String qrPath);
 
 	/**

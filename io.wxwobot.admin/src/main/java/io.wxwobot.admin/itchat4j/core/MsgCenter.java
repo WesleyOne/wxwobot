@@ -222,9 +222,11 @@ public class MsgCenter implements LogInterface {
 				core.getMsgList().remove(0);
 			}
 			try {
-				TimeUnit.MILLISECONDS.sleep(1000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+				LOG.error("线程中断");
+				break;
 			}
 		}
 	}

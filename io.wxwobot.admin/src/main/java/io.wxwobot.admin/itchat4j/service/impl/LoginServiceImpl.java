@@ -92,7 +92,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			} catch (Exception e) {
 				LOG.error("微信登陆异常！", e);
 			}
-			// 一分钟超时不再请求
+			// 3分钟超时不再请求
 			SleepUtils.sleep(1000);
 			overTime = (millis - startMillis) > 1000 * 180;
 		}
@@ -126,11 +126,13 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		return core.getUuid();
 	}
 
+    @Deprecated
 	@Override
 	public boolean getQR(String qrPath) {
 		return getQR(qrPath, false);
 	}
 
+	@Deprecated
 	public boolean getQR(String qrPath, boolean open) {
 		qrPath = qrPath + File.separator +"QR.jpg";
 		String qrUrl = URLEnum.QRCODE_URL.getUrl() + core.getUuid();
@@ -183,7 +185,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			// 请求初始化接口
 			HttpEntity entity = core.getMyHttpClient().doPost(url, JSON.toJSONString(paramMap), getPersistentCookieMap());
 			String result = EntityUtils.toString(entity, Consts.UTF_8);
-			LOG.info("webWxInit_result: {}",result);
+//			LOG.info("webWxInit_result: {}",result);
             /**
              * 相关返回信息，本项目未做封装
              * @see io.wxwobot.admin.itchat4j.beans.WebWxInit
@@ -260,24 +262,24 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                     try {
                         long startTime = System.currentTimeMillis();
                         Map<String, String> resultMap = syncCheck();
-						LOG.info(JSONObject.toJSONString(resultMap));
-						String retcode = resultMap.get("retcode");
-						String selector = resultMap.get("selector");
-						RetCodeEnum retCodeEnum = RetCodeEnum.fromCode(retcode);
-						if (retCodeEnum != null) {
-							LOG.info(retCodeEnum.getType());
-							if (retcode.equals(RetCodeEnum.UNKOWN.getCode())) {
-								// 防止频繁请求
-								SleepUtils.sleep(1000);
-								continue;
-							} else if (retcode.equals(RetCodeEnum.SUCCESS.getCode())) {
-								// 修改最后收到正常报文时间
-								core.setLastNormalRetcodeTime(System.currentTimeMillis());
+                        LOG.info(JSONObject.toJSONString(resultMap));
+                        String retcode = resultMap.get("retcode");
+                        String selector = resultMap.get("selector");
+                        RetCodeEnum retCodeEnum = RetCodeEnum.fromCode(retcode);
+                        if (retCodeEnum != null) {
+                            LOG.info(retCodeEnum.getType());
+                            if (retcode.equals(RetCodeEnum.UNKOWN.getCode())) {
+                                // 防止频繁请求
+                                Thread.sleep(1000);
+                                continue;
+                            } else if (retcode.equals(RetCodeEnum.SUCCESS.getCode())) {
+                                // 修改最后收到正常报文时间
+                                core.setLastNormalRetcodeTime(System.currentTimeMillis());
                                 SelectorEnum selectorEnum = SelectorEnum.fromCode(selector);
-                                if (selectorEnum != null){
+                                if (selectorEnum != null) {
                                     if (selector.equals(SelectorEnum.NORMAL.getCode())) {
                                         continue;
-                                    }else if (selector.equals(SelectorEnum.NEW_MSG.getCode())) {
+                                    } else if (selector.equals(SelectorEnum.NEW_MSG.getCode())) {
                                         // 有新消息
 //                                        processWebwxSync();
                                     } else if (selector.equals(SelectorEnum.ENTER_OR_LEAVE_CHAT.getCode())) {
@@ -292,31 +294,36 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
                                     } else {
                                         LOG.error("UNKNOW SELECTOR CODE {}", selector);
                                     }
-                                }else{
+                                } else {
                                     // 防止新类型不处理堆积
 //                                    processWebwxSync();
                                 }
-							} else if (retcode.equals(RetCodeEnum.NOT_LOGIN_CHECK.getCode()) ||
-									retcode.equals(RetCodeEnum.TICKET_ERROR.getCode()) ||
-									retcode.equals(RetCodeEnum.PARAM_ERROR.getCode()) ||
-									retcode.equals(RetCodeEnum.NOT_LOGIN_WARN.getCode()) ||
-									retcode.equals(RetCodeEnum.COOKIE_INVALID_ERROR.getCode()) ||
-									retcode.equals(RetCodeEnum.LOGIN_ENV_ERROR.getCode()) ){
-								// 状态异常直接退出
-								core.setAlive(false);
-								break;
-							} else {
-								// 防止频繁请求
-								SleepUtils.sleep(1000);
-								break;
-							}
-						}else{
-							LOG.error("特殊retcode： {}" ,retcode);
-						}
-						processWebwxSync();
-						if (System.currentTimeMillis() - startTime < 1000 * 1){
-							Thread.sleep(1000);
-						}
+                            } else if (retcode.equals(RetCodeEnum.NOT_LOGIN_CHECK.getCode()) ||
+                                    retcode.equals(RetCodeEnum.TICKET_ERROR.getCode()) ||
+                                    retcode.equals(RetCodeEnum.PARAM_ERROR.getCode()) ||
+                                    retcode.equals(RetCodeEnum.NOT_LOGIN_WARN.getCode()) ||
+                                    retcode.equals(RetCodeEnum.COOKIE_INVALID_ERROR.getCode()) ||
+                                    retcode.equals(RetCodeEnum.LOGIN_ENV_ERROR.getCode())) {
+                                // 状态异常直接退出
+                                core.setAlive(false);
+                                break;
+                            } else {
+                                // 防止频繁请求
+                                Thread.sleep(1000);
+                                break;
+                            }
+                        } else {
+                            LOG.error("特殊retcode： {}", retcode);
+                        }
+                        // 统统尝试获取新消息
+                        processWebwxSync();
+                        if (System.currentTimeMillis() - startTime < 1000 * 1) {
+                            Thread.sleep(1000);
+                        }
+                    } catch (InterruptedException e0){
+                        LOG.error("线程中断");
+                        core.setAlive(false);
+                        break;
 					} catch (Exception e) {
 						LOG.error(e.getMessage());
 						retryCount += 1;
@@ -327,6 +334,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 								Thread.sleep(1000);
 							} catch (InterruptedException e1) {
 								LOG.error(e.getMessage());
+								break;
 							}
 						}
 					}
@@ -809,7 +817,6 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		params.add(new BasicNameValuePair("r", String.valueOf(System.currentTimeMillis())));
 		params.add(new BasicNameValuePair("synckey", (String) core.getLoginInfo().get("synckey")));
 		params.add(new BasicNameValuePair("_", String.valueOf(System.currentTimeMillis())));
-		SleepUtils.sleep(7);
 		try {
 			HttpEntity entity = core.getMyHttpClient().doGet(url, params, true, getPersistentCookieMap());
 			if (entity == null) {
@@ -851,7 +858,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		}
 		Map<String, String> headerMap = null;
 		if (cookieStr != null){
-			headerMap = new HashMap<>(2);
+			headerMap = new HashMap<>(6);
 			headerMap.put("Cookie",cookieStr);
 		}
 		/* ^-----------------------------------------------^ */

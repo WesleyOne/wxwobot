@@ -12,10 +12,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.cookie.BasicClientCookie;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * 多开管理
@@ -35,7 +32,7 @@ public class CoreManage implements LogInterface {
             return null;
         }
         Core core;
-        if ( !coreMap.containsKey(uniqueKey) || coreMap.get(uniqueKey) == null || !coreMap.get(uniqueKey).isAlive()){
+        if ( !coreMap.containsKey(uniqueKey) || coreMap.get(uniqueKey) == null ){
             core = Core.getInstance(uniqueKey);
             coreMap.put(uniqueKey, core);
         }
@@ -126,75 +123,90 @@ public class CoreManage implements LogInterface {
                     JSONArray jsonArray = JSONArray.parseArray(result);
                     int size = jsonArray.size();
                     if (size > 0){
-                        // TODO 封装成线程同时操作
+                        // 封装成线程操作
                         for (int i=0;i<size;i++){
-                            Core core = null;
-                            try {
-                                /**
-                                 * 初始化Core,
-                                 * 1.获取登入的状态信息并装入CoreManage
-                                 * 2.构建ThreadGroup
-                                 * 3.获取Cookies并装入HttpClientManage
-                                 * 4.获取信息及启动线程
-                                 */
-                                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                core = jsonObject.getObject("core",Core.class);
-                                if (core.isAlive()){
-                                    String uniqueKey = core.getUniqueKey();
-                                    core.setThreadGroup(new ThreadGroup(uniqueKey));
-                                    coreMap.put(uniqueKey,core);
-
-                                    JSONArray cookiesJsonArray = jsonObject.getJSONArray("cookies");
-                                    int arraySize = cookiesJsonArray.size();
-                                    if (arraySize<=0){
-                                        continue;
-                                    }
-
-                                    // 装载原cookie信息,json解析cookie异常，干脆手动封装
-                                    BasicCookieStore cookieStore = new BasicCookieStore();
-                                    for (int ci=0;ci<arraySize;ci++){
-                                        JSONObject cookieJson = cookiesJsonArray.getJSONObject(ci);
-                                        String name = cookieJson.getString("name");
-                                        String value = cookieJson.getString("value");
-                                        String domain = cookieJson.getString("domain");
-                                        String path = cookieJson.getString("path");
-                                        Boolean persistent = cookieJson.getBoolean("persistent");
-                                        Boolean secure = cookieJson.getBoolean("secure");
-                                        Long expiryDate = cookieJson.getLong("expiryDate");
-                                        Integer version = cookieJson.getInteger("version");
-
-                                        BasicClientCookie cookie = new BasicClientCookie(name,value);
-                                        cookie.setDomain(domain);
-                                        cookie.setPath(path);
-                                        cookie.setSecure(secure);
-                                        cookie.setExpiryDate(new Date(expiryDate));
-                                        cookie.setVersion(version);
-
-                                        cookieStore.addCookie(cookie);
-                                    }
-                                    // 必须在构建client时就放入cookie
-                                    HttpClientManage.getInstance(uniqueKey,cookieStore);
-                                    //装载core信息及启动线程
-                                    LoginController login = new LoginController(uniqueKey);
-                                    if (!login.login_3()){
-                                        // 加载失败退出
-                                        core.setAlive(false);
-                                    }
-
-                                }
-                            }catch (Exception e){
-                                e.printStackTrace();
-                                if (core != null){
-                                    core.setAlive(false);
-                                    core = null;
-                                }
-                            }
-
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            ReloadThread reloadThread = new ReloadThread(jsonObject);
+                            Thread thread = new Thread(reloadThread);
+                            thread.start();
                         }
                     }
 
                     LOG.info("登录数据热加载完成");
                 }
+        }
+    }
+
+    private static class ReloadThread implements Runnable{
+
+        private JSONObject reloadObject;
+
+        public ReloadThread(JSONObject object){
+            this.reloadObject = object;
+        }
+
+        @Override
+        public void run() {
+            Core core = null;
+            try {
+                /**
+                 * 初始化Core,
+                 * 1.获取登入的状态信息并装入CoreManage
+                 * 2.构建ThreadGroup
+                 * 3.获取Cookies并装入HttpClientManage
+                 * 4.获取信息及启动线程
+                 */
+                JSONObject jsonObject = this.reloadObject;
+                core = jsonObject.getObject("core",Core.class);
+                if (core.isAlive()){
+                    String uniqueKey = core.getUniqueKey();
+                    core.setThreadGroup(new ThreadGroup(uniqueKey));
+                    coreMap.put(uniqueKey,core);
+
+                    JSONArray cookiesJsonArray = jsonObject.getJSONArray("cookies");
+                    int arraySize = cookiesJsonArray.size();
+                    if (arraySize<=0){
+                        return;
+                    }
+
+                    // 装载原cookie信息,json解析cookie异常，干脆手动封装
+                    BasicCookieStore cookieStore = new BasicCookieStore();
+                    for (int ci=0;ci<arraySize;ci++){
+                        JSONObject cookieJson = cookiesJsonArray.getJSONObject(ci);
+                        String name = cookieJson.getString("name");
+                        String value = cookieJson.getString("value");
+                        String domain = cookieJson.getString("domain");
+                        String path = cookieJson.getString("path");
+                        Boolean persistent = cookieJson.getBoolean("persistent");
+                        Boolean secure = cookieJson.getBoolean("secure");
+                        Long expiryDate = cookieJson.getLong("expiryDate");
+                        Integer version = cookieJson.getInteger("version");
+
+                        BasicClientCookie cookie = new BasicClientCookie(name,value);
+                        cookie.setDomain(domain);
+                        cookie.setPath(path);
+                        cookie.setSecure(secure);
+                        cookie.setExpiryDate(new Date(expiryDate));
+                        cookie.setVersion(version);
+
+                        cookieStore.addCookie(cookie);
+                    }
+                    // 必须在构建client时就放入cookie
+                    HttpClientManage.getInstance(uniqueKey,cookieStore);
+                    //装载core信息及启动线程
+                    LoginController login = new LoginController(uniqueKey);
+                    if (!login.login_3()){
+                        // 加载失败退出
+                        core.setAlive(false);
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                if (core != null){
+                    core.setAlive(false);
+                    core = null;
+                }
+            }
         }
     }
 
@@ -205,7 +217,6 @@ public class CoreManage implements LogInterface {
      * @param jsonObject
      */
     public static void addNewGroup(Core core,JSONObject jsonObject){
-        String nickName = jsonObject.getString("NickName");
         String userName = jsonObject.getString("UserName");
 
         CommonTools.emojiFormatter2(jsonObject, "NickName");
@@ -225,7 +236,6 @@ public class CoreManage implements LogInterface {
      * @param jsonObject
      */
     public static void addNewContact(Core core,JSONObject jsonObject){
-        String nickName = jsonObject.getString("NickName");
         String userName = jsonObject.getString("UserName");
 
         CommonTools.emojiFormatter2(jsonObject, "NickName");
