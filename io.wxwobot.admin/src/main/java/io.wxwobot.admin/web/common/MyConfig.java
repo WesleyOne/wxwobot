@@ -6,6 +6,7 @@ import com.jfinal.config.*;
 import com.jfinal.json.FastJsonFactory;
 import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
+import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.template.Engine;
 import com.jfinal.template.source.ClassPathSourceFactory;
@@ -18,7 +19,11 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * @author admin
+ * JFinal项目的核心配置
+ * 详情查看官方文档
+ * https://www.jfinal.com/doc
+ *
+ * @author WesleyOne
  */
 public class MyConfig extends JFinalConfig {
 
@@ -29,14 +34,12 @@ public class MyConfig extends JFinalConfig {
 	 */
 	@Override
 	public void configConstant(Constants me) {
-		// 加载少量必要配置，随后可用PropKit.get(...)获取值
 		PropKit.use("appConfig.properties");
-		me.setDevMode(PropKit.use("appConfig.properties").getBoolean("devMode", false));
+		me.setDevMode(PropKit.getBoolean("devMode", false));
 		//上传的文件的最大50M
-		me.setMaxPostSize(50 * 1024 * 1024);
+		me.setMaxPostSize(10 * 1024 * 1024);
 		me.setEncoding("UTF-8");
 		me.setJsonFactory(new FastJsonFactory());
-		me.setBaseUploadPath(PropKit.get("cachUploadPath"));
 		me.setError404View("/WEB-INF/templates/404.html");
 	}
 	
@@ -61,27 +64,25 @@ public class MyConfig extends JFinalConfig {
 	@Override
 	public void configPlugin(Plugins me) {
 		// 配置 druid 数据库连接池插件
-		DruidPlugin druidPlugin = createAgentDruidPlugin();
-		//防止sql 注入
-		druidPlugin.addFilter(new StatFilter());//sql 监控
+		DruidPlugin druidPlugin = createDruidPlugin();
+		druidPlugin.addFilter(new StatFilter());
 		WallFilter wall = new WallFilter();
-		wall.setDbType("sqlserver");
+		wall.setDbType("mysql");
 		druidPlugin.addFilter(wall);
 		druidPlugin.setInitialSize(1);
 		me.add(druidPlugin);
 
 		// 配置ActiveRecord插件
 		ActiveRecordPlugin arp = new ActiveRecordPlugin(druidPlugin);
-		// 所有映射在 MappingKit 中自动化搞定
 		_MappingKit.mapping(arp);
-		arp.setDialect(new NewSqlServerDialect());
+		arp.setDialect(new MysqlDialect());
 		arp.setShowSql(PropKit.use("appConfig.properties").getBoolean("devMode", false));
 		arp.getEngine().setSourceFactory(new ClassPathSourceFactory());
 		me.add(arp);
 	}
 
-	public static DruidPlugin createAgentDruidPlugin() {
-		return new DruidPlugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim(),PropKit.get("jdbcDriverSqlServe"));
+	public static DruidPlugin createDruidPlugin() {
+		return new DruidPlugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim(),PropKit.get("jdbcDriverMysql"));
 	}
 	/**
 	 * 配置全局拦截器

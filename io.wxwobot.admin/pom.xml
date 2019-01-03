@@ -33,73 +33,30 @@
     <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <pro.jdbc.agent.driver.sqlserve>com.microsoft.sqlserver.jdbc.SQLServerDriver</pro.jdbc.agent.driver.sqlserve>
-    <pro.jdbc.agent.url><![CDATA[jdbc:sqlserver://120.78.251.84:33341;Database=agent]]></pro.jdbc.agent.url>
-    <pro.jdbc.agent.username>sa</pro.jdbc.agent.username>
-    <pro.jdbc.agent.password>xiangyoukeji</pro.jdbc.agent.password>
+    <pro.jdbc.agent.driver.mysql>com.mysql.jdbc.Driver</pro.jdbc.agent.driver.mysql>
+    <pro.jdbc.agent.url><![CDATA[jdbc:mysql://127.0.0.1:3306/wxwobot?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull]]></pro.jdbc.agent.url>
+    <pro.jdbc.agent.username>wxwobot</pro.jdbc.agent.username>
+    <pro.jdbc.agent.password>wxwobot</pro.jdbc.agent.password>
     <pro.devMode>true</pro.devMode>
     <log.level>debug</log.level>
-    <log.file.path>/home/www/output/logs/hyagent/wxrobot</log.file.path>
-    <pro.cookie.domain>devrob.com</pro.cookie.domain>
-    <pro.upload.cachpath>E:\home\www\images\rob\cache</pro.upload.cachpath>
-    <pro.upload.img.realpath>E:\home\www\images\rob\img</pro.upload.img.realpath>
-    <pro.upload.file.realpath>E:\home\www\images\rob\file</pro.upload.file.realpath>
-    <pro.upload.reload.realpath>E:\home\www\images\rob\reload</pro.upload.reload.realpath>
-    <pro.domain.img>http://devrob.com/img/</pro.domain.img>
-    <pro.domain.file>http://devrob.com/file/</pro.domain.file>
+    <pro.user.hotreload>true</pro.user.hotreload>
+    <pro.cookie.domain>localhost</pro.cookie.domain>
+    <pro.domain.img>http://localhost/img/</pro.domain.img>
+    <pro.domain.file>http://localhost/file/</pro.domain.file>
+
+    <log.file.path>/home/www/output/logs/wxrobot</log.file.path>
+    <pro.upload.img.realpath>D:\IdeaProjects\io.wxwobot\io.wxwobot.admin\src\main\webapp\img</pro.upload.img.realpath>
+    <pro.upload.file.realpath>D:\IdeaProjects\io.wxwobot\io.wxwobot.admin\src\main\webapp\file</pro.upload.file.realpath>
+    <pro.upload.reload.realpath>D:\IdeaProjects\io.wxwobot\io.wxwobot.admin\src\main\webapp\reload</pro.upload.reload.realpath>
   </properties>
   <profiles>
     <profile>
       <id>mac</id>
       <properties>
-        <log.file.path>/Users/wesley/output/logs/hyagent/wxrobot</log.file.path>
-        <pro.cookie.domain>localhost</pro.cookie.domain>
-        <pro.upload.cachpath>/Users/wesley/output/images/rob/cache</pro.upload.cachpath>
+        <log.file.path>/Users/wesley/output/logs/wxrobot</log.file.path>
         <pro.upload.img.realpath>/Users/wesley/output/images/rob/img</pro.upload.img.realpath>
         <pro.upload.file.realpath>/Users/wesley/output/images/rob/file</pro.upload.file.realpath>
         <pro.upload.reload.realpath>/Users/wesley/output/images/rob/reload</pro.upload.reload.realpath>
-        <!--<pro.domain.img>http://devrob.com/img/</pro.domain.img>-->
-        <!--<pro.domain.file>http://devrob.com/file/</pro.domain.file>-->
-        <pro.domain.img>file://Users/wesley/output/images/rob/img/</pro.domain.img>
-        <pro.domain.file>file://Users/wesley/output/images/rob/file/</pro.domain.file>
-      </properties>
-    </profile>
-    <profile>
-      <id>uat</id>
-      <properties>
-        <pro.jdbc.agent.driver.sqlserve>com.microsoft.sqlserver.jdbc.SQLServerDriver</pro.jdbc.agent.driver.sqlserve>
-        <pro.jdbc.agent.url><![CDATA[jdbc:sqlserver://106.15.249.12:14333;Database=agent]]></pro.jdbc.agent.url>
-        <pro.jdbc.agent.username>sa</pro.jdbc.agent.username>
-        <pro.jdbc.agent.password>xiangyoukeji</pro.jdbc.agent.password>
-        <pro.devMode>true</pro.devMode>
-        <log.level>debug</log.level>
-        <log.file.path>/home/www/output/logs/hyagent/wxrobot</log.file.path>
-        <pro.cookie.domain>robtest.fengying78.com</pro.cookie.domain>
-        <pro.upload.cachpath>/home/www/web-deploy/com.xyagent.admin.images/rob/cache</pro.upload.cachpath>
-        <pro.upload.img.realpath>/home/www/web-deploy/com.xyagent.admin.images/rob/img</pro.upload.img.realpath>
-        <pro.upload.file.realpath>/home/www/web-deploy/com.xyagent.admin.images/rob/file</pro.upload.file.realpath>
-        <pro.upload.reload.realpath>/home/www/web-deploy/com.xyagent.admin.images/rob/reload</pro.upload.reload.realpath>
-        <pro.domain.img>http://robtest.fengying78.com/img/</pro.domain.img>
-        <pro.domain.file>http://robtest.fengying78.com/file/</pro.domain.file>
-      </properties>
-    </profile>
-    <profile>
-      <id>pro</id>
-      <properties>
-        <pro.jdbc.agent.driver.sqlserve>com.microsoft.sqlserver.jdbc.SQLServerDriver</pro.jdbc.agent.driver.sqlserve>
-        <pro.jdbc.agent.url><![CDATA[jdbc:sqlserver://106.15.62.112:1433;Database=agent]]></pro.jdbc.agent.url>
-        <pro.jdbc.agent.username><![CDATA[IeuQxc#_ds&4cMsde61]]></pro.jdbc.agent.username>
-        <pro.jdbc.agent.password><![CDATA[fsd&#2Lkd_21@%fsRWcsas]]></pro.jdbc.agent.password>
-        <pro.devMode>false</pro.devMode>
-        <log.level>info</log.level>
-        <log.file.path>/home/www/output/logs/hyagent/rob</log.file.path>
-        <pro.cookie.domain>rob.fengying78.com</pro.cookie.domain>
-        <pro.upload.cachpath>/home/www/upload/rob/cache</pro.upload.cachpath>
-        <pro.upload.img.realpath>/home/www/upload/rob/img</pro.upload.img.realpath>
-        <pro.upload.file.realpath>/home/www/upload/rob/file</pro.upload.file.realpath>
-        <pro.upload.reload.realpath>/home/www/upload/rob/reload</pro.upload.reload.realpath>
-        <pro.domain.img>http://rob.fengying78.com/img/</pro.domain.img>
-        <pro.domain.file>http://rob.fengying78.com/file/</pro.domain.file>
       </properties>
     </profile>
   </profiles>
@@ -152,13 +109,12 @@
       <artifactId>jcl-over-slf4j</artifactId>
       <version>1.7.12</version>
     </dependency>
-
     <dependency>
-      <groupId>com.microsoft.sqlserver</groupId>
-      <artifactId>sqljdbc4</artifactId>
-      <version>4.0</version>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.44</version>
+        <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
@@ -201,11 +157,11 @@
       <artifactId>activation</artifactId>
       <version>1.1.1</version>
     </dependency>
-      <dependency>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-          <version>20.0</version>
-      </dependency>
+    <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>20.0</version>
+    </dependency>
 
   </dependencies>
   <build>

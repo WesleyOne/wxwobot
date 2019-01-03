@@ -28,9 +28,10 @@ public class _BaseController extends Controller {
     /**
      * 通用验证
      * @param result    true说明验证不通过
+     * @param code
      * @param errorMsg
      */
-    public boolean validatorParam(boolean result,String code,String errorMsg){
+    public boolean vldParam(boolean result, String code, String errorMsg){
         if (result){
             setAttr("code",code);
             setAttr("message",errorMsg);
@@ -40,16 +41,16 @@ public class _BaseController extends Controller {
         return false;
     }
 
-    public boolean validatorParam(boolean result,BaseError baseError){
+    public boolean vldParam(boolean result, BaseError baseError){
         if (result){
-            return validatorParam(true,baseError.getCode(),baseError.getMsg());
+            return vldParam(true,baseError.getCode(),baseError.getMsg());
         }
         return false;
     }
 
-    public boolean validatorParam(boolean result,String errMsg){
+    public boolean vldParam(boolean result, String errMsg){
         if (result){
-            return validatorParam(true,BaseError.NORMAL_ERR.getCode(),errMsg);
+            return vldParam(true,BaseError.NORMAL_ERR.getCode(),errMsg);
         }
         return false;
     }
@@ -60,16 +61,16 @@ public class _BaseController extends Controller {
      * @param baseError
      * @return
      */
-    public boolean validatorParamNull(String paramValue,BaseError baseError){
+    public boolean vldParamNull(String paramValue, BaseError baseError){
         if (StrKit.isBlank(paramValue)) {
-            return validatorParam(true,baseError.getCode(),baseError.getMsg());
+            return vldParam(true,baseError.getCode(),baseError.getMsg());
         }
         return false;
     }
 
-    public boolean validatorParamNull(String paramValue,String errMsg){
+    public boolean vldParamNull(String paramValue, String errMsg){
         if (StrKit.isBlank(paramValue)) {
-            return validatorParam(true,BaseError.NORMAL_ERR.getCode(),errMsg);
+            return vldParam(true,BaseError.NORMAL_ERR.getCode(),errMsg);
         }
         return false;
     }
@@ -80,16 +81,16 @@ public class _BaseController extends Controller {
      * @param baseError
      * @return
      */
-    public boolean validatorParamNull(Object paramValue,BaseError baseError){
+    public boolean vldParamNull(Object paramValue, BaseError baseError){
         if (paramValue == null) {
-            return validatorParam(true,baseError.getCode(),baseError.getMsg());
+            return vldParam(true,baseError.getCode(),baseError.getMsg());
         }
         return false;
     }
 
-    public boolean validatorParamNull(Object paramValue,String errMsg){
+    public boolean vldParamNull(Object paramValue, String errMsg){
         if (paramValue == null) {
-            return validatorParam(true,BaseError.NORMAL_ERR.getCode(),errMsg);
+            return vldParam(true,BaseError.NORMAL_ERR.getCode(),errMsg);
         }
         return false;
     }
@@ -145,7 +146,12 @@ public class _BaseController extends Controller {
         return this.getCookie("uid");
     }
 
-    //分页处理
+    /**
+     * 分页处理
+     * @param list
+     * @param count
+     * @return
+     */
     @SuppressWarnings("rawtypes")
     protected Map<String, Object> buildPagination(List list, Integer count) {
         return buildPagination(list, count, null);
@@ -154,7 +160,7 @@ public class _BaseController extends Controller {
     @SuppressWarnings("rawtypes")
     protected Map<String, Object> buildPagination(List list, Integer count,
                                                   List<Map<String, Object>> footer) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<String, Object>(4);
         map.put("total", count);
         map.put("rows", list);
         if (footer != null){

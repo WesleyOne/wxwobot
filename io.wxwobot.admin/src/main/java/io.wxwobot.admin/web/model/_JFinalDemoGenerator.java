@@ -1,6 +1,7 @@
 package io.wxwobot.admin.web.model;
 
 import com.jfinal.kit.PathKit;
+import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
 import com.jfinal.plugin.activerecord.generator.Generator;
 import com.jfinal.plugin.druid.DruidPlugin;
 import io.wxwobot.admin.web.utils.NewSqlServerDialect;
@@ -18,8 +19,8 @@ public class _JFinalDemoGenerator {
 	public static DataSource getDataSource() {
 //		PropKit.use("appConfig.properties");
 //		DruidPlugin druidPlugin =  new DruidPlugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim(),PropKit.get("jdbcDriverSqlServe"));
-		DruidPlugin druidPlugin = new DruidPlugin("jdbc:sqlserver://120.78.251.84:33341;Database=agent",
-				"sa", "xiangyoukeji","com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		DruidPlugin druidPlugin = new DruidPlugin("jdbc:mysql://127.0.0.1:3306/wxwobot?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull",
+				"wxwobot", "wxwobot","com.mysql.jdbc.Driver");
 		druidPlugin.start();
 		return druidPlugin.getDataSource();
 	}
@@ -41,11 +42,7 @@ public class _JFinalDemoGenerator {
 		// 设置是否生成链式 setter 方法
 		generator.setGenerateChainSetter(false);
 		// 添加不需要生成的表名
-		generator.addExcludedTable("agent","agent_app","agent_bank","agent_percent","agent_withdraw","app"
-				,"app_setting","business_apply","commission_detail","company","custom_config","exchange_activity","exchange_goods"
-				,"exchange_record","goods","goods2","order","order_goods","payment_apply","player"
-				,"privs","privs_player","recharge_record","role","stat_order_day","trade","transfer_record","wx_player_cash_img"
-				);
+		generator.addExcludedTable();
 		// 设置是否在 Model 中生成 dao 对象
 		generator.setGenerateDaoInModel(false);
 		// 设置是否生成链式 setter 方法
@@ -55,10 +52,7 @@ public class _JFinalDemoGenerator {
 		// 设置需要被移除的表名前缀用于生成modelName。例如表名 "osc_user"，移除前缀 "osc_"后生成的model名为 "User"而非 OscUser
 //		generator.setRemovedTableNamePrefixes("t_");
 
-		/**
-		 * sqlserver方言
-		 */
-		generator.setDialect(new NewSqlServerDialect());
+		generator.setDialect(new MysqlDialect());
 		// 生成
 		generator.generate();
 

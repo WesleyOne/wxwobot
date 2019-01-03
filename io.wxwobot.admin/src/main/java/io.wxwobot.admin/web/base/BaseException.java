@@ -3,9 +3,7 @@ package io.wxwobot.admin.web.base;
 import java.io.Serializable;
 
 /**
- * 统一异常关联
- * 具体处理查看
- * @see
+ * 统一异常对象
  * @author WesleyOne
  * @create 2018/7/28
  */

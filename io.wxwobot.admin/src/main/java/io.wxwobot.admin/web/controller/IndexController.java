@@ -39,8 +39,8 @@ public class IndexController extends _BaseController {
     public void loginPost(){
         String username = getPara("username");
         String password = getPara("password");
-        if (validatorParamNull(username,"用户名不能为空")||
-                validatorParamNull(password,"密码不能为空")){
+        if (vldParamNull(username,"用户名不能为空")||
+                vldParamNull(password,"密码不能为空")){
             return;
         }
 

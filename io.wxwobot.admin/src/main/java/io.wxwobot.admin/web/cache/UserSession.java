@@ -5,7 +5,7 @@ import io.wxwobot.admin.web.utils.LRUCache;
 import java.util.LinkedHashMap;
 
 /**
- * 会话处理
+ * 简单的本地会话存储
  * @author WesleyOne
  * @create 2018/9/25
  */

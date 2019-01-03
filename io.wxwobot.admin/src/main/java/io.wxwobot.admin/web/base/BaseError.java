@@ -13,10 +13,8 @@ public enum BaseError {
 
     UNPERMISSION("09","没有操作权限"),
     UNLOGIN("01","未登录或登录过期"),
-    NORMAL_ERR("8999","参数异常"),
     OPERATION_ERR("8899","操作失败!"),
-    UNDEV_ERR("4444","功能尚未开发!"),
-    NEW_VERSION("9988","当前版本已最新"),
+    NORMAL_ERR("8999","参数异常"),
     SYSTEM_ERR("9999","系统异常");
 
 

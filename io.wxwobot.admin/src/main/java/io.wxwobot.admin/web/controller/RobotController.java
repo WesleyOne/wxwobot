@@ -81,12 +81,12 @@ public class RobotController extends _BaseController {
         JSONObject postParam = getPostParam();
         String remark = postParam.getString("remark");
 
-        if (validatorParamNull(remark,"微信号不能为空")){
+        if (vldParamNull(remark,"微信号不能为空")){
             return;
         }
 
         Record remarkRecord = Db.findFirst("SELECT TOP 1 remark FROM wx_rob_config with(nolock) WHERE remark = ?", remark);
-        if (validatorParamNull(remarkRecord != null,"备注已存在")){
+        if (vldParamNull(remarkRecord != null,"备注已存在")){
             return;
         }
         WxRobConfig bean = new WxRobConfig();
@@ -162,15 +162,15 @@ public class RobotController extends _BaseController {
         JSONObject postParam = getPostParam();
         Integer id = postParam.getInteger("rid");
         String remark = postParam.getString("remark");
-        if (validatorParamNull(id,"ID不能为空")){
+        if (vldParamNull(id,"ID不能为空")){
             return;
         }
-        if (validatorParamNull(remark,"备注不能为空")){
+        if (vldParamNull(remark,"备注不能为空")){
             return;
         }
 
         Record remarkRecord = Db.findFirst("SELECT TOP 1 remark FROM wx_rob_config with(nolock) WHERE remark = ?", remark);
-        if (validatorParamNull(remarkRecord != null,"备注已存在")){
+        if (vldParamNull(remarkRecord != null,"备注已存在")){
             return;
         }
         WxRobConfig config = new WxRobConfig();

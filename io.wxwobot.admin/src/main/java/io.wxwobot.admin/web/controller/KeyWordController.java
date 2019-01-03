@@ -5,7 +5,6 @@ import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.render.JsonRender;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
-import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.web.enums.KeyMsgValueType;
 import io.wxwobot.admin.web.model.WxRobKeyword;
 import org.apache.commons.lang3.StringUtils;
@@ -150,22 +149,22 @@ public class KeyWordController extends _BaseController{
             editRecord.setUniqueKey(uniqueKey);
             editRecord.setCreateTime(new Date());
             editRecord.setEnable(true);
-            if (validatorParamNull(editRecord.getUniqueKey(),"唯一码不能为空")){
+            if (vldParamNull(editRecord.getUniqueKey(),"唯一码不能为空")){
                 return;
             }
-            if (validatorParamNull(editRecord.getKeyData(),"关键字不能为空")){
+            if (vldParamNull(editRecord.getKeyData(),"关键字不能为空")){
                 return;
             }
-            if (validatorParamNull(editRecord.getValueData(),"内容不能为空")){
+            if (vldParamNull(editRecord.getValueData(),"内容不能为空")){
                 return;
             }
-            if (validatorParamNull(editRecord.getTypeData(),"内容类型不能为空")){
+            if (vldParamNull(editRecord.getTypeData(),"内容类型不能为空")){
                 return;
             }
-            if (validatorParamNull(editRecord.getNickName(),"昵称不能为空")){
+            if (vldParamNull(editRecord.getNickName(),"昵称不能为空")){
                 return;
             }
-            if (validatorParamNull(editRecord.getToGroup(),"群聊好友未选择")){
+            if (vldParamNull(editRecord.getToGroup(),"群聊好友未选择")){
                 return;
             }
             boolean save = editRecord.save();

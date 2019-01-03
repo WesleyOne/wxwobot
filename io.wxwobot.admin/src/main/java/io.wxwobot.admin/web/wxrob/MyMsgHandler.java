@@ -102,7 +102,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
         /**
          * 群里的新人进群消息处理
          * 优先发专门这个群的欢迎词
-         * 没有发通用的
+         * 没有的发通用的
          * 欢迎词内容实质就是在最前面加上@昵称\n
          *
          * 欢迎词的关键字

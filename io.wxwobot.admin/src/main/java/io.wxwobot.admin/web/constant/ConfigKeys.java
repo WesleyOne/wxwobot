@@ -5,10 +5,7 @@ package io.wxwobot.admin.web.constant;
  * @create 2018/12/13
  */
 public class ConfigKeys {
-
-    public static final String WX_ROB_AI = "WX_ROB_AI_";
-    public static final String WX_ROB_KEYWORD = "WX_ROB_KEYWORD_";
-
+    
     /**
      * 默认全局关键字回复用昵称，该字段超过16字符防止与用户昵称冲突
      *

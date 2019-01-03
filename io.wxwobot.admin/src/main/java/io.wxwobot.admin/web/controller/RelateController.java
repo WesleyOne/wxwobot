@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.render.JsonRender;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
-import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.web.model.WxRobRelation;
 import io.wxwobot.admin.web.utils.UUIDShortUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -137,13 +136,13 @@ public class RelateController extends _BaseController {
             editRecord.setUniqueKey(uniqueKey);
             editRecord.setCreateTime(new Date());
             editRecord.setEnable(true);
-            if (validatorParamNull(editRecord.getUniqueKey(),"唯一码不能为空")){
+            if (vldParamNull(editRecord.getUniqueKey(),"唯一码不能为空")){
                 return;
             }
-            if (validatorParamNull(editRecord.getNickName(),"昵称不能为空")){
+            if (vldParamNull(editRecord.getNickName(),"昵称不能为空")){
                 return;
             }
-            if (validatorParamNull(editRecord.getToGroup(),"群聊好友未选择")){
+            if (vldParamNull(editRecord.getToGroup(),"群聊好友未选择")){
                 return;
             }
 

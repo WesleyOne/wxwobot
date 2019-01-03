@@ -5,7 +5,7 @@ import io.wxwobot.admin.web.interceptor.VisitLogInterceptor;
 import io.wxwobot.admin.web.controller.*;
 
 /**
- * 路由统一管理
+ * 管理后台路由统一管理
  * @author wesleyOne
  */
 public class MyRoute extends Routes {
@@ -26,8 +26,5 @@ public class MyRoute extends Routes {
 
 		add("/upload",UploadController.class);
 		add("/tool",ToolController.class);
-
-		add("/qyq",QyqController.class);
-
 	}
 }

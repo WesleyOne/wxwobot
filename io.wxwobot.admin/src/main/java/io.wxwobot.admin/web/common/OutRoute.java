@@ -5,6 +5,7 @@ import io.wxwobot.admin.web.controller.ExtendController;
 import io.wxwobot.admin.web.interceptor.VisitLogInterceptor4down;
 
 /**
+ * 对外路由统一管理
  * @author WesleyOne
  * @create 2018/9/25
  */
