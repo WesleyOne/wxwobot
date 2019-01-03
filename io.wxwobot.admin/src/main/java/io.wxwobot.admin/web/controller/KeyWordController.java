@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.render.JsonRender;
+import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.web.enums.KeyMsgValueType;
 import io.wxwobot.admin.web.model.WxRobKeyword;
@@ -74,7 +75,7 @@ public class KeyWordController extends _BaseController{
         Integer kid = getParaToInt("kid");
         WxRobKeyword kwRecord;
         boolean isEdit = true;
-        Set<String> groupNickNames = new HashSet<>();
+        List<String> groupNickNames = new ArrayList<>();
         if (kid != null){
             kwRecord = WxRobKeyword.dao.findById(kid);
         }else{
@@ -83,7 +84,7 @@ public class KeyWordController extends _BaseController{
             String uniqueKey = getPara("uk");
             if (StringUtils.isNotEmpty(uniqueKey)){
                 kwRecord.setUniqueKey(uniqueKey);
-                groupNickNames.addAll(CoreManage.getInstance(uniqueKey).getGroupInfoMap().keySet());
+                groupNickNames.addAll(WechatTools.getGroupNickNameList(uniqueKey));
             }
             // 默认显示文本
             kwRecord.setTypeData(KeyMsgValueType.TEXT.toValue());

@@ -2,11 +2,74 @@
 #@layout()
 
 #define main()
-123456
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">功能简介</h3>
+    </div>
+    <div class="panel-body">
+        <div class="well" >
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">机器人</div>
+                        <div class="panel-body">
+                            登入退出，开关状态管理，群名查看等
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 arrow_my" >
+                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                </div>
+                <div class="col-md-5">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">关键字</div>
+                        <div class="panel-body">
+                            自动回复某个或全局群或好友关键词，新人进群欢迎词等
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5 arrow_my">
+                    <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                </div>
+                <div class="col-md-2"></div>
+                <div class="col-md-5 arrow_my">
+                    <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">对外接口</div>
+                        <div class="panel-body">
+                            外部项目通过调用对外接口完成信息转发
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 arrow_my">
+                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                </div>
+                <div class="col-md-5">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">消息发送</div>
+                        <div class="panel-body">
+                            文本 图片 文件
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 #end
 
 #define css()
-
+<style type="text/css">
+    .arrow_my{
+        text-align: center;
+    }
+</style>
 #end
 
 #define js()

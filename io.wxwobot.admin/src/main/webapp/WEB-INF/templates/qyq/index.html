@@ -21,9 +21,12 @@
         </div>
         <div class="form-group" >
             <label for="search_qyqId">亲友圈ID</label>
+            <input type="text" class="form-control" id="search_qyqShowId" >
+        </div>
+        <div class="form-group" >
+            <label for="search_qyqId">亲友圈记录ID</label>
             <input type="text" class="form-control" id="search_qyqId" >
         </div>
-
         <div class="form-group">
             <label for="search_enable">是否已启用</label>
             <select class="form-control" id="search_enable" aria-describedby="search_enable">
@@ -83,6 +86,7 @@
                                 params.outKey = $('#search_out_key').val();
                                 params.appId = $('#search_appId').val();
                                 params.qyqId = $('#search_qyqId').val();
+                                params.qyqShowId = $('#search_qyqShowId').val();
                                 params.enable = $('#search_enable').val();
 
                                 return params;// 分页下默认limit,offset,order
@@ -128,8 +132,14 @@
                                     valign : 'middle',
                                 },
                                 {
-                                    field : 'pyqId',
+                                    field : 'pyqShowId',
                                     title : '亲友圈ID',
+                                    align : 'center',
+                                    valign : 'middle',
+                                },
+                                {
+                                    field : 'pyqId',
+                                    title : '亲友圈记录ID',
                                     align : 'center',
                                     valign : 'middle',
                                 },

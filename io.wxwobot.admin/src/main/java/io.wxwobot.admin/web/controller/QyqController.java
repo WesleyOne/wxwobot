@@ -49,6 +49,7 @@ public class QyqController extends _BaseController {
         String outKey = getPara("outKey");
         Integer appId = getParaToInt("appId");
         Integer pyqId = getParaToInt("pyqId");
+        Integer pyqShowId = getParaToInt("qyqShowId");
         Boolean enable = getParaToBoolean("enable");
 
         String where = " where 1=1 ";
@@ -60,6 +61,9 @@ public class QyqController extends _BaseController {
         }
         if (pyqId != null){
             where += " and pyq_id = '"+ pyqId +"'";
+        }
+        if (pyqShowId != null){
+            where += " and pyq_show_id = '"+ pyqShowId +"'";
         }
         if (enable != null){
             where += " and enable = " + (enable?1:0);
@@ -108,6 +112,7 @@ public class QyqController extends _BaseController {
         String outKey = postParam.getString("outKey");
         Integer appId = postParam.getInteger("appId");
         Integer pyqId = postParam.getInteger("pyqId");
+        Integer pyqShowId = postParam.getInteger("pyqShowId");
         String img = postParam.getString("img");
         Boolean enable = postParam.getBoolean("enable");
 
@@ -121,6 +126,9 @@ public class QyqController extends _BaseController {
         }
         if (pyqId != null){
             editRecord.setPyqId(pyqId);
+        }
+        if (pyqShowId != null){
+            editRecord.setPyqShowId(pyqShowId);
         }
         if (enable != null){
             editRecord.setEnable(enable);
@@ -139,14 +147,17 @@ public class QyqController extends _BaseController {
             }
         }else{
             // 校验
-            editRecord.setEnable(true);
+            editRecord.setEnable(false);
             if (validatorParamNull(editRecord.getOutKey(),"外接码不能为空")){
                 return;
             }
             if (validatorParamNull(editRecord.getAppId(),"应用ID不能为空")){
                 return;
             }
-            if (validatorParamNull(editRecord.getPyqId(),"亲友圈ID不能为空")){
+            if (validatorParamNull(editRecord.getPyqId(),"亲友圈记录ID不能为空")){
+                return;
+            }
+            if (validatorParamNull(editRecord.getPyqShowId(),"牌友圈ID不能为空")){
                 return;
             }
             if (validatorParamNull(editRecord.getImg(),"图片ID不能为空")){

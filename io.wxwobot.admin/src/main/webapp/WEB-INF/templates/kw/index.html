@@ -163,14 +163,17 @@
                                         } else {
                                             result += "<span class='label label-danger'>未知</span> ";
                                         }
-                                        var v_len = value.length;
-                                        var max_len = 10;
-                                        if (v_len > max_len){
-                                            result += "<span title='"+value+"'>"+value.substr(0,max_len-3)+"...</span>";
+                                        if (value == '#(io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_WELCOME)'){
+                                            result += "<span class='label label-danger'>欢迎词</span> ";
                                         } else{
-                                            result += "<span>"+value+"</span>"
+                                            var v_len = value.length;
+                                            var max_len = 10;
+                                            if (v_len > max_len){
+                                                result += "<span title='"+value+"'>"+value.substr(0,max_len-3)+"...</span>";
+                                            } else{
+                                                result += "<span>"+value+"</span>"
+                                            }
                                         }
-
                                         return result;
                                     }
                                 },

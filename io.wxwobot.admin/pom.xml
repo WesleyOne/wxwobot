@@ -83,6 +83,25 @@
         <pro.domain.file>http://robtest.fengying78.com/file/</pro.domain.file>
       </properties>
     </profile>
+    <profile>
+      <id>pro</id>
+      <properties>
+        <pro.jdbc.agent.driver.sqlserve>com.microsoft.sqlserver.jdbc.SQLServerDriver</pro.jdbc.agent.driver.sqlserve>
+        <pro.jdbc.agent.url><![CDATA[jdbc:sqlserver://106.15.62.112:1433;Database=agent]]></pro.jdbc.agent.url>
+        <pro.jdbc.agent.username><![CDATA[IeuQxc#_ds&4cMsde61]]></pro.jdbc.agent.username>
+        <pro.jdbc.agent.password><![CDATA[fsd&#2Lkd_21@%fsRWcsas]]></pro.jdbc.agent.password>
+        <pro.devMode>false</pro.devMode>
+        <log.level>info</log.level>
+        <log.file.path>/home/www/output/logs/hyagent/rob</log.file.path>
+        <pro.cookie.domain>rob.fengying78.com</pro.cookie.domain>
+        <pro.upload.cachpath>/home/www/upload/rob/cache</pro.upload.cachpath>
+        <pro.upload.img.realpath>/home/www/upload/rob/img</pro.upload.img.realpath>
+        <pro.upload.file.realpath>/home/www/upload/rob/file</pro.upload.file.realpath>
+        <pro.upload.reload.realpath>/home/www/upload/rob/reload</pro.upload.reload.realpath>
+        <pro.domain.img>http://rob.fengying78.com/img/</pro.domain.img>
+        <pro.domain.file>http://rob.fengying78.com/file/</pro.domain.file>
+      </properties>
+    </profile>
   </profiles>
 
   <dependencies>

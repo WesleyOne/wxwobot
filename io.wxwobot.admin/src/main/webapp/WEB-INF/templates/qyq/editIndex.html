@@ -5,7 +5,7 @@
     #if(form.outKey ??)
     <li><a href="/qyq?ok=#(form.outKey ??)">#(form.outKey ??)的配置</a></li>
     #else
-    <li><a href="/qyq">所有关键字</a></li>
+    <li><a href="/qyq">所有配置</a></li>
     #end
     <li class="active">#if(isEdit)修改#else添加#end配置</li>
 </ol>
@@ -38,9 +38,15 @@
                             #end
                         </select>
                     </div>
+                </div>
+                <div class="form-group">
                     <label for="pyqId" class="col-sm-2 control-label">亲友圈ID:</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="pyqId" name="pyqId" value="#(form.pyqId ??)">
+                        <input type="text" class="form-control" id="pyqShowId" name="pyqShowId" value="#(form.pyqShowId ??)" placeholder="PyqInfo的SHOW_ID字段">
+                    </div>
+                    <label for="pyqId" class="col-sm-2 control-label">亲友圈记录ID:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="pyqId" name="pyqId" value="#(form.pyqId ??)" placeholder="PyqInfo的ID或PyqRecordLog_temp的ID">
                     </div>
                 </div>
                 <div class="form-group">
@@ -119,10 +125,17 @@
                         }
                     }
                 },
+                pyqShowId: {
+                    validators: {
+                        notEmpty: {
+                            message: '亲友圈ID不能为空,联系技术管理员'
+                        }
+                    }
+                },
                 pyqId: {
                     validators: {
                         notEmpty: {
-                            message: '亲友圈ID不能为空'
+                            message: '亲友圈记录ID不能为空,联系技术管理员'
                         }
                     }
                 },

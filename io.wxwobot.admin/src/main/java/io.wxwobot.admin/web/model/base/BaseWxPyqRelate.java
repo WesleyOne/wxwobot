@@ -63,4 +63,13 @@ public abstract class BaseWxPyqRelate<M extends BaseWxPyqRelate<M>> extends Mode
 		return getInt("pyq_id");
 	}
 
+	public M setPyqShowId(java.lang.Integer pyqShowId) {
+		set("pyq_show_id", pyqShowId);
+		return (M)this;
+	}
+	
+	public java.lang.Integer getPyqShowId() {
+		return getInt("pyq_show_id");
+	}
+
 }

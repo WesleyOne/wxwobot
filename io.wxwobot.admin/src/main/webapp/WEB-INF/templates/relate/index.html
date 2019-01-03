@@ -250,11 +250,12 @@
     function delPost(kid) {
         bootbox.confirm("确定删除编号【"+kid+"】的外接配置记录吗？",function (result) {
             if (result){
-                $.get("/relate/delRelation",
+                $.get("/relate/delRelate",
                     { kid : kid},
                     function(data,status){
                         if (status == 'success'){
                             bootbox.alert(data.message);
+                            refreshTable();
                         } else{
                             bootbox.alert("请求异常:"+status);
                         }

@@ -10,6 +10,7 @@ import io.wxwobot.admin.web.constant.ConfigKeys;
 import io.wxwobot.admin.web.enums.KeyMsgValueType;
 import io.wxwobot.admin.web.model.WxRobConfig;
 import io.wxwobot.admin.web.model.WxRobKeyword;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Matcher;
 
@@ -121,28 +122,31 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
             }
         }
 
-        WxRobConfig robConfig = WxRobConfig.dao.findFirst("SELECT TOP 1 * FROM wx_rob_config WHERE unique_key = ?", uniqueKey);
-        if(robConfig != null && robConfig.getEnable()){
-            // 判断是否要回复
-            boolean isOpen = false;
-            // 判断是群聊的话是否允许回复 昵称关键字
-            if (robConfig.getToGroup() && msg.isGroupMsg()){
-                isOpen = true;
-            }
-            if (isOpen){
-                WxRobKeyword robKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, ConfigKeys.DEAFAULT_WELCOME,fromNickName,msg.isGroupMsg()?1:0);
-                if (sendSysWelcomeMsg(fromUserName, newNickName, robKeyword)){ return;}
-            }
+        if (StringUtils.isNotEmpty(newNickName)){
 
-            // 没有专门的关键字，则使用默认关键字
-            isOpen = false;
-            // 判断是群聊的话是否允许回复 昵称关键字
-            if (robConfig.getDefaultGroup() && msg.isGroupMsg()){
-                isOpen = true;
-            }
-            if (isOpen){
-                WxRobKeyword defaultRobKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, ConfigKeys.DEAFAULT_WELCOME, ConfigKeys.DEAFAULT_KEYWORD,msg.isGroupMsg()?1:0);
-                if (sendSysWelcomeMsg(fromUserName, newNickName, defaultRobKeyword)){ return;}
+            WxRobConfig robConfig = WxRobConfig.dao.findFirst("SELECT TOP 1 * FROM wx_rob_config WHERE unique_key = ?", uniqueKey);
+            if(robConfig != null && robConfig.getEnable()){
+                // 判断是否要回复
+                boolean isOpen = false;
+                // 判断是群聊的话是否允许回复 昵称关键字
+                if (robConfig.getToGroup() && msg.isGroupMsg()){
+                    isOpen = true;
+                }
+                if (isOpen){
+                    WxRobKeyword robKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, ConfigKeys.DEAFAULT_WELCOME,fromNickName,msg.isGroupMsg()?1:0);
+                    if (sendSysWelcomeMsg(fromUserName, newNickName, robKeyword)){ return;}
+                }
+
+                // 没有专门的关键字，则使用默认关键字
+                isOpen = false;
+                // 判断是群聊的话是否允许回复 昵称关键字
+                if (robConfig.getDefaultGroup() && msg.isGroupMsg()){
+                    isOpen = true;
+                }
+                if (isOpen){
+                    WxRobKeyword defaultRobKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, ConfigKeys.DEAFAULT_WELCOME, ConfigKeys.DEAFAULT_KEYWORD,msg.isGroupMsg()?1:0);
+                    if (sendSysWelcomeMsg(fromUserName, newNickName, defaultRobKeyword)){ return;}
+                }
             }
         }
 
