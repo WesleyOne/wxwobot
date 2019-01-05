@@ -13,7 +13,6 @@ import com.jfinal.template.source.ClassPathSourceFactory;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.web.interceptor.ExceptionInterceptor;
 import io.wxwobot.admin.web.model._MappingKit;
-import io.wxwobot.admin.web.utils.NewSqlServerDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

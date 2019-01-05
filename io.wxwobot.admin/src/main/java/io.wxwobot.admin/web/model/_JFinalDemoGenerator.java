@@ -4,7 +4,6 @@ import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
 import com.jfinal.plugin.activerecord.generator.Generator;
 import com.jfinal.plugin.druid.DruidPlugin;
-import io.wxwobot.admin.web.utils.NewSqlServerDialect;
 
 import javax.sql.DataSource;
 

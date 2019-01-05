@@ -1,4 +1,4 @@
-package io.wxwobot.admin.web.wxrob;
+package io.wxwobot.admin.web.msghandlers;
 
 
 import io.wxwobot.admin.itchat4j.api.MessageTools;
@@ -19,11 +19,11 @@ import java.util.regex.Matcher;
  * @author WesleyOne
  * @create 2018/12/11
  */
-public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
+public class DefaultMsgHandler implements IMsgHandlerFace,LogInterface {
 
     private String uniqueKey;
 
-    public MyMsgHandler(String uniqueKey){
+    public DefaultMsgHandler(String uniqueKey){
         this.uniqueKey = uniqueKey;
     }
 

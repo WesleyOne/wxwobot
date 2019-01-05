@@ -1,11 +1,7 @@
 package io.wxwobot.admin.itchat4j.core;
 
-import com.alibaba.fastjson.JSON;
-import com.jfinal.kit.PropKit;
-import io.wxwobot.admin.itchat4j.api.MessageTools;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
-import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
 import io.wxwobot.admin.itchat4j.utils.MoreConfig;
 import io.wxwobot.admin.itchat4j.utils.enums.MsgCodeEnum;
@@ -13,12 +9,11 @@ import io.wxwobot.admin.itchat4j.utils.enums.MsgTypeEnum;
 import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import io.wxwobot.admin.web.wxrob.MyMsgHandler;
+import io.wxwobot.admin.web.msghandlers.DefaultMsgHandler;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 消息处理中心
@@ -178,7 +173,7 @@ public class MsgCenter implements LogInterface {
 	 */
 	public static void handleMsg(String uniqueKey) {
 		Core core = CoreManage.getInstance(uniqueKey);
-        MyMsgHandler msgHandler = new MyMsgHandler(uniqueKey);
+        DefaultMsgHandler msgHandler = new DefaultMsgHandler(uniqueKey);
         while (true) {
 			if (!core.isAlive()){
 				LOG.info("停止消息处理");
