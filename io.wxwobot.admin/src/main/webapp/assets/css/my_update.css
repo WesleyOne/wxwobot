@@ -1,0 +1,15 @@
+body {
+    /*min-height: 1000px;*/
+    padding-top: 70px;
+    line-height: 1.6;
+    font-family: -apple-system-font, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", Arial, sans-serif;
+    color: #353535;
+    font-size: 14px;
+}
+.bootbox-body{
+    font-size: 20px;
+}
+.bootstrap-table table tbody tr td:first-child{
+    text-align: left;
+    vertical-align: middle;
+}
