@@ -2,8 +2,8 @@ target/
 .idea/
 *.iml
 *.hot
-webapp/file/*
-webapp/img/*
-webapp/logs/*
-webapp/reload/*
-webapp/upload/*
+webapp/file/**
+webapp/img/**
+webapp/logs/**
+webapp/reload/**
+webapp/upload/**
