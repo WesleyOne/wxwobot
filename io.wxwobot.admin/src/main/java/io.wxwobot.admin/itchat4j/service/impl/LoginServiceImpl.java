@@ -44,6 +44,7 @@ import java.util.regex.Matcher;
  * @date 创建时间：2017年5月13日 上午12:09:35
  * @version 1.0
  *
+ * @author WesleyOne 修改
  */
 public class LoginServiceImpl implements ILoginService , LogInterface {
 	private Core core ;

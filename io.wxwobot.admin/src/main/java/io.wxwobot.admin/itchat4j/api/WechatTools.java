@@ -30,6 +30,7 @@ import java.util.regex.Matcher;
  * @date 创建时间：2017年5月4日 下午10:49:16
  * @version 1.0
  *
+ * @author WesleyOne 修改
  */
 public class WechatTools  implements LogInterface {
 

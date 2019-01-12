@@ -17,6 +17,7 @@ import io.wxwobot.admin.web.base.BaseException;
  * @date 创建时间：2017年5月13日 下午12:56:07
  * @version 1.0
  *
+ * @author WesleyOne 修改
  */
 public class LoginController  implements LogInterface {
 

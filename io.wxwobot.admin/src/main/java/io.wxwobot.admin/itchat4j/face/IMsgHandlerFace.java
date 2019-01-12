@@ -9,6 +9,7 @@ import io.wxwobot.admin.itchat4j.beans.BaseMsg;
  * @date 创建时间：2017年4月20日 上午12:13:49
  * @version 1.0
  *
+ * @author WesleyOne 修改
  */
 public interface IMsgHandlerFace {
 
@@ -19,7 +20,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public void textMsgHandle(BaseMsg msg);
+	void textMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理图片消息
@@ -29,7 +30,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public void picMsgHandle(BaseMsg msg);
+	void picMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理声音消息
@@ -39,7 +40,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public void voiceMsgHandle(BaseMsg msg);
+	void voiceMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理小视频消息
@@ -49,7 +50,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public void videoMsgHandle(BaseMsg msg);
+	void videoMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理名片消息
@@ -59,7 +60,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public void nameCardMsgHandle(BaseMsg msg);
+	void nameCardMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理系统消息
@@ -69,7 +70,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public void sysMsgHandle(BaseMsg msg);
+	void sysMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理确认添加好友消息
@@ -78,7 +79,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public void verifyAddFriendMsgHandle(BaseMsg msg);
+	void verifyAddFriendMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理收到的文件消息
@@ -87,6 +88,6 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public void mediaMsgHandle(BaseMsg msg);
+	void mediaMsgHandle(BaseMsg msg);
 
 }

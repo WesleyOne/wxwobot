@@ -20,6 +20,7 @@ import java.util.Map;
  * @date 创建时间：2017年4月23日 下午2:33:56
  * @version 1.0
  *
+ * @author WesleyOne 修改
  */
 public class Core {
 

@@ -1,18 +1,17 @@
 package io.wxwobot.admin.itchat4j.api;
 
-import com.jfinal.kit.PropKit;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
 import io.wxwobot.admin.itchat4j.beans.RecommendInfo;
 import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.utils.Config;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.enums.SendMsgType;
 import io.wxwobot.admin.itchat4j.utils.enums.StorageLoginInfoEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.VerifyFriendEnum;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import io.wxwobot.admin.itchat4j.utils.enums.SendMsgType;
 import io.wxwobot.admin.web.constant.UploadConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;
@@ -33,6 +32,8 @@ import java.util.*;
  * @author https://github.com/yaphone
  * @date 创建时间：2017年4月23日 下午2:30:37
  * @version 1.0
+ *
+ * @author WesleyOne 修改
  */
 public class MessageTools implements LogInterface {
 

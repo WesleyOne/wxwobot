@@ -5,6 +5,7 @@ import com.jfinal.plugin.activerecord.Record;
 import java.util.*;
 
 /**
+ * 发送类型
  * @author WesleyOne
  * @create 2018/12/14
  */

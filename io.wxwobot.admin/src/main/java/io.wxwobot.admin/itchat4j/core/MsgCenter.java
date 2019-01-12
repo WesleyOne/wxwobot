@@ -26,6 +26,7 @@ import java.util.List;
  * @date 创建时间：2017年5月14日 下午12:47:50
  * @version 1.0
  *
+ * @author WesleyOne 修改
  */
 public class MsgCenter implements LogInterface {
 

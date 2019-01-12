@@ -9,6 +9,7 @@ package io.wxwobot.admin.itchat4j.service;
  * @date 创建时间：2017年5月13日 上午12:07:21
  * @version 1.0
  *
+ * @author WesleyOne 修改
  */
 public interface ILoginService {
 
