@@ -3,6 +3,7 @@ package io.wxwobot.admin.itchat4j.core;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
+import io.wxwobot.admin.itchat4j.beans.SendMsg;
 import io.wxwobot.admin.itchat4j.client.HttpClientManage;
 import io.wxwobot.admin.itchat4j.client.SingleHttpClient;
 import io.wxwobot.admin.itchat4j.utils.enums.parameters.BaseParaEnum;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 /**
  * 核心存储类，全局只保存一份，单例模式
- * 
+ *
  * @author https://github.com/yaphone
  * @date 创建时间：2017年4月23日 下午2:33:56
  * @version 1.0
@@ -41,17 +42,17 @@ public class Core {
 
 	/**
 	 * 管理当前机器人的所有业务线程
- 	 */
+	 */
 	@JSONField(serialize=false)
 	private ThreadGroup threadGroup;
 
 	@JSONField(serialize=false)
 	boolean isFinishInit = false;
 
-    /**
+	/**
 	 * login,webWxInit
-     * 登录接口获取
-     */
+	 * 登录接口获取
+	 */
 	private String indexUrl;
 	private String userName;
 	private String nickName;
@@ -68,19 +69,19 @@ public class Core {
 
 	/**
 	 * webWxInit
-     * 登陆账号自身信息
+	 * 登陆账号自身信息
 	 * @see io.wxwobot.admin.itchat4j.beans.User
-     */
+	 */
 	private JSONObject userSelf;
 
 
-    /**
-     * 初始化/cgi-bin/mmwebwx-bin/webwxinit
-     * 最后一次收到正常retcode的时间，秒为单位
+	/**
+	 * 初始化/cgi-bin/mmwebwx-bin/webwxinit
+	 * 最后一次收到正常retcode的时间，秒为单位
 	 *
 	 * synccheck刷新
-     */
-    private long lastNormalRetcodeTime;
+	 */
+	private long lastNormalRetcodeTime;
 
 
 	/**
@@ -95,40 +96,40 @@ public class Core {
 		return HttpClientManage.getInstance(uniqueKey);
 	}
 
-    /**
-     * 初始话时获取联系人时创建
-     * @see io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl#webWxGetContact()
-     */
+	/**
+	 * 初始话时获取联系人时创建
+	 * @see io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl#webWxGetContact()
+	 */
 	/**
 	 * memberList长度
 	 */
 	@JSONField(serialize=false)
 	private int memberCount = 0;
-    /**
-     * 好友+群聊+公众号+特殊账号
+	/**
+	 * 好友+群聊+公众号+特殊账号
 	 * 注意：不主动插入,获取时通过其他几个账号集合合并
-     */
+	 */
 	@JSONField(serialize=false)
 	private List<JSONObject> memberList = new ArrayList<JSONObject>();
-    /**
-     * 好友
-     */
+	/**
+	 * 好友
+	 */
 	@JSONField(serialize=false)
 	private List<JSONObject> contactList = new ArrayList<JSONObject>();
-    /**
-     * 群
-     */
+	/**
+	 * 群
+	 */
 	@JSONField(serialize=false)
 	private List<JSONObject> groupList = new ArrayList<JSONObject>();
-    /**
-     * 公众号/服务号
-     */
+	/**
+	 * 公众号/服务号
+	 */
 	@Deprecated
 	@JSONField(serialize=false)
 	private List<JSONObject> publicUsersList = new ArrayList<JSONObject>();
-    /**
-     * 特殊账号
-     */
+	/**
+	 * 特殊账号
+	 */
 	@JSONField(serialize=false)
 	private List<JSONObject> specialUsersList = new ArrayList<JSONObject>();
 
@@ -136,12 +137,16 @@ public class Core {
 
 	/**
 	 * synccheck和webWxSynct添加
-	 *	异步消息存储
+	 *	异步接受消息存储
 	 */
 	@JSONField(serialize=false)
 	private List<BaseMsg> msgList = new ArrayList<>();
 
-
+	/**
+	 * 异步发送消息存储
+	 */
+	@JSONField(serialize=false)
+	private List<SendMsg> sendList = new ArrayList();
 
 	/********************************
 	 * 缓存字段,用于快速查找
@@ -175,7 +180,7 @@ public class Core {
 	public Map<String, Object> getParamMap() {
 		return new HashMap<String, Object>(1) {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -355,5 +360,9 @@ public class Core {
 
 	public void setThreadGroup(ThreadGroup threadGroup) {
 		this.threadGroup = threadGroup;
+	}
+
+	public List<SendMsg> getSendList() {
+		return sendList;
 	}
 }

@@ -11,6 +11,7 @@ import java.util.List;
  * @author WesleyOne
  * @create 2018/12/21
  */
+@Deprecated
 public class Member {
 
     private String Alias;

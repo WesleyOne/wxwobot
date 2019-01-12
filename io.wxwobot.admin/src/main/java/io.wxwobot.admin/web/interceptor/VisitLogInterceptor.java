@@ -28,6 +28,8 @@ public class VisitLogInterceptor implements Interceptor {
 		String ip = IpUtil.getRealIp(inv.getController().getRequest());
         LOG.info("{} - {}-{} 操作了 {}",ip,uid,sid,requestUrl);
 
+		inv.getController().setAttr("active",inv.getController().getControllerKey());
+
 		//找到不需要登录的action
 		Class controllerClass = inv.getController().getClass();
 		UnCheckLogin methodOwn = getControllerMethodUnLoginOwn(controllerClass, inv.getMethodName());

@@ -26,6 +26,7 @@ WebWxPluginSwitch: 0
  * @author WesleyOne
  * @create 2018/12/21
  */
+@Deprecated
 public class User {
 
     private String AppAccountFlag;

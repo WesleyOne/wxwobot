@@ -23,7 +23,7 @@ public class IndexController extends _BaseController {
         setAttr("username",getCookie("uid"));
         setAttr("imgdomain",PropKit.get("imgDomain"));
 
-        setAttr("active","#");
+
         renderTemplate("index.html");
     }
 
@@ -44,14 +44,12 @@ public class IndexController extends _BaseController {
             return;
         }
 
-        // TODO 获取真实密码。此处为了方便直接从配置文件里获取
-//        String truePass = PropKit.use("passport.properties").get(username);
+        // 获取真实密码。此处为了方便直接从配置文件里获取
+        String pass = PropKit.use("passport.properties").get(username);
         // 清楚缓存,可以修改配置文件直接修改
-//        PropKit.useless("passport.properties");
+        PropKit.useless("passport.properties");
 
-        Record pass = Db.use().findFirst("SELECT val FROM custom_config WHERE [key] = ?", WX_ROB_LOGIN_ + username);
-
-        if (StringUtils.isNotEmpty(password) && pass != null && MD5Util.MD5Encrypt(password).equals(pass.getStr("val"))){
+        if (StringUtils.isNotEmpty(password) && pass != null && pass.equals(MD5Util.MD5Encrypt(password))){
 
             String sid = UUID.randomUUID().toString();
             UserSession.addUserSession(username,sid);

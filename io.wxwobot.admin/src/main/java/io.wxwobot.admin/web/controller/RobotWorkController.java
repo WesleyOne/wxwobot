@@ -3,14 +3,12 @@ package io.wxwobot.admin.web.controller;
 import com.alibaba.fastjson.JSONObject;
 import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.controller.LoginController;
-import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl;
 import io.wxwobot.admin.web.base.BaseException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author WesleyOne
@@ -23,8 +21,8 @@ public class RobotWorkController extends _BaseController {
      * @throws BaseException
      */
     public void getStatus() throws BaseException {
-        String coreKey = getCoreKey();
-        boolean wechatStatus = WechatTools.getWechatStatus(coreKey);
+        String uniqueKey = getUniqueKey();
+        boolean wechatStatus = WechatTools.getWechatStatus(uniqueKey);
         setData(wechatStatus);
         renderJson();
     }
@@ -34,8 +32,8 @@ public class RobotWorkController extends _BaseController {
      * @throws BaseException
      */
     public void getQr() throws BaseException, IOException {
-        String coreKey = getCoreKey();
-        LoginController login = new LoginController(coreKey);
+        String uniqueKey = getUniqueKey();
+        LoginController login = new LoginController(uniqueKey);
         String qrSrc = login.login_1();
         setData(qrSrc);
         renderJson();
@@ -46,8 +44,8 @@ public class RobotWorkController extends _BaseController {
      * @throws BaseException
      */
     public void login() throws BaseException {
-        String coreKey = getCoreKey();
-        LoginController login = new LoginController(coreKey);
+        String uniqueKey = getUniqueKey();
+        LoginController login = new LoginController(uniqueKey);
         boolean result = login.login_2();
         if (result){
 
@@ -62,8 +60,8 @@ public class RobotWorkController extends _BaseController {
      * @throws BaseException
      */
     public void init() throws BaseException {
-        String coreKey = getCoreKey();
-        LoginController login = new LoginController(coreKey);
+        String uniqueKey = getUniqueKey();
+        LoginController login = new LoginController(uniqueKey);
         boolean loginResult = login.login_3();
         if (loginResult){
             setMsg("登录成功");
@@ -78,8 +76,8 @@ public class RobotWorkController extends _BaseController {
      * @throws BaseException
      */
     public void logout() throws BaseException {
-        String coreKey = getCoreKey();
-        WechatTools.logout(coreKey);
+        String uniqueKey = getUniqueKey();
+        WechatTools.logout(uniqueKey);
         renderJson();
     }
 
@@ -87,8 +85,8 @@ public class RobotWorkController extends _BaseController {
      * 获取群昵称
      */
     public void getGroupNickNames() throws BaseException {
-        String coreKey = getCoreKey();
-        List<String> groupNickNameList = WechatTools.getGroupNickNameList(coreKey);
+        String uniqueKey = getUniqueKey();
+        List<String> groupNickNameList = WechatTools.getGroupNickNameList(uniqueKey);
         setData(groupNickNameList);
         renderJson();
     }
@@ -97,29 +95,29 @@ public class RobotWorkController extends _BaseController {
      * 获取好友昵称
      */
     public void getContactNickNames() throws BaseException {
-        String coreKey = getCoreKey();
-        List<String> contactNickNameList = WechatTools.getContactNickNameList(coreKey);
+        String uniqueKey = getUniqueKey();
+        List<String> contactNickNameList = WechatTools.getContactNickNameList(uniqueKey);
         setData(contactNickNameList);
         renderJson();
     }
 
     public void getGroups() throws BaseException {
-        String coreKey = getCoreKey();
-        List<JSONObject> groupList = WechatTools.getGroupList(coreKey);
+        String uniqueKey = getUniqueKey();
+        List<JSONObject> groupList = WechatTools.getGroupList(uniqueKey);
         setData(groupList);
         renderJson();
     }
 
     public void getContacts() throws BaseException {
-        String coreKey = getCoreKey();
-        List<JSONObject> contactList = WechatTools.getContactList(coreKey);
+        String uniqueKey = getUniqueKey();
+        List<JSONObject> contactList = WechatTools.getContactList(uniqueKey);
         setData(contactList);
         renderJson();
     }
 
     public void getCore() throws BaseException {
-        String coreKey = getCoreKey();
-        setData(CoreManage.getInstance(coreKey));
+        String uniqueKey = getUniqueKey();
+        setData(CoreManage.getInstance(uniqueKey));
         renderJson();
     }
 
@@ -127,8 +125,8 @@ public class RobotWorkController extends _BaseController {
      * 强制刷新通讯录
      */
     public void gct() throws BaseException {
-        String coreKey = getCoreKey();
-        LoginServiceImpl loginService = new LoginServiceImpl(coreKey);
+        String uniqueKey = getUniqueKey();
+        LoginServiceImpl loginService = new LoginServiceImpl(uniqueKey);
         loginService.webWxGetContact();
         renderJson();
     }
@@ -138,8 +136,8 @@ public class RobotWorkController extends _BaseController {
      * @throws BaseException
      */
     public void ggp() throws BaseException {
-        String coreKey = getCoreKey();
-        LoginServiceImpl loginService = new LoginServiceImpl(coreKey);
+        String uniqueKey = getUniqueKey();
+        LoginServiceImpl loginService = new LoginServiceImpl(uniqueKey);
         loginService.WebWxBatchGetContact();
         renderJson();
     }
@@ -149,8 +147,8 @@ public class RobotWorkController extends _BaseController {
      * @throws BaseException
      */
     public void reboot() throws BaseException {
-        String coreKey = getCoreKey();
-        LoginController login = new LoginController(coreKey);
+        String uniqueKey = getUniqueKey();
+        LoginController login = new LoginController(uniqueKey);
         boolean loginResult = login.reboot();
         setData(loginResult);
         renderJson();

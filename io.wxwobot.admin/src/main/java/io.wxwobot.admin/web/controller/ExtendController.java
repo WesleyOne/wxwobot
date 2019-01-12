@@ -2,16 +2,12 @@ package io.wxwobot.admin.web.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.jfinal.kit.PropKit;
-import io.wxwobot.admin.itchat4j.api.MessageTools;
+import io.wxwobot.admin.itchat4j.beans.SendMsg;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
-import io.wxwobot.admin.itchat4j.utils.SleepUtils;
-import io.wxwobot.admin.web.enums.KeyMsgValueType;
+import io.wxwobot.admin.itchat4j.utils.enums.SendMsgType;
 import io.wxwobot.admin.web.model.WxRobRelation;
 import io.wxwobot.admin.web.utils.IpUtil;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
 
 /**
  * 对外接口
@@ -26,7 +22,7 @@ public class ExtendController extends _BaseController {
      * 参数:
      * ok       外接唯一码
      * msg     消息列表
-     *         类型参考@see     io.wxwobot.admin.web.enums.KeyMsgValueType
+     *         类型参考@see     io.wxwobot.admin.itchat4j.utils.enums.SendMsgType
      *          TEXT     文本消息串
      *          IMG      图片名串（需要后台上传获取）
      *          FILE     文件名串（需要后台上传获取）
@@ -89,12 +85,6 @@ public class ExtendController extends _BaseController {
             }
         }
 
-        /**
-         * 限制单次消息数量,防封,发送消息短暂间隔
-         * 优先发文本，其次图片，最后文件
-         *
-         * 多条消息发送看最后一条成功与否
-         */
         String uniqueKey = relationRecord.getUniqueKey();
         // 查看机器是否加载完成
         if (!CoreManage.getInstance(uniqueKey).isAlive() || !CoreManage.getInstance(uniqueKey).isFinishInit()){
@@ -104,30 +94,31 @@ public class ExtendController extends _BaseController {
             return;
         }
 
+
+        /**
+         * 添加到消息队列
+         */
         Boolean toGroup = relationRecord.getToGroup();
         String nickName = relationRecord.getNickName();
-        String realImgUploadPath = PropKit.use("appConfig.properties").get("realImgUploadPath")+ File.separator;
-        String realFileUploadPath = PropKit.use("appConfig.properties").get("realFileUploadPath")+ File.separator;
         // 单次请求最大消息数
-        int maxMessages = 5;
+        int maxMessages = 10;
         int msgLength = msgs.size();
         if (msgLength<maxMessages){
             maxMessages = msgLength;
         }
-        boolean result = false;
+        // 到这一步默认返回成功
+        boolean result = true;
         for (int i=0;i<maxMessages;i++){
             JSONObject message = msgs.getJSONObject(i);
             String type = message.getString("type");
             String body = message.getString("body");
 
-            if (KeyMsgValueType.TEXT.toValue().equals(type)){
-                result = MessageTools.sendMsgByNickNameApi(body, nickName, uniqueKey, toGroup);
-            }else if (KeyMsgValueType.IMG.toValue().equals(type)){
-                result = MessageTools.sendPicMsgByNickNameApi(nickName, realImgUploadPath + body, uniqueKey, toGroup);
-            }else if (KeyMsgValueType.FILE.toValue().equals(type)){
-                result = MessageTools.sendFileMsgByNickNameApi(nickName,realFileUploadPath+body,uniqueKey,toGroup);
-            }
-            SleepUtils.sleep(500);
+            SendMsg sendMsg = new SendMsg();
+            sendMsg.setNickName(nickName);
+            sendMsg.setMessage(body);
+            sendMsg.setMsgType(SendMsgType.fromValue(type));
+            sendMsg.setGroup(toGroup);
+            CoreManage.getInstance(uniqueKey).getSendList().add(sendMsg);
         }
 
         if (!result){
@@ -136,22 +127,5 @@ public class ExtendController extends _BaseController {
 
         renderJson();
     }
-
-//    public void ss(){
-//
-//        String id = getPara("id");
-//        String uniqueKey = getPara("uk");
-//        Integer tid = getParaToInt("tid");
-//
-//        String title = "你好";
-//        String desc = "描述";
-//        String clickUrl = "https://m.xy7878.com/ff9806d4bcd1ef55/";
-//        String viewUrl = "http://images2.fengying78.com/logo/fkhh.jpg";
-//        String content = String.format("<msg><appmsg appid=\"\" sdkver=\"0\"><title>%s</title><des>%s</des><action>view</action><type>5</type><showtype>0</showtype><soundtype>0</soundtype><mediatagname></mediatagname><messageext></messageext><messageaction></messageaction><content></content><contentattr>0</contentattr><url>%s</url><lowurl></lowurl><dataurl></dataurl><lowdataurl></lowdataurl><appattach><totallen>0</totallen><attachid></attachid><emoticonmd5></emoticonmd5><fileext></fileext><cdnthumbaeskey></cdnthumbaeskey><aeskey></aeskey></appattach><extinfo></extinfo><sourceusername></sourceusername><sourcedisplayname></sourcedisplayname><thumburl>%s</thumburl><md5></md5><statextstr></statextstr></appmsg><fromusername></fromusername><scene>0</scene><appinfo><version>1</version><appname></appname></appinfo><commenturl></commenturl></msg>",
-//                title, desc, clickUrl, viewUrl);
-//
-//        MessageTools.webWxSendMsg(tid,content,id,uniqueKey);
-//        renderJson();
-//    }
 
 }

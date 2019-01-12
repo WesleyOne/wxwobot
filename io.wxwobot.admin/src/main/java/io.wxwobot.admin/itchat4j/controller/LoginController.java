@@ -12,7 +12,7 @@ import io.wxwobot.admin.web.base.BaseException;
 
 /**
  * 登陆控制器
- * 
+ *
  * @author https://github.com/yaphone
  * @date 创建时间：2017年5月13日 下午12:56:07
  * @version 1.0
@@ -30,29 +30,30 @@ public class LoginController  implements LogInterface {
 		this.core = CoreManage.getInstance(uniqueKey);
 	}
 
-    /**
-     * 获取二维码地址
-     * @return
-     */
+	/**
+	 * 获取二维码地址
+	 * 风险:已登录账号不可调用该接口,会移除当前core信息
+	 * @return
+	 */
 	public String login_1() throws BaseException {
-        if (core.isAlive()) {
+		if (core.isAlive()) {
 			LOG.warn("微信已登陆");
-            throw new BaseException("微信已登陆");
-        }
-        LOG.info("1.获取微信UUID");
-        while (loginService.getUuid() == null) {
-            LOG.warn("1.1. 获取微信UUID失败，一秒后重新获取");
-            SleepUtils.sleep(1000);
-        }
-        LOG.info("2. 获取登陆二维码图片");
-        return URLEnum.QRCODE_URL.getUrl() + core.getUuid();
-    }
+			throw new BaseException("微信已登陆");
+		}
+		LOG.info("1.获取微信UUID");
+		while (loginService.getUuid() == null) {
+			LOG.warn("1.1. 获取微信UUID失败，一秒后重新获取");
+			SleepUtils.sleep(1000);
+		}
+		LOG.info("2. 获取登陆二维码图片");
+		return URLEnum.QRCODE_URL.getUrl() + core.getUuid();
+	}
 
 	/**
 	 * 确认登录
 	 * @return
 	 */
-    public  boolean login_2(){
+	public  boolean login_2(){
 
 		boolean result = false;
 
@@ -87,17 +88,20 @@ public class LoginController  implements LogInterface {
 			loginService.wxStatusNotify();
 
 			LOG.info(String.format("欢迎回来， %s", core.getNickName()));
-			LOG.info("6.+++开始消息处理["+uniqueKey+"]+++++++");
-			Thread msgThread = new Thread(core.getThreadGroup(), () -> MsgCenter.handleMsg(uniqueKey),"WXBOT-MSG-"+uniqueKey);
-			msgThread.start();
+			LOG.info("6.+++开启消息发送线程["+uniqueKey+"]+++");
+			Thread sendThread = new Thread(core.getThreadGroup(), () -> MsgCenter.sendMsg(uniqueKey), "SEND-" + uniqueKey);
+			sendThread.start();
+			LOG.info("7.+++开启消息处理线程["+uniqueKey+"]+++");
+			Thread handleThread = new Thread(core.getThreadGroup(), () -> MsgCenter.handleMsg(uniqueKey),"HANDLE-"+uniqueKey);
+			handleThread.start();
 
-			LOG.info("7. 开始接收消息");
+			LOG.info("8. +++开始接收消息线程["+uniqueKey+"]+++");
 			loginService.startReceiving();
 
-			LOG.info("8. 获取联系人信息");
+			LOG.info("9. 获取联系人信息");
 			loginService.webWxGetContact();
 
-			LOG.info("9. 获取群好友及群好友列表及缓存");
+			LOG.info("10. 获取群好友及群好友列表及缓存");
 			loginService.WebWxBatchGetContact();
 
 		}

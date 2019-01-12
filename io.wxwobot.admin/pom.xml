@@ -33,7 +33,6 @@
     <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <pro.jdbc.agent.driver.mysql>com.mysql.jdbc.Driver</pro.jdbc.agent.driver.mysql>
     <pro.jdbc.agent.url><![CDATA[jdbc:mysql://127.0.0.1:3306/wxwobot?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull]]></pro.jdbc.agent.url>
     <pro.jdbc.agent.username>root</pro.jdbc.agent.username>
     <pro.jdbc.agent.password>root</pro.jdbc.agent.password>

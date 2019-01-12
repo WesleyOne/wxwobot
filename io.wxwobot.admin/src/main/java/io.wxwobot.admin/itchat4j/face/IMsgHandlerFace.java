@@ -19,7 +19,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public String textMsgHandle(BaseMsg msg);
+	public void textMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理图片消息
@@ -29,7 +29,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public String picMsgHandle(BaseMsg msg);
+	public void picMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理声音消息
@@ -39,7 +39,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public String voiceMsgHandle(BaseMsg msg);
+	public void voiceMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理小视频消息
@@ -49,7 +49,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public String videoMsgHandle(BaseMsg msg);
+	public void videoMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理名片消息
@@ -59,7 +59,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public String nameCardMsgHandle(BaseMsg msg);
+	public void nameCardMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理系统消息
@@ -78,7 +78,7 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public String verifyAddFriendMsgHandle(BaseMsg msg);
+	public void verifyAddFriendMsgHandle(BaseMsg msg);
 
 	/**
 	 * 处理收到的文件消息
@@ -87,6 +87,6 @@ public interface IMsgHandlerFace {
 	 * @param msg
 	 * @return
 	 */
-	public String mediaMsgHandle(BaseMsg msg);
+	public void mediaMsgHandle(BaseMsg msg);
 
 }

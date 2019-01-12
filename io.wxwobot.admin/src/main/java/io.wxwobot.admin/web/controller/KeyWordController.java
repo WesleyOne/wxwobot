@@ -104,7 +104,7 @@ public class KeyWordController extends _BaseController{
      */
     public void editKeyWord(){
         JSONObject postParam = getPostParam();
-        Integer id = postParam.getInteger("kid");
+        Long id = postParam.getLong("kid");
         String uniqueKey = postParam.getString("uniqueKey");
         String keyData = postParam.getString("keyData");
         String valueData = postParam.getString("valueData");

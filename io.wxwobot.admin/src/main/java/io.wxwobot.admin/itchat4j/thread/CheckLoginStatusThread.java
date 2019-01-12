@@ -19,7 +19,9 @@ import org.slf4j.LoggerFactory;
  * @date 创建时间：2017年5月17日 下午10:53:15
  * @version 1.0
  *
+ *
  */
+@Deprecated
 public class CheckLoginStatusThread implements Runnable, LogInterface {
 	private Core core;
 	private String coreKey;

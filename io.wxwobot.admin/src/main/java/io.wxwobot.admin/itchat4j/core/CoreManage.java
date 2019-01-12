@@ -3,9 +3,11 @@ package io.wxwobot.admin.itchat4j.core;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jfinal.kit.PropKit;
+import io.wxwobot.admin.itchat4j.beans.SendMsg;
 import io.wxwobot.admin.itchat4j.client.HttpClientManage;
 import io.wxwobot.admin.itchat4j.controller.LoginController;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.enums.SendMsgType;
 import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -37,6 +39,16 @@ public class CoreManage implements LogInterface {
             coreMap.put(uniqueKey, core);
         }
         return coreMap.get(uniqueKey);
+    }
+
+    /**
+     * 移除
+     * @param uniqueKey
+     */
+    public static void remove(String uniqueKey){
+        if (coreMap.containsKey(uniqueKey)){
+            coreMap.remove(uniqueKey);
+        }
     }
 
     /**
@@ -97,43 +109,43 @@ public class CoreManage implements LogInterface {
      */
     public static void reload(){
         if (USE_HOT_RELOAD){
-                File file =new File(HOT_RELOAD_DIR);
-                if (file.exists()){
-                    LOG.info("登录数据热加载中");
-                    StringBuilder stringBuilder = new StringBuilder();
-                    try {
-                        FileReader fr = new FileReader(HOT_RELOAD_DIR);
-                        BufferedReader bf = new BufferedReader(fr);
-                        String str;
-                        // 按行读取字符串
-                        while ((str = bf.readLine()) != null) {
-                            stringBuilder.append(str);
-                        }
-                        bf.close();
-                        fr.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return;
+            File file =new File(HOT_RELOAD_DIR);
+            if (file.exists()){
+                LOG.info("登录数据热加载中");
+                StringBuilder stringBuilder = new StringBuilder();
+                try {
+                    FileReader fr = new FileReader(HOT_RELOAD_DIR);
+                    BufferedReader bf = new BufferedReader(fr);
+                    String str;
+                    // 按行读取字符串
+                    while ((str = bf.readLine()) != null) {
+                        stringBuilder.append(str);
                     }
-                    String result = stringBuilder.toString();
-                    if (StringUtils.isEmpty(result)){
-                        return;
-                    }
-
-                    JSONArray jsonArray = JSONArray.parseArray(result);
-                    int size = jsonArray.size();
-                    if (size > 0){
-                        // 封装成线程操作
-                        for (int i=0;i<size;i++){
-                            JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            ReloadThread reloadThread = new ReloadThread(jsonObject);
-                            Thread thread = new Thread(reloadThread);
-                            thread.start();
-                        }
-                    }
-
-                    LOG.info("登录数据热加载完成");
+                    bf.close();
+                    fr.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
                 }
+                String result = stringBuilder.toString();
+                if (StringUtils.isEmpty(result)){
+                    return;
+                }
+
+                JSONArray jsonArray = JSONArray.parseArray(result);
+                int size = jsonArray.size();
+                if (size > 0){
+                    // 封装成线程操作
+                    for (int i=0;i<size;i++){
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        ReloadThread reloadThread = new ReloadThread(jsonObject);
+                        Thread thread = new Thread(reloadThread);
+                        thread.start();
+                    }
+                }
+
+                LOG.info("登录数据热加载完成");
+            }
         }
     }
 
@@ -158,8 +170,8 @@ public class CoreManage implements LogInterface {
                  */
                 JSONObject jsonObject = this.reloadObject;
                 core = jsonObject.getObject("core",Core.class);
+                String uniqueKey = core.getUniqueKey();
                 if (core.isAlive()){
-                    String uniqueKey = core.getUniqueKey();
                     core.setThreadGroup(new ThreadGroup(uniqueKey));
                     coreMap.put(uniqueKey,core);
 
@@ -198,7 +210,9 @@ public class CoreManage implements LogInterface {
                     if (!login.login_3()){
                         // 加载失败退出
                         core.setAlive(false);
+                        return;
                     }
+                    LOG.info("热登录成功: {}", uniqueKey);
                 }
             }catch (Exception e){
                 e.printStackTrace();
@@ -245,6 +259,23 @@ public class CoreManage implements LogInterface {
         core.getContactList().add(jsonObject);
         core.getUserInfoMap().put(jsonObject.getString("NickName"), jsonObject);
         core.getUserInfoMap().put(userName, jsonObject);
+    }
+
+    /**
+     * 消息统一加到队列里处理
+     * @param uniqueKey
+     * @param fromUserName
+     * @param data
+     * @param type
+     * @param isGroup
+     */
+    public static void addSendMsg(String uniqueKey, String fromUserName, String data, SendMsgType type, boolean isGroup){
+        SendMsg sendMsg = new SendMsg();
+        sendMsg.setUserName(fromUserName);
+        sendMsg.setMessage(data);
+        sendMsg.setMsgType(type);
+        sendMsg.setGroup(isGroup);
+        CoreManage.getInstance(uniqueKey).getSendList().add(sendMsg);
     }
 
 }

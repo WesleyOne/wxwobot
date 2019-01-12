@@ -1,8 +1,14 @@
 package io.wxwobot.admin.web.common;
 
 import com.jfinal.config.Routes;
+import io.wxwobot.admin.web.controller.IndexController;
+import io.wxwobot.admin.web.controller.KeyWordController;
+import io.wxwobot.admin.web.controller.RelateController;
+import io.wxwobot.admin.web.controller.RobotController;
+import io.wxwobot.admin.web.controller.RobotWorkController;
+import io.wxwobot.admin.web.controller.ToolController;
+import io.wxwobot.admin.web.controller.UploadController;
 import io.wxwobot.admin.web.interceptor.VisitLogInterceptor;
-import io.wxwobot.admin.web.controller.*;
 
 /**
  * 管理后台路由统一管理

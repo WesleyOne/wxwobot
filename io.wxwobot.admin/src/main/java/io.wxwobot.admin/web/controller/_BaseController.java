@@ -130,7 +130,7 @@ public class _BaseController extends Controller {
 
     public void addCookie(String key,String value,int second) {
         Cookie cookie = new Cookie(key,value);
-        cookie.setDomain(PropKit.get("COOKIE_DOMAIN"));
+//        cookie.setDomain(PropKit.get("COOKIE_DOMAIN"));
         cookie.setMaxAge(second);
         cookie.setPath("/");
         setCookie(cookie);
@@ -175,15 +175,15 @@ public class _BaseController extends Controller {
     }
 
     /**
-     * 获取CoreKey
+     * 获取UniqueKey
      * @return
      */
-    public String getCoreKey() throws BaseException {
-        String coreKey = getPara("_ck", "");
-        if (StringUtils.isEmpty(coreKey)){
+    public String getUniqueKey() throws BaseException {
+        String uniqueKey = getPara("_ck", "");
+        if (StringUtils.isEmpty(uniqueKey)){
             throw new BaseException("CoreKey为空");
         }
-        return coreKey;
+        return uniqueKey;
     }
 
 }

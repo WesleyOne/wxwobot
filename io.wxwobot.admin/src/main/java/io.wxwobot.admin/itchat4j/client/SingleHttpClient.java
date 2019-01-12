@@ -101,9 +101,11 @@ public class SingleHttpClient {
             CloseableHttpResponse response = httpClient.execute(httpGet);
             entity = response.getEntity();
         } catch (ClientProtocolException e) {
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
         } catch (IOException e) {
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
+        } catch (Exception e){
+            logger.error(e.getMessage());
         }
         return entity;
     }
@@ -139,9 +141,11 @@ public class SingleHttpClient {
             CloseableHttpResponse response = httpClient.execute(httpPost);
             entity = response.getEntity();
         } catch (ClientProtocolException e) {
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
         } catch (IOException e) {
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
+        } catch (Exception e){
+            logger.error(e.getMessage());
         }
         return entity;
     }
@@ -165,7 +169,7 @@ public class SingleHttpClient {
             entity = response.getEntity();
 
         } catch (Exception e) {
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
         }
         return entity;
     }

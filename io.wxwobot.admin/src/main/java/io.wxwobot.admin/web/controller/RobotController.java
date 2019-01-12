@@ -121,9 +121,15 @@ public class RobotController extends _BaseController {
      */
     public void change(){
         JSONObject postParam = getPostParam();
-        Integer id = postParam.getInteger("rid");
+        Long id = postParam.getLong("rid");
         String type = postParam.getString("type");
         Boolean state = postParam.getBoolean("state");
+
+        if (id == null || StringUtils.isEmpty(type) || state == null){
+            setOperateErr();
+            renderJson();
+            return;
+        }
 
         WxRobConfig config = new WxRobConfig();
         config.setId(id);
@@ -160,7 +166,7 @@ public class RobotController extends _BaseController {
      */
     public void changeRemark(){
         JSONObject postParam = getPostParam();
-        Integer id = postParam.getInteger("rid");
+        Long id = postParam.getLong("rid");
         String remark = postParam.getString("remark");
         if (vldParamNull(id,"ID不能为空")){
             return;

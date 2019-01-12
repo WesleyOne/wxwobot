@@ -6,8 +6,11 @@ import com.alibaba.fastjson.JSONObject;
 import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.utils.LogInterface;
+import io.wxwobot.admin.itchat4j.utils.enums.ResultEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.StorageLoginInfoEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
+import io.wxwobot.admin.itchat4j.utils.enums.parameters.UUIDParaEnum;
+import io.wxwobot.admin.itchat4j.utils.tools.CommonTools;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -18,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * 微信小工具，如获好友列表,根据昵称查找好友或群等
@@ -88,20 +92,20 @@ public class WechatTools  implements LogInterface {
 	 */
 	public static JSONArray getGroupMemberByGroupId(String groupId, String uniqueKey){
 		Core core = CoreManage.getInstance(uniqueKey);
-        JSONObject jsonObject = core.getGroupInfoMap().get(groupId);
-        if (jsonObject == null){
-            return new JSONArray();
-        }
-        return jsonObject.getJSONArray("MemberList");
-    }
+		JSONObject jsonObject = core.getGroupInfoMap().get(groupId);
+		if (jsonObject == null){
+			return new JSONArray();
+		}
+		return jsonObject.getJSONArray("MemberList");
+	}
 
-    /**
-     * 通过群成员ID获取昵称
-     * @param groupId
-     * @param uniqueKey
-     * @param memberId
-     * @return
-     */
+	/**
+	 * 通过群成员ID获取昵称
+	 * @param groupId
+	 * @param uniqueKey
+	 * @param memberId
+	 * @return
+	 */
 	public static String getMemberNickName(String groupId, String uniqueKey, String memberId){
 		JSONArray members = getGroupMemberByGroupId(groupId, uniqueKey);
 		int size = members.size();
@@ -114,7 +118,7 @@ public class WechatTools  implements LogInterface {
 			}
 		}
 		return "";
-    }
+	}
 
 	/**
 	 * 退出微信
@@ -210,7 +214,7 @@ public class WechatTools  implements LogInterface {
 		Core core = CoreManage.getInstance(uniqueKey);
 		// 通过userName查询
 		if (StringUtils.isNotEmpty(userName) && StringUtils.isEmpty(nickName)){
-		    for (JSONObject contact:core.getContactList()){
+			for (JSONObject contact:core.getContactList()){
 				if (userName.equals(contact.getString("UserName"))){
 					return contact;
 				}
@@ -244,7 +248,7 @@ public class WechatTools  implements LogInterface {
 	 * @return
 	 */
 	public static String getContactNickNameByUserName(String userName, String uniqueKey){
-        JSONObject contact = getContactByNickNameAndUserName(userName,null, uniqueKey);
+		JSONObject contact = getContactByNickNameAndUserName(userName,null, uniqueKey);
 		if (contact!=null && StringUtils.isNotEmpty(contact.getString("NickName"))){
 			return contact.getString("NickName");
 		}else{
@@ -330,4 +334,22 @@ public class WechatTools  implements LogInterface {
 			return null;
 		}
 	}
+
+	/**
+	 * 通过UserName查找NickName
+	 * 只查群名和好友名
+	 * @param userName
+	 * @param uniqueKey
+	 * @return
+	 */
+	public static String getNickNameByUserName(String userName, String uniqueKey){
+		if (userName.startsWith("@@")){
+			return getGroupNickNameByUserName(userName,uniqueKey);
+		}else if (userName.startsWith("@")){
+			return getContactNickNameByUserName(userName,uniqueKey);
+		}else {
+			return "";
+		}
+	}
+
 }

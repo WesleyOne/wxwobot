@@ -12,7 +12,7 @@ import io.wxwobot.admin.itchat4j.utils.enums.URLEnum;
 import io.wxwobot.admin.itchat4j.utils.enums.VerifyFriendEnum;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import io.wxwobot.admin.web.enums.KeyMsgValueType;
+import io.wxwobot.admin.itchat4j.utils.enums.SendMsgType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -28,11 +28,10 @@ import java.util.*;
 
 /**
  * 消息处理类
- * 
+ *
  * @author https://github.com/yaphone
  * @date 创建时间：2017年4月23日 下午2:30:37
  * @version 1.0
- *
  */
 public class MessageTools implements LogInterface {
 
@@ -40,17 +39,49 @@ public class MessageTools implements LogInterface {
 	public static String realFileUploadPath = PropKit.use("appConfig.properties").get("realFileUploadPath")+ File.separator;
 
 
+	/**
+	 * 通过UserName发送消息
+	 * @param toUserName
+	 * @param uniqueKey
+	 * @param data
+	 * @param type
+	 * @return
+	 */
 	public static boolean send(String toUserName, String uniqueKey, String data, String type){
-		if (KeyMsgValueType.TEXT.toValue().equals(type)){
-			MessageTools.sendMsgById(data,toUserName,uniqueKey);
-			return true;
-		}else if (KeyMsgValueType.IMG.toValue().equals(type)){
-			MessageTools.sendPicMsgByUserId(toUserName,realImgUploadPath+data,uniqueKey);
-			return true;
-		}else if (KeyMsgValueType.FILE.toValue().equals(type)){
-			LOG.info("发送文件 {}:{}",toUserName,data);
-			MessageTools.sendFileMsgByUserId(toUserName,realFileUploadPath+data,uniqueKey);
-			return true;
+		String nickName = WechatTools.getNickNameByUserName(toUserName, uniqueKey);
+		if (SendMsgType.TEXT.toValue().equals(type)){
+			LOG.info("发送文本 {}:{}", nickName, data);
+			return MessageTools.sendMsgById(data,toUserName,uniqueKey);
+		}else if (SendMsgType.IMG.toValue().equals(type)){
+			LOG.info("发送图片 {}:{}", nickName, realImgUploadPath+data);
+			return MessageTools.sendPicMsgByUserId(toUserName,realImgUploadPath+data,uniqueKey);
+		}else if (SendMsgType.FILE.toValue().equals(type)){
+			LOG.info("发送文件 {}:{}",nickName,realImgUploadPath+data);
+			return MessageTools.sendFileMsgByUserId(toUserName,realFileUploadPath+data,uniqueKey);
+		}
+		return false;
+	}
+
+	/**
+	 * 通过NickName发送消息
+	 * @param nickName
+	 * @param uniqueKey
+	 * @param data
+	 * @param type
+	 * @param isGroup
+	 * @return
+	 */
+	public static boolean sendByNickName(String nickName, String uniqueKey, String data, String type,boolean isGroup){
+
+		if (SendMsgType.TEXT.toValue().equals(type)){
+			LOG.info("发送文本 {}:{}", nickName, data);
+			return MessageTools.sendMsgByNickNameApi(data, nickName, uniqueKey, isGroup);
+		}else if (SendMsgType.IMG.toValue().equals(type)){
+			LOG.info("发送图片 {}:{}", nickName, realImgUploadPath+data);
+			return MessageTools.sendPicMsgByNickNameApi(nickName, realImgUploadPath + data, uniqueKey, isGroup);
+		}else if (SendMsgType.FILE.toValue().equals(type)){
+			LOG.info("发送文件 {}:{}",nickName,realImgUploadPath+data);
+			return MessageTools.sendFileMsgByNickNameApi(nickName,realFileUploadPath+data,uniqueKey,isGroup);
 		}
 		return false;
 	}
@@ -58,40 +89,23 @@ public class MessageTools implements LogInterface {
 
 	/**
 	 * 根据UserName发送文本消息
-	 * 
+	 *
 	 * @author https://github.com/yaphone
-	 * @date 2017年5月4日 下午11:17:38
+	 * @date 2017年5月6日 上午11:45:51
 	 * @param text
 	 * @param toUserName
 	 * @param uniqueKey
 	 */
-	private static void sendMsg(String text, String toUserName, String uniqueKey) {
+	public static boolean sendMsgById(String text, String toUserName, String uniqueKey) {
 		if (text == null) {
-			return;
+			return false;
 		}
-		LOG.info(String.format("发送文本 %s: %s", toUserName, text));
-		webWxSendMsg(1, text, toUserName, uniqueKey);
-	}
-
-	/**
-	 * 根据ID发送文本消息
-	 * 
-	 * @author https://github.com/yaphone
-	 * @date 2017年5月6日 上午11:45:51
-	 * @param text
-	 * @param id
-	 * @param uniqueKey
-	 */
-	public static void sendMsgById(String text, String id, String uniqueKey) {
-		if (text == null) {
-			return;
-		}
-		sendMsg(text, id, uniqueKey);
+		return webWxSendMsg(1, text, toUserName, uniqueKey);
 	}
 
 	/**
 	 * 根据NickName发送文本消息
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月4日 下午11:17:38
 	 * @param text
@@ -101,8 +115,7 @@ public class MessageTools implements LogInterface {
 		if (nickName != null) {
 			String toUserName = WechatTools.getContactUserNameByNickName(nickName,uniqueKey);
 			if (toUserName != null) {
-				webWxSendMsg(1, text, toUserName, uniqueKey);
-				return true;
+				return sendMsgById(text, toUserName, uniqueKey);
 			}
 		}
 		return false;
@@ -125,12 +138,11 @@ public class MessageTools implements LogInterface {
 	 * @param uniqueKey
 	 * @return
 	 */
-	public static boolean sendGroupMsgByNickName(String text, String nickName, String uniqueKey) {
+	private static boolean sendGroupMsgByNickName(String text, String nickName, String uniqueKey) {
 		if (nickName != null) {
 			String toUserName = WechatTools.getGroupUserNameByNickName(nickName,uniqueKey);
 			if (toUserName != null) {
-				webWxSendMsg(1, text, toUserName, uniqueKey);
-				return true;
+				return sendMsgById(text, toUserName, uniqueKey);
 			}
 		}
 		return false;
@@ -139,7 +151,7 @@ public class MessageTools implements LogInterface {
 
 	/**
 	 * 消息发送
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年4月23日 下午2:32:02
 	 * @param msgType
@@ -175,7 +187,7 @@ public class MessageTools implements LogInterface {
 
 	/**
 	 * 上传多媒体文件到 微信服务器，目前应该支持3种类型: 1. pic 直接显示，包含图片，表情 2.video 3.doc 显示为文件，包含PDF等
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月7日 上午12:41:13
 	 * @param filePath
@@ -253,7 +265,7 @@ public class MessageTools implements LogInterface {
 
 	/**
 	 * 根据NickName发送图片消息
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月7日 下午10:32:45
 	 * @param nickName
@@ -279,7 +291,7 @@ public class MessageTools implements LogInterface {
 	public static boolean sendGroupPicMsgByNickName(String nickName, String filePath, String uniqueKey) {
 		String toUserName = WechatTools.getGroupUserNameByNickName(nickName,uniqueKey);
 		if (toUserName != null) {
-			LOG.info("发送图片 {}:{}",nickName,filePath);
+			LOG.info("发送群图片 {}:{}",nickName,filePath);
 			return sendPicMsgByUserId(toUserName, filePath, uniqueKey);
 		}
 		return false;
@@ -287,7 +299,7 @@ public class MessageTools implements LogInterface {
 
 	/**
 	 * 根据用户id发送图片消息
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月7日 下午10:34:24
 	 * @param userId
@@ -300,7 +312,6 @@ public class MessageTools implements LogInterface {
 		if (responseObj != null) {
 			String mediaId = responseObj.getString("MediaId");
 			if (mediaId != null) {
-				LOG.info("发送图片 {}:{}",userId,filePath);
 				return webWxSendMsgImg(userId, mediaId, uniqueKey);
 			}
 		}
@@ -309,7 +320,7 @@ public class MessageTools implements LogInterface {
 
 	/**
 	 * 发送图片消息，内部调用
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月7日 下午10:38:55
 	 * @return
@@ -349,14 +360,14 @@ public class MessageTools implements LogInterface {
 
 	/**
 	 * 根据用户id发送文件
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月7日 下午11:57:36
 	 * @param userId
 	 * @param filePath
 	 * @return
 	 */
-	public static boolean sendFileMsgByUserId(String userId, String filePath, String uniqueKey) {
+	private static boolean sendFileMsgByUserId(String userId, String filePath, String uniqueKey) {
 		String title = new File(filePath).getName();
 		Map<String, String> data = new HashMap<String, String>(12);
 		data.put("appid", Config.API_WXAPPID);
@@ -386,14 +397,14 @@ public class MessageTools implements LogInterface {
 
 	/**
 	 * 根据用户昵称发送文件消息
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月10日 下午10:59:27
 	 * @param nickName
 	 * @param filePath
 	 * @return
 	 */
-	public static boolean sendFileMsgByNickName(String nickName, String filePath, String uniqueKey) {
+	private static boolean sendFileMsgByNickName(String nickName, String filePath, String uniqueKey) {
 		String toUserName = WechatTools.getContactUserNameByNickName(nickName,uniqueKey);
 		if (toUserName != null) {
 			LOG.info("发送文件 {}:{}",nickName,filePath);
@@ -409,7 +420,7 @@ public class MessageTools implements LogInterface {
 	 * @param uniqueKey
 	 * @return
 	 */
-	public static boolean sendGroupFileMsgByNickName(String nickName, String filePath, String uniqueKey) {
+	private static boolean sendGroupFileMsgByNickName(String nickName, String filePath, String uniqueKey) {
 		String toUserName = WechatTools.getGroupUserNameByNickName(nickName,uniqueKey);
 		if (toUserName != null) {
 			LOG.info("发送文件 {}:{}",nickName,filePath);
@@ -420,7 +431,7 @@ public class MessageTools implements LogInterface {
 
 	/**
 	 * 内部调用
-	 * 
+	 *
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月10日 上午12:21:28
 	 * @param userId
@@ -450,7 +461,7 @@ public class MessageTools implements LogInterface {
 		msgMap.put("ClientMsgId", clientMsgId);
 		/*
 		 * Map<String, Object> paramMap = new HashMap<String, Object>();
-		 * 
+		 *
 		 * @SuppressWarnings("unchecked") Map<String, Map<String, String>>
 		 * baseRequestMap = (Map<String, Map<String, String>>)
 		 * core.getLoginInfo() .get("baseRequest"); paramMap.put("BaseRequest",
@@ -475,13 +486,13 @@ public class MessageTools implements LogInterface {
 
 	/**
 	 * 被动添加好友
-	 * 
+	 *
 	 * @date 2017年6月29日 下午10:08:43
 	 * @param msg
 	 * @param accept
 	 *            true 接受 false 拒绝
 	 */
-	public static void addFriend(BaseMsg msg, boolean accept, String uniqueKey) {
+	private static void addFriend(BaseMsg msg, boolean accept, String uniqueKey) {
 		Core core = CoreManage.getInstance(uniqueKey);
 		if (!accept) { // 不添加
 			return;

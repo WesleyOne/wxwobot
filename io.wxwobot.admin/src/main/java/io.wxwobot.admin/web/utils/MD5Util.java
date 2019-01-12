@@ -68,7 +68,7 @@ public class MD5Util {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(MD5Encrypt("fengying666"));
+		System.out.println(MD5Encrypt("wxwobot"));
 	}
 
 

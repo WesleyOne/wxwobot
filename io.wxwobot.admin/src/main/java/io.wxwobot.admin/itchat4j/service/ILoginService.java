@@ -26,7 +26,6 @@ public interface ILoginService {
 	 * 
 	 * @author https://github.com/yaphone
 	 * @date 2017年5月13日 上午12:21:40
-	 * @param qrPath
 	 * @return
 	 */
 	String getUuid();

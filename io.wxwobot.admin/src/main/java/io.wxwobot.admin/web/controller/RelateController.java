@@ -101,7 +101,7 @@ public class RelateController extends _BaseController {
      */
     public void editRelate(){
         JSONObject postParam = getPostParam();
-        Integer id = postParam.getInteger("kid");
+        Long id = postParam.getLong("kid");
         String uniqueKey = postParam.getString("uniqueKey");
         String nickName = postParam.getString("nickName");
         String whiteList = postParam.getString("whiteList");

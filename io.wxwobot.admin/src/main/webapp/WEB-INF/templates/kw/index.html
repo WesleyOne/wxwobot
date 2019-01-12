@@ -154,11 +154,11 @@
                                                          row, index) {
                                         var result = "";
                                         var typeData = row['typeData'];
-                                        if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::TEXT)') {
+                                        if (typeData == '#(io.wxwobot.admin.itchat4j.utils.enums.SendMsgType::TEXT)') {
                                             result += "<span class='label label-default'>纯文本</span> ";
-                                        } else if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::FILE)'){
+                                        } else if (typeData == '#(io.wxwobot.admin.itchat4j.utils.enums.SendMsgType::FILE)'){
                                             result += "<span class='label label-info'>文件</span> ";
-                                        } else if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::IMG)'){
+                                        } else if (typeData == '#(io.wxwobot.admin.itchat4j.utils.enums.SendMsgType::IMG)'){
                                             result += "<span class='label label-primary'>图片</span> ";
                                         } else {
                                             result += "<span class='label label-danger'>未知</span> ";
@@ -217,7 +217,7 @@
                                                          row, index) {
                                         var result = "";
                                         var typeData = row['typeData'];
-                                        if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::TEXT)') {
+                                        if (typeData == '#(io.wxwobot.admin.itchat4j.utils.enums.SendMsgType::TEXT)') {
                                             var v_len = value.length;
                                             var max_len = 20;
                                             if (v_len > max_len){
@@ -225,9 +225,9 @@
                                             } else{
                                                 result = "<span>"+value+"</span>"
                                             }
-                                        } else if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::FILE)'){
+                                        } else if (typeData == '#(io.wxwobot.admin.itchat4j.utils.enums.SendMsgType::FILE)'){
                                             result = "<a type='button' class='btn btn-default btn-sm' href='#(filedomain)"+value+"'  title='"+value+"' target='_blank'>文件下载</a>";
-                                        } else if (typeData == '#(io.wxwobot.admin.web.enums.KeyMsgValueType::IMG)'){
+                                        } else if (typeData == '#(io.wxwobot.admin.itchat4j.utils.enums.SendMsgType::IMG)'){
                                             result = "<img src='#(imgdomain)"+value+"' class='img-responsive img-thumbnail' style='max-width: 100px'>";
                                         } else {
                                             result = value;
