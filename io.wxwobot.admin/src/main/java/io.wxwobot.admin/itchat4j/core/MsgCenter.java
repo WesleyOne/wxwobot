@@ -195,19 +195,15 @@ public class MsgCenter implements LogInterface {
 							} else if (msg.getType().equals(MsgTypeEnum.VOICE.getType())) {
 								msgHandler.voiceMsgHandle(msg);
 							} else if (msg.getType().equals(MsgTypeEnum.VIEDO.getType())) {
-								String result = msgHandler.videoMsgHandle(msg);
-								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),uniqueKey);
+								msgHandler.videoMsgHandle(msg);
 							} else if (msg.getType().equals(MsgTypeEnum.NAMECARD.getType())) {
-								String result = msgHandler.nameCardMsgHandle(msg);
-								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),uniqueKey);
+								msgHandler.nameCardMsgHandle(msg);
 							} else if (msg.getType().equals(MsgTypeEnum.SYS.getType())) { // 系统消息
 								msgHandler.sysMsgHandle(msg);
 							} else if (msg.getType().equals(MsgTypeEnum.VERIFYMSG.getType())) { // 确认添加好友消息
-								String result = msgHandler.verifyAddFriendMsgHandle(msg);
-								MessageTools.sendMsgById(result,core.getMsgList().get(0).getRecommendInfo().getUserName(),uniqueKey);
+								msgHandler.verifyAddFriendMsgHandle(msg);
 							} else if (msg.getType().equals(MsgTypeEnum.MEDIA.getType())) { // 多媒体消息
-								String result = msgHandler.mediaMsgHandle(msg);
-								MessageTools.sendMsgById(result, core.getMsgList().get(0).getFromUserName(),uniqueKey);
+								msgHandler.mediaMsgHandle(msg);
 							} else{
 								LOG.warn("暂未处理信息【{}】", msg.getType());
 							}
