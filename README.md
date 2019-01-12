@@ -1,5 +1,6 @@
 ### <a href="https://gitee.com/wesleyOne/wxwobot">wxwobot 某信运营自助工具</a>
-
+[![star](https://gitee.com/wesleyOne/wxwobot/badge/star.svg?theme=dark)](https://gitee.com/wesleyOne/wxwobot/stargazers)
+[![fork](https://gitee.com/wesleyOne/wxwobot/badge/fork.svg?theme=dark)](https://gitee.com/wesleyOne/wxwobot/members)
 #### 线上DEMO
 [点击跳转=>>在线DEMO 账号密码都是wxwobot](http://wxwobot.51guagua.top)
 - 由于是公开的线上项目，注意下自己的账号安全
