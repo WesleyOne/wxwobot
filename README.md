@@ -1,5 +1,10 @@
 ### <a href="https://gitee.com/wesleyOne/wxwobot">wxwobot 某信运营自助工具</a>
 
+#### 线上DEMO
+[点击跳转=>>在线DEMO 账号密码都是wxwobot](http://wxwobot.51guagua.top)
+- 由于是公开的线上项目，注意下自己的账号安全
+- 那台服务器配置低，麻烦不要做压测
+
 #### 项目介绍
 - 项目简介：模拟某信WEB端接口的自助机器人
 - 基于<a href="https://github.com/yaphone/itchat4j">itchat4j开源项目</a>开发
