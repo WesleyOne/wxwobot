@@ -16,7 +16,6 @@ import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 public class _MappingKit {
 	
 	public static void mapping(ActiveRecordPlugin arp) {
-		arp.addMapping("wx_pyq_relate", "id", WxPyqRelate.class);
 		arp.addMapping("wx_rob_config", "id", WxRobConfig.class);
 		arp.addMapping("wx_rob_keyword", "id", WxRobKeyword.class);
 		arp.addMapping("wx_rob_relation", "id", WxRobRelation.class);

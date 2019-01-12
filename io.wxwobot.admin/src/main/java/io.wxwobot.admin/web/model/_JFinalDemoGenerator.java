@@ -1,9 +1,11 @@
 package io.wxwobot.admin.web.model;
 
 import com.jfinal.kit.PathKit;
+import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
 import com.jfinal.plugin.activerecord.generator.Generator;
 import com.jfinal.plugin.druid.DruidPlugin;
+import io.wxwobot.admin.web.common.MyConfig;
 
 import javax.sql.DataSource;
 
@@ -15,17 +17,23 @@ import javax.sql.DataSource;
  */
 public class _JFinalDemoGenerator {
 	
+//	public static DataSource getDataSource() {
+////		PropKit.use("appConfig.properties");
+////		DruidPlugin druidPlugin =  new DruidPlugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim(),PropKit.get("jdbcDriverSqlServe"));
+////		DruidPlugin druidPlugin = new DruidPlugin("jdbc:mysql://127.0.0.1:3306/wxwobot?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull","root", "root");
+//		DruidPlugin druidPlugin = new DruidPlugin("jdbc:mysql://localhost:3306/wxwobot?characterEncoding=utf8&useSSL=false&zeroDateTimeBehavior=convertToNull",
+//				"root", "root");
+//		druidPlugin.start();
+//		return druidPlugin.getDataSource();
+//	}
 	public static DataSource getDataSource() {
-//		PropKit.use("appConfig.properties");
-//		DruidPlugin druidPlugin =  new DruidPlugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim(),PropKit.get("jdbcDriverSqlServe"));
-		DruidPlugin druidPlugin = new DruidPlugin("jdbc:mysql://127.0.0.1:3306/wxwobot?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull",
-				"wxwobot", "wxwobot","com.mysql.jdbc.Driver");
+		DruidPlugin druidPlugin = MyConfig.createDruidPlugin();
 		druidPlugin.start();
 		return druidPlugin.getDataSource();
 	}
-
 	
 	public static void main(String[] args) {
+		PropKit.use("appConfig.properties");
 		// base model 所使用的包名
 		String baseModelPackageName = "io.wxwobot.admin.web.model.base";
 		// base model 文件保存路径

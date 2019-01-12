@@ -35,8 +35,8 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <pro.jdbc.agent.driver.mysql>com.mysql.jdbc.Driver</pro.jdbc.agent.driver.mysql>
     <pro.jdbc.agent.url><![CDATA[jdbc:mysql://127.0.0.1:3306/wxwobot?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull]]></pro.jdbc.agent.url>
-    <pro.jdbc.agent.username>wxwobot</pro.jdbc.agent.username>
-    <pro.jdbc.agent.password>wxwobot</pro.jdbc.agent.password>
+    <pro.jdbc.agent.username>root</pro.jdbc.agent.username>
+    <pro.jdbc.agent.password>root</pro.jdbc.agent.password>
     <pro.devMode>true</pro.devMode>
     <log.level>debug</log.level>
     <pro.user.hotreload>true</pro.user.hotreload>
@@ -110,10 +110,9 @@
       <version>1.7.12</version>
     </dependency>
     <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>5.1.44</version>
-        <scope>provided</scope>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.44</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>

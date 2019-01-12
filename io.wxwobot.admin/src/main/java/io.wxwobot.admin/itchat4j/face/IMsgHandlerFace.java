@@ -13,13 +13,6 @@ import io.wxwobot.admin.itchat4j.beans.BaseMsg;
 public interface IMsgHandlerFace {
 
 	/**
-	 * 获取
-	 * @param handlerName
-	 * @return
-	 */
-	public IMsgHandlerFace getInstance(String handlerName);
-
-	/**
 	 * 
 	 * @author https://github.com/yaphone
 	 * @date 2017年4月20日 上午12:15:00

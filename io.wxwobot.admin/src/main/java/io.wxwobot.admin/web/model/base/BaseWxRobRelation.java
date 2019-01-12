@@ -9,13 +9,13 @@ import com.jfinal.plugin.activerecord.IBean;
 @SuppressWarnings({"serial", "unchecked"})
 public abstract class BaseWxRobRelation<M extends BaseWxRobRelation<M>> extends Model<M> implements IBean {
 
-	public M setId(java.lang.Integer id) {
+	public M setId(java.lang.Long id) {
 		set("id", id);
 		return (M)this;
 	}
 	
-	public java.lang.Integer getId() {
-		return getInt("id");
+	public java.lang.Long getId() {
+		return getLong("id");
 	}
 
 	public M setOutKey(java.lang.String outKey) {
@@ -45,13 +45,13 @@ public abstract class BaseWxRobRelation<M extends BaseWxRobRelation<M>> extends 
 		return getStr("nick_name");
 	}
 
-	public M setCreateTime(java.util.Date createTime) {
-		set("create_time", createTime);
+	public M setToGroup(java.lang.Boolean toGroup) {
+		set("to_group", toGroup);
 		return (M)this;
 	}
 	
-	public java.util.Date getCreateTime() {
-		return get("create_time");
+	public java.lang.Boolean getToGroup() {
+		return get("to_group");
 	}
 
 	public M setEnable(java.lang.Boolean enable) {
@@ -63,15 +63,6 @@ public abstract class BaseWxRobRelation<M extends BaseWxRobRelation<M>> extends 
 		return get("enable");
 	}
 
-	public M setToGroup(java.lang.Boolean toGroup) {
-		set("to_group", toGroup);
-		return (M)this;
-	}
-	
-	public java.lang.Boolean getToGroup() {
-		return get("to_group");
-	}
-
 	public M setWhiteList(java.lang.String whiteList) {
 		set("white_list", whiteList);
 		return (M)this;
@@ -79,6 +70,15 @@ public abstract class BaseWxRobRelation<M extends BaseWxRobRelation<M>> extends 
 	
 	public java.lang.String getWhiteList() {
 		return getStr("white_list");
+	}
+
+	public M setCreateTime(java.util.Date createTime) {
+		set("create_time", createTime);
+		return (M)this;
+	}
+	
+	public java.util.Date getCreateTime() {
+		return get("create_time");
 	}
 
 }

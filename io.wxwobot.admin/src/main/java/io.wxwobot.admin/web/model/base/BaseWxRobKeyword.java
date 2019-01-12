@@ -9,13 +9,13 @@ import com.jfinal.plugin.activerecord.IBean;
 @SuppressWarnings({"serial", "unchecked"})
 public abstract class BaseWxRobKeyword<M extends BaseWxRobKeyword<M>> extends Model<M> implements IBean {
 
-	public M setId(java.lang.Integer id) {
+	public M setId(java.lang.Long id) {
 		set("id", id);
 		return (M)this;
 	}
 	
-	public java.lang.Integer getId() {
-		return getInt("id");
+	public java.lang.Long getId() {
+		return getLong("id");
 	}
 
 	public M setUniqueKey(java.lang.String uniqueKey) {
@@ -54,22 +54,13 @@ public abstract class BaseWxRobKeyword<M extends BaseWxRobKeyword<M>> extends Mo
 		return getStr("type_data");
 	}
 
-	public M setCreateTime(java.util.Date createTime) {
-		set("create_time", createTime);
+	public M setNickName(java.lang.String nickName) {
+		set("nick_name", nickName);
 		return (M)this;
 	}
 	
-	public java.util.Date getCreateTime() {
-		return get("create_time");
-	}
-
-	public M setEnable(java.lang.Boolean enable) {
-		set("enable", enable);
-		return (M)this;
-	}
-	
-	public java.lang.Boolean getEnable() {
-		return get("enable");
+	public java.lang.String getNickName() {
+		return getStr("nick_name");
 	}
 
 	public M setToGroup(java.lang.Boolean toGroup) {
@@ -81,13 +72,22 @@ public abstract class BaseWxRobKeyword<M extends BaseWxRobKeyword<M>> extends Mo
 		return get("to_group");
 	}
 
-	public M setNickName(java.lang.String nickName) {
-		set("nick_name", nickName);
+	public M setEnable(java.lang.Boolean enable) {
+		set("enable", enable);
 		return (M)this;
 	}
 	
-	public java.lang.String getNickName() {
-		return getStr("nick_name");
+	public java.lang.Boolean getEnable() {
+		return get("enable");
+	}
+
+	public M setCreateTime(java.util.Date createTime) {
+		set("create_time", createTime);
+		return (M)this;
+	}
+	
+	public java.util.Date getCreateTime() {
+		return get("create_time");
 	}
 
 }

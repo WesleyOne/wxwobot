@@ -81,7 +81,7 @@ public class MyConfig extends JFinalConfig {
 	}
 
 	public static DruidPlugin createDruidPlugin() {
-		return new DruidPlugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim(),PropKit.get("jdbcDriverMysql"));
+		return new DruidPlugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim());
 	}
 	/**
 	 * 配置全局拦截器

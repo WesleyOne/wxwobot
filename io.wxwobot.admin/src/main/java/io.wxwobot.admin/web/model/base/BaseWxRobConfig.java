@@ -9,13 +9,13 @@ import com.jfinal.plugin.activerecord.IBean;
 @SuppressWarnings({"serial", "unchecked"})
 public abstract class BaseWxRobConfig<M extends BaseWxRobConfig<M>> extends Model<M> implements IBean {
 
-	public M setId(java.lang.Integer id) {
+	public M setId(java.lang.Long id) {
 		set("id", id);
 		return (M)this;
 	}
 	
-	public java.lang.Integer getId() {
-		return getInt("id");
+	public java.lang.Long getId() {
+		return getLong("id");
 	}
 
 	public M setUniqueKey(java.lang.String uniqueKey) {
@@ -72,24 +72,6 @@ public abstract class BaseWxRobConfig<M extends BaseWxRobConfig<M>> extends Mode
 		return get("to_group");
 	}
 
-	public M setEnable(java.lang.Boolean enable) {
-		set("enable", enable);
-		return (M)this;
-	}
-	
-	public java.lang.Boolean getEnable() {
-		return get("enable");
-	}
-
-	public M setFromOut(java.lang.Boolean fromOut) {
-		set("from_out", fromOut);
-		return (M)this;
-	}
-	
-	public java.lang.Boolean getFromOut() {
-		return get("from_out");
-	}
-
 	public M setDefaultFriend(java.lang.Boolean defaultFriend) {
 		set("default_friend", defaultFriend);
 		return (M)this;
@@ -106,6 +88,24 @@ public abstract class BaseWxRobConfig<M extends BaseWxRobConfig<M>> extends Mode
 	
 	public java.lang.Boolean getDefaultGroup() {
 		return get("default_group");
+	}
+
+	public M setFromOut(java.lang.Boolean fromOut) {
+		set("from_out", fromOut);
+		return (M)this;
+	}
+	
+	public java.lang.Boolean getFromOut() {
+		return get("from_out");
+	}
+
+	public M setEnable(java.lang.Boolean enable) {
+		set("enable", enable);
+		return (M)this;
+	}
+	
+	public java.lang.Boolean getEnable() {
+		return get("enable");
 	}
 
 }
