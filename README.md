@@ -31,7 +31,7 @@
 #### 安装教程
 
 **准备**
-- 使用 create_sql/mysql/wxwobot.sql 中的 sql 语句创建数据库与数据库表
+- 使用 wxwobot.sql 中的 sql 语句创建数据库与数据库表
 - 修改 pom.xml 文件，填入正确的数据库连接用户名、密码
 - 请确保安装了 JavaSE 1.8 或更高版本
 
