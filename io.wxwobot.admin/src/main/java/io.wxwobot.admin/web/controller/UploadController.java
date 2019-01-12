@@ -16,7 +16,6 @@ public class UploadController extends _BaseController {
 
     public void img2local(){
         UploadFile file = getFile();
-        String imgDomain = PropKit.get("imgDomain");
 
         String fn = getPara("fn", "");
         String originalFileName = file.getOriginalFileName();
@@ -24,10 +23,8 @@ public class UploadController extends _BaseController {
         String fileType = originalFileName.substring(i);
         String fileName = fn + "_" + System.currentTimeMillis() + "." + fileType;
         String newFilePath = UploadConstant.IMG_PATH+File.separator+fileName;
-        String newFileUrl = imgDomain+fileName;
         file.getFile().renameTo(new File(newFilePath));
 
-        setAttr("url",newFileUrl);
         setAttr("name",fileName);
 
         renderJson();
