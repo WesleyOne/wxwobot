@@ -23,7 +23,7 @@ MAIN_CLASS=io.wxwobot.admin.web.common.MyConfig
 # Java 命令行参数，根据需要开启下面的配置，改成自己需要的，注意等号前后不能有空格
 # JAVA_OPTS="-Xms256m -Xmx1024m -Dundertow.port=80 -Dundertow.host=0.0.0.0"
 # JAVA_OPTS="-Dundertow.port=80 -Dundertow.host=0.0.0.0"
-JAVA_OPTS="-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:./gclog/gc.$$.log -Djava.security.egd=file:/dev/./urandom -Xms500m -Xmx500m  -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:+UseConcMarkSweepGC -Xmn400m -Xss328k"
+JAVA_OPTS="-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.$$.log -Djava.security.egd=file:/dev/./urandom -Xms500m -Xmx500m  -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:+UseConcMarkSweepGC -Xmn400m -Xss328k"
 
 # 生成 class path 值
 APP_BASE_PATH=$(cd `dirname $0`; pwd)

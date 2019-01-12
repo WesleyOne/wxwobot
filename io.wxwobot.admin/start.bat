@@ -24,7 +24,7 @@ set MAIN_CLASS=io.wxwobot.admin.web.common.MyConfig
 rem Java 命令行参数,根据需要开启下面的配置,改成自己需要的,注意等号前后不能有空格
 rem set "JAVA_OPTS=-Xms256m -Xmx1024m -Dundertow.port=80 -Dundertow.host=0.0.0.0"
 rem set "JAVA_OPTS=-Dundertow.port=80 -Dundertow.host=0.0.0.0"
-set "JAVA_OPTS=-Dundertow.port=8180 -Dundertow.host=0.0.0.0 -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:./logs/gc.$$.log -Djava.security.egd=file:/dev/./urandom -Xms500m -Xmx500m  -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:+UseConcMarkSweepGC -Xmn400m -Xss328k"
+set "JAVA_OPTS=-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:./logs/gc.$$.log -Djava.security.egd=file:/dev/./urandom -Xms500m -Xmx500m  -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:+UseConcMarkSweepGC -Xmn400m -Xss328k"
 
 set APP_BASE_PATH=%~dp0
 set CP=%APP_BASE_PATH%config;%APP_BASE_PATH%lib\*
