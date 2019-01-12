@@ -17,4 +17,5 @@ public class ConfigKeys {
     public static final String DEAFAULT_KEYWORD = "默认全局关键字回复用昵称-请勿修改";
     public static final String DEAFAULT_WELCOME = "默认群欢迎新人用-请勿修改";
 
+
 }

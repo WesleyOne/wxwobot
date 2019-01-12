@@ -3,57 +3,91 @@
 
 #define main()
 <div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">功能简介</h3>
-    </div>
     <div class="panel-body">
-        <div class="well" >
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="panel panel-success">
-                        <div class="panel-heading">机器人</div>
-                        <div class="panel-body">
-                            登入退出，开关状态管理，群名查看等
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-success">
-                        <div class="panel-heading">关键字</div>
-                        <div class="panel-body">
-                            自动回复某个或全局群或好友关键词，新人进群欢迎词等
-                        </div>
-                    </div>
-                </div>
+        <div class="panel panel-success">
+            <div class="panel-heading">项目介绍</div>
+            <div class="panel-body">
+                <p>类别：某信WEB端的自助工具</p>
+                <p>基础：基于<a href="https://github.com/yaphone/itchat4j">itchat4j开源项目</a>开发</p>
+                <p>注意：WEB端接口功能有限，且用且珍惜</p>
             </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="panel panel-success">
-                        <div class="panel-heading">对外接口</div>
-                        <div class="panel-body">
-                            外部项目通过调用对外接口完成信息转发
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-success">
-                        <div class="panel-heading">消息发送</div>
-                        <div class="panel-body">
-                            文本 图片 文件
-                        </div>
-                    </div>
-                </div>
+        </div>
+        <div class="panel panel-success">
+            <div class="panel-heading">项目特点</div>
+            <div class="panel-body">
+                <ul class="list-unstyled">
+                    <li>*支持多账号</li>
+                    <li>*重启项目热登录</li>
+                    <li>*消息使用队列间隔时间发送，减少被封几率</li>
+                    <li>*其他业务访问项目的对外接口，可实现消息转发到某信(需布置到公网环境)</li>
+                    <li>*自动回复（目前效果市全匹配关键字回复和进群欢迎语）</li>
+                    <li>*jfinal-undertow开发部署的种种优势</li>
+                    <li>*有开发能力可自行实现消息的处理</li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
+
+<!-- 以下可删除 -->
+<footer class="footer">
+    <div class="container">
+        <div class="row footer-top">
+            <div class="col-md-4 col-lg-4">
+                <p>声明：该工具仅限学习交流，</p>
+                <p>项目中用到的所有资源所有权归其所有者所有，</p>
+                <p>在此感谢使用到的所有开源项目的开发团队和个人！</p>
+            </div>
+
+            <div class="col-md-7  col-lg-7 ">
+                <div class="row about">
+                    <div class="col-sm-4">
+                        <h4>友情链接</h4>
+                        <ul class="list-unstyled">
+                            <li><a href="https://www.jfinal.com/">JFinal极速开发社区</a></li>
+                            <li><a href="https://github.com/yaphone/itchat4j">itchat4j开源项目</a></li>
+                            <li><a href="http://www.bootcss.com">Bootstrap中文网</a>,<a href="https://www.bootcdn.cn/">BootCDN</a></li>
+                            <li><a href="https://www.glyphicons.com/">Glyphicons</a>,<a href="https://bootstrap-table.wenzhixin.net.cn/" target="_blank">BootstrapTable</a></li>
+                            <li><a href="https://github.com/Bttstrp/bootstrap-switch">Bootstrap Switch</a>,<a href="http://bootboxjs.com/" target="_blank">Bootbox.js</a></li>
+                            <li><a href="https://github.com/nghuuphuoc/bootstrapvalidator">bootstrapvalidator</a></li>
+                            <li><a href="https://github.com/kartik-v/bootstrap-fileinput">bootstrap-fileinput</a> </li>
+                            <li><a href="https://promotion.aliyun.com/ntms/yunparter/invite.html?userCode=dnuqwh0e" target="_blank">阿里云推广计划</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-6">
+                        <h4>众筹植发(滑稽)</h4>
+                        <ul class="list-unstyled">
+                            <li>
+                                <img title="微信赞赏码" style="width: 144px;height: 144px;" src="/assets/img/wxzsm.png">
+                                <img title="支付宝赞赏码" style="width: 144px;height: 144px;" src="/assets/img/zfbzsm.jpg">
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-2">
+                        <h4>技术交流</h4>
+                        <ul class="list-unstyled">
+                            <li><img title="QQ交流群" style="width: 144px;height: 144px;" src="/assets/img/wxwobot_qq_qrcode.png"></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <hr>
+        <div class="row footer-bottom">
+            <ul class="list-inline text-center">
+                <li><a href="https://promotion.aliyun.com/ntms/act/qwbk.html?userCode=dnuqwh0e" target="_blank">
+                    <img style="width: 100%" src="/assets/img/aliad.png" ></img>
+                </a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+<!-- 以上可删除 -->
 #end
 
 #define css()
 <style type="text/css">
-    .arrow_my{
-        text-align: center;
-    }
 </style>
 #end
 

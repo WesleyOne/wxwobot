@@ -172,18 +172,6 @@
             }
         });
 
-        // $("#useDefaultNickName").on('click',function(){
-        //     var flag = $(this).is(':checked');
-        //     console.log(flag);
-        //     if(flag){
-        //         $('#nickName').val('#(io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_KEYWORD)');
-        //         $('#nickName').attr("readonly",true);
-        //     }else{
-        //         $('#nickName').val('');
-        //         $('#nickName').attr("readonly",false);
-        //     }
-        // });
-
 
         $("#f_upload")
             .fileinput(
@@ -229,7 +217,7 @@
                         "<img src='#(imgurl)' class='img-thumbnail file-preview-image'>"
                     ],
     #end
-                    allowedFileExtensions : [ 'jpg','gif', 'png' ],//接收的文件后缀
+                    allowedFileExtensions : [ 'jpeg','jpg','gif', 'png' ],//接收的文件后缀
                     uploadExtraData:{"fn": "#(form.uniqueKey ?? 'err')"},//其他参数
                     uploadAsync : true, //默认异步上传
                     showUpload : true, //是否显示上传按钮

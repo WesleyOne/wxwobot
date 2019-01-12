@@ -2,7 +2,6 @@ package io.wxwobot.admin.web.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import io.wxwobot.admin.itchat4j.beans.SendMsg;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.utils.enums.SendMsgType;
 import io.wxwobot.admin.web.model.WxRobRelation;
@@ -113,12 +112,7 @@ public class ExtendController extends _BaseController {
             String type = message.getString("type");
             String body = message.getString("body");
 
-            SendMsg sendMsg = new SendMsg();
-            sendMsg.setNickName(nickName);
-            sendMsg.setMessage(body);
-            sendMsg.setMsgType(SendMsgType.fromValue(type));
-            sendMsg.setGroup(toGroup);
-            CoreManage.getInstance(uniqueKey).getSendList().add(sendMsg);
+            CoreManage.addSendMsg(uniqueKey,nickName,body,SendMsgType.fromValue(type),toGroup);
         }
 
         if (!result){

@@ -2,6 +2,7 @@ package io.wxwobot.admin.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jfinal.core.Controller;
+import com.jfinal.core.NotAction;
 import com.jfinal.kit.HttpKit;
 import com.jfinal.kit.PropKit;
 import com.jfinal.kit.StrKit;
@@ -31,6 +32,7 @@ public class _BaseController extends Controller {
      * @param code
      * @param errorMsg
      */
+    @NotAction
     public boolean vldParam(boolean result, String code, String errorMsg){
         if (result){
             setAttr("code",code);
@@ -41,6 +43,7 @@ public class _BaseController extends Controller {
         return false;
     }
 
+    @NotAction
     public boolean vldParam(boolean result, BaseError baseError){
         if (result){
             return vldParam(true,baseError.getCode(),baseError.getMsg());
@@ -48,6 +51,7 @@ public class _BaseController extends Controller {
         return false;
     }
 
+    @NotAction
     public boolean vldParam(boolean result, String errMsg){
         if (result){
             return vldParam(true,BaseError.NORMAL_ERR.getCode(),errMsg);
@@ -61,6 +65,7 @@ public class _BaseController extends Controller {
      * @param baseError
      * @return
      */
+    @NotAction
     public boolean vldParamNull(String paramValue, BaseError baseError){
         if (StrKit.isBlank(paramValue)) {
             return vldParam(true,baseError.getCode(),baseError.getMsg());
@@ -68,6 +73,7 @@ public class _BaseController extends Controller {
         return false;
     }
 
+    @NotAction
     public boolean vldParamNull(String paramValue, String errMsg){
         if (StrKit.isBlank(paramValue)) {
             return vldParam(true,BaseError.NORMAL_ERR.getCode(),errMsg);
@@ -81,6 +87,7 @@ public class _BaseController extends Controller {
      * @param baseError
      * @return
      */
+    @NotAction
     public boolean vldParamNull(Object paramValue, BaseError baseError){
         if (paramValue == null) {
             return vldParam(true,baseError.getCode(),baseError.getMsg());
@@ -88,6 +95,7 @@ public class _BaseController extends Controller {
         return false;
     }
 
+    @NotAction
     public boolean vldParamNull(Object paramValue, String errMsg){
         if (paramValue == null) {
             return vldParam(true,BaseError.NORMAL_ERR.getCode(),errMsg);
@@ -95,53 +103,52 @@ public class _BaseController extends Controller {
         return false;
     }
 
-
+    @NotAction
     public void setData(Object o){
         this.setAttr("data",o);
     }
-
+    @NotAction
     public void setCount(Object o){
         this.setAttr("_count",o);
     }
-
+    @NotAction
     public void setCode(String code){
         this.setAttr("code",code);
     }
-
+    @NotAction
     public void setMsg(String msg){
         this.setAttr("message",msg);
     }
-
+    @NotAction
     public void setOperateErr(String msg){
         this.setAttr("code",BaseError.OPERATION_ERR.getCode());
         this.setAttr("message",msg);
     }
-
+    @NotAction
     public void setOperateErr(){
         this.setAttr("code",BaseError.OPERATION_ERR.getCode());
         this.setAttr("message",BaseError.OPERATION_ERR.getMsg());
     }
-
+    @NotAction
     public void setDeleteErr(){
         this.setAttr("code",BaseError.OPERATION_ERR.getCode());
         this.setAttr("message",BaseError.OPERATION_ERR.getMsg());
     }
 
-
+    @NotAction
     public void addCookie(String key,String value,int second) {
         Cookie cookie = new Cookie(key,value);
-//        cookie.setDomain(PropKit.get("COOKIE_DOMAIN"));
         cookie.setMaxAge(second);
         cookie.setPath("/");
         setCookie(cookie);
     }
 
-
+    @NotAction
     public JSONObject getPostParam(){
         String jsonString= HttpKit.readData(getRequest());
         return JSONObject.parseObject(jsonString);
     }
-
+    @NotAction
     public String getUid(){
         return this.getCookie("uid");
     }
@@ -153,11 +160,13 @@ public class _BaseController extends Controller {
      * @return
      */
     @SuppressWarnings("rawtypes")
+    @NotAction
     protected Map<String, Object> buildPagination(List list, Integer count) {
         return buildPagination(list, count, null);
     }
 
     @SuppressWarnings("rawtypes")
+    @NotAction
     protected Map<String, Object> buildPagination(List list, Integer count,
                                                   List<Map<String, Object>> footer) {
         Map<String, Object> map = new HashMap<String, Object>(4);
@@ -169,6 +178,7 @@ public class _BaseController extends Controller {
         return map;
     }
 
+    @NotAction
     protected static int getPageNum(int pageNum,int rows){
         int pageNumber = pageNum / rows + 1;
         return pageNumber;
@@ -178,6 +188,7 @@ public class _BaseController extends Controller {
      * 获取UniqueKey
      * @return
      */
+    @NotAction
     public String getUniqueKey() throws BaseException {
         String uniqueKey = getPara("_ck", "");
         if (StringUtils.isEmpty(uniqueKey)){

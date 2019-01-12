@@ -4,13 +4,16 @@ import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.wall.WallFilter;
 import com.jfinal.config.*;
 import com.jfinal.json.FastJsonFactory;
+import com.jfinal.kit.PathKit;
 import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
 import com.jfinal.plugin.druid.DruidPlugin;
+import com.jfinal.server.undertow.UndertowServer;
 import com.jfinal.template.Engine;
 import com.jfinal.template.source.ClassPathSourceFactory;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
+import io.wxwobot.admin.web.constant.UploadConstant;
 import io.wxwobot.admin.web.interceptor.ExceptionInterceptor;
 import io.wxwobot.admin.web.model._MappingKit;
 import org.slf4j.Logger;
@@ -27,6 +30,10 @@ import org.slf4j.LoggerFactory;
 public class MyConfig extends JFinalConfig {
 
 	public final Logger LOG = LoggerFactory.getLogger(this.getClass());
+
+	public static void main(String[] args) {
+		UndertowServer.start(MyConfig.class, 8180, true);
+	}
 
 	/**
 	 * 配置常量
@@ -55,6 +62,8 @@ public class MyConfig extends JFinalConfig {
 	public void configEngine(Engine me) {
 		me.setDevMode(PropKit.use("appConfig.properties").getBoolean("devMode", false));
 		me.addSharedFunction("/WEB-INF/templates/bs4temp/layout.html");
+		me.addSharedObject("imgDomain" , UploadConstant.IMG_URL);
+		me.addSharedObject("filedomain" , UploadConstant.FILE_URL);
 	}
 	
 	/**

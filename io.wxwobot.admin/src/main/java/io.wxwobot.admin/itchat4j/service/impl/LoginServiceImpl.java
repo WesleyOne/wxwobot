@@ -228,7 +228,7 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 			 * MPSubscribeMsgList 公众号服务号也不处理
 			 */
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("热登录出现该异常请忽略"+e.getMessage(),e);
 			core.setAlive(false);
 			return false;
 		}

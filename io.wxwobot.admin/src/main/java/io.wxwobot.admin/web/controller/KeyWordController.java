@@ -25,8 +25,6 @@ public class KeyWordController extends _BaseController{
             setAttr("search_uk",uniqueKey);
         }
         setAttr("keys",KeyMsgValueType.LIST_KV);
-        setAttr("imgdomain",PropKit.get("imgDomain"));
-        setAttr("filedomain",PropKit.get("fileDomain"));
         renderTemplate("index.html");
     }
 
@@ -91,8 +89,6 @@ public class KeyWordController extends _BaseController{
         setAttr("form",kwRecord);
 
         setAttr("keys",KeyMsgValueType.LIST_KV);
-        setAttr("imgdomain",PropKit.get("imgDomain"));
-        setAttr("filedomain",PropKit.get("fileDomain"));
         setAttr("groupNickNames",groupNickNames);
         renderTemplate("editIndex.html");
     }

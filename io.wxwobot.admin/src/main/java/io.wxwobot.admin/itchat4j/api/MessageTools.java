@@ -13,6 +13,7 @@ import io.wxwobot.admin.itchat4j.utils.enums.VerifyFriendEnum;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.wxwobot.admin.itchat4j.utils.enums.SendMsgType;
+import io.wxwobot.admin.web.constant.UploadConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -35,9 +36,6 @@ import java.util.*;
  */
 public class MessageTools implements LogInterface {
 
-	public static String realImgUploadPath = PropKit.use("appConfig.properties").get("realImgUploadPath")+ File.separator;
-	public static String realFileUploadPath = PropKit.use("appConfig.properties").get("realFileUploadPath")+ File.separator;
-
 
 	/**
 	 * 通过UserName发送消息
@@ -53,11 +51,11 @@ public class MessageTools implements LogInterface {
 			LOG.info("发送文本 {}:{}", nickName, data);
 			return MessageTools.sendMsgById(data,toUserName,uniqueKey);
 		}else if (SendMsgType.IMG.toValue().equals(type)){
-			LOG.info("发送图片 {}:{}", nickName, realImgUploadPath+data);
-			return MessageTools.sendPicMsgByUserId(toUserName,realImgUploadPath+data,uniqueKey);
+			LOG.info("发送图片 {}:{}", nickName, UploadConstant.IMG_PATH_SEP+data);
+			return MessageTools.sendPicMsgByUserId(toUserName,UploadConstant.IMG_PATH_SEP+data,uniqueKey);
 		}else if (SendMsgType.FILE.toValue().equals(type)){
-			LOG.info("发送文件 {}:{}",nickName,realImgUploadPath+data);
-			return MessageTools.sendFileMsgByUserId(toUserName,realFileUploadPath+data,uniqueKey);
+			LOG.info("发送文件 {}:{}",nickName,UploadConstant.FILE_PATH_SEP+data);
+			return MessageTools.sendFileMsgByUserId(toUserName,UploadConstant.FILE_PATH_SEP+data,uniqueKey);
 		}
 		return false;
 	}
@@ -77,11 +75,11 @@ public class MessageTools implements LogInterface {
 			LOG.info("发送文本 {}:{}", nickName, data);
 			return MessageTools.sendMsgByNickNameApi(data, nickName, uniqueKey, isGroup);
 		}else if (SendMsgType.IMG.toValue().equals(type)){
-			LOG.info("发送图片 {}:{}", nickName, realImgUploadPath+data);
-			return MessageTools.sendPicMsgByNickNameApi(nickName, realImgUploadPath + data, uniqueKey, isGroup);
+			LOG.info("发送图片 {}:{}", nickName, UploadConstant.IMG_PATH_SEP+data);
+			return MessageTools.sendPicMsgByNickNameApi(nickName, UploadConstant.IMG_PATH_SEP + data, uniqueKey, isGroup);
 		}else if (SendMsgType.FILE.toValue().equals(type)){
-			LOG.info("发送文件 {}:{}",nickName,realImgUploadPath+data);
-			return MessageTools.sendFileMsgByNickNameApi(nickName,realFileUploadPath+data,uniqueKey,isGroup);
+			LOG.info("发送文件 {}:{}",nickName,UploadConstant.FILE_PATH_SEP+data);
+			return MessageTools.sendFileMsgByNickNameApi(nickName,UploadConstant.FILE_PATH_SEP+data,uniqueKey,isGroup);
 		}
 		return false;
 	}

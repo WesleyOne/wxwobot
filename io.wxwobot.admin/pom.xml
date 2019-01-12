@@ -7,7 +7,7 @@
   <groupId>io.wxwobot</groupId>
   <artifactId>admin</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
 
   <name>wxwobot</name>
   <url>https://gitee.com/wesleyOne/wxwobot</url>
@@ -37,25 +37,27 @@
     <pro.jdbc.agent.username>root</pro.jdbc.agent.username>
     <pro.jdbc.agent.password>root</pro.jdbc.agent.password>
     <pro.devMode>true</pro.devMode>
-    <log.level>debug</log.level>
+    <pro.undertow.devMode>true</pro.undertow.devMode>
     <pro.user.hotreload>true</pro.user.hotreload>
-    <pro.cookie.domain>localhost</pro.cookie.domain>
-    <pro.domain.img>http://localhost:8180/img/</pro.domain.img>
-    <pro.domain.file>http://localhost:8180/file/</pro.domain.file>
-
-    <log.file.path>/home/www/output/logs/wxrobot</log.file.path>
-    <pro.upload.img.realpath>D:\IdeaProjects\io.wxwobot\io.wxwobot.admin\src\main\webapp\img</pro.upload.img.realpath>
-    <pro.upload.file.realpath>D:\IdeaProjects\io.wxwobot\io.wxwobot.admin\src\main\webapp\file</pro.upload.file.realpath>
-    <pro.upload.reload.realpath>D:\IdeaProjects\io.wxwobot\io.wxwobot.admin\src\main\webapp\reload</pro.upload.reload.realpath>
+    <pro.domain.host>localhost</pro.domain.host>
+    <pro.domain.port>8180</pro.domain.port>
+    <log.level>debug</log.level>
+    <log.file.path>/Users/wesley/output/logs/wxrobot</log.file.path>
   </properties>
   <profiles>
     <profile>
-      <id>mac</id>
+      <id>uat</id>
       <properties>
-        <log.file.path>/Users/wesley/output/logs/wxrobot</log.file.path>
-        <pro.upload.img.realpath>/Users/wesley/IdeaProjects/wxwobot/io.wxwobot.admin/src/main/webapp/img</pro.upload.img.realpath>
-        <pro.upload.file.realpath>/Users/wesley/IdeaProjects/wxwobot/io.wxwobot.admin/src/main/webapp/file</pro.upload.file.realpath>
-        <pro.upload.reload.realpath>/Users/wesley/IdeaProjects/wxwobot/io.wxwobot.admin/src/main/webapp/reload</pro.upload.reload.realpath>
+        <pro.jdbc.agent.url><![CDATA[jdbc:mysql://127.0.0.1:3306/wxwobot?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull]]></pro.jdbc.agent.url>
+        <pro.jdbc.agent.username>root</pro.jdbc.agent.username>
+        <pro.jdbc.agent.password>root</pro.jdbc.agent.password>
+        <pro.devMode>false</pro.devMode>
+        <pro.undertow.devMode>false</pro.undertow.devMode>
+        <pro.user.hotreload>true</pro.user.hotreload>
+        <pro.domain.host>localhost</pro.domain.host>
+        <pro.domain.port>8180</pro.domain.port>
+        <log.level>info</log.level>
+        <log.file.path>/home/www/output/logs/wxrobot</log.file.path>
       </properties>
     </profile>
   </profiles>
@@ -70,19 +72,19 @@
     <dependency>
       <groupId>com.jfinal</groupId>
       <artifactId>jfinal</artifactId>
-      <version>3.4</version>
+      <version>3.5</version>
     </dependency>
     <dependency>
       <groupId>com.jfinal</groupId>
       <artifactId>cos</artifactId>
       <version>2017.5</version>
     </dependency>
-    <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>3.1.0</version>
-        <scope>provided</scope>
-    </dependency>
+    <!--<dependency>-->
+        <!--<groupId>javax.servlet</groupId>-->
+        <!--<artifactId>javax.servlet-api</artifactId>-->
+        <!--<version>3.1.0</version>-->
+        <!--&lt;!&ndash;<scope>provided</scope>&ndash;&gt;-->
+    <!--</dependency>-->
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>druid</artifactId>
@@ -160,10 +162,15 @@
         <artifactId>guava</artifactId>
         <version>20.0</version>
     </dependency>
-
+    <dependency>
+      <groupId>com.jfinal</groupId>
+      <artifactId>jfinal-undertow</artifactId>
+      <version>1.4</version>
+    </dependency>
   </dependencies>
+
   <build>
-    <finalName>ROOT</finalName>
+    <finalName>wxwobot</finalName>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -176,22 +183,71 @@
     </resources>
     <plugins>
       <plugin>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>maven-jetty-plugin</artifactId>
-        <version>6.1.10</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.6.1</version>
         <configuration>
-          <contextPath>/</contextPath>
-          <scanIntervalSeconds>1</scanIntervalSeconds>
-          <stopKey>foo</stopKey>
-          <stopPort>9990</stopPort>
-          <connectors>
-            <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-              <port>8180</port>
-              <maxIdleTime>60000</maxIdleTime>
-            </connector>
-          </connectors>
+          <source>1.8</source>
+          <target>1.8</target>
+          <encoding>UTF-8</encoding>
+          <!-- java8 保留参数名编译参数 -->
+          <compilerArgument>-parameters</compilerArgument>
+          <compilerArguments><verbose /></compilerArguments>
         </configuration>
       </plugin>
+
+      <!--
+          jar 包中的配置文件优先级高于 config 目录下的 "同名文件"
+          因此，打包时需要排除掉 jar 包中来自 src/main/resources 目录的
+          配置文件，否则部署时 config 目录中的同名配置文件不会生效
+       -->
+      <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-jar-plugin</artifactId>-->
+        <!--<version>2.6</version>-->
+        <!--<configuration>-->
+          <!--<excludes>-->
+            <!--<exclude>*.txt</exclude>-->
+            <!--<exclude>*.xml</exclude>-->
+            <!--<exclude>*.properties</exclude>-->
+          <!--</excludes>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
+
+      <!--
+          使用 mvn clean package 打包
+          更多配置可参考官司方文档：http://maven.apache.org/plugins/maven-assembly-plugin/single-mojo.html
+       -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+
+            <configuration>
+              <!-- 打包生成的文件名 -->
+              <finalName>${project.name}</finalName>
+              <!-- jar 等压缩文件在被打包进入 zip、tar.gz 时是否压缩，设置为 false 可加快打包速度 -->
+              <recompressZippedFiles>false</recompressZippedFiles>
+              <!-- 打包生成的文件是否要追加 release.xml 中定义的 id 值 -->
+              <appendAssemblyId>true</appendAssemblyId>
+              <!-- 指向打包描述文件 package.xml -->
+              <descriptors>
+                <descriptor>package.xml</descriptor>
+              </descriptors>
+              <!-- 打包结果输出的基础目录 -->
+              <outputDirectory>${project.build.directory}/</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 </project>

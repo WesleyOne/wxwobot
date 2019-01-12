@@ -100,8 +100,10 @@
                     msgFilesTooMany : "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
                 }).on("fileuploaded",function(event, data, previewId, index) {
                     if (data.response.code == "00") {
-                        $('#result_name').html(data.response.name);
-                        $('#result_url').html(data.response.url);
+                        var filename = data.response.name;
+                        var fileurl = '#(filedomain)'+filename;
+                        $('#result_name').html(filename);
+                        $('#result_url').html(fileurl);
                     } else {
                         bootbox.alert("文件上传失败,请重试:"
                             + data.response.message);
@@ -134,9 +136,11 @@
                     msgFilesTooMany : "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
                 }).on("fileuploaded",function(event, data, previewId, index) {
                         if (data.response.code == "00") {
-                            $('#result_name').html(data.response.name);
-                            $('#result_url').html(data.response.url);
-                            $('#showDataImg').attr("src",data.response.url);
+                            var imgname = data.response.name;
+                            var imgurl = '#(imgDomain)'+imgname;
+                            $('#result_name').html(imgname);
+                            $('#result_url').html(imgurl);
+                            $('#showDataImg').attr("src",imgurl);
                             $('#showDataImg').show();
                         } else {
                             bootbox.alert("图片上传失败,请重试:"
