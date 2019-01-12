@@ -1,27 +1,27 @@
-<a href="https://github.com/yaphone/itchat4j"># wxwobot</a>
+### <a href="https://gitee.com/wesleyOne/wxwobot">wxwobot 某信运营自助工具</a>
 
 #### 项目介绍
 - 项目简介：某信WEB端的自助工具
 - 基于<a href="https://github.com/yaphone/itchat4j">itchat4j开源项目</a>开发
+- 支持多开/热登录/远程操作等特点
 
 #### 项目特点
 - 支持多账号
 - 重启项目热登录
-- 消息使用队列间隔时间发送，减少被封几率
-- 其他业务访问项目的对外接口，可实现消息转发到某信(需布置到公网环境)
+- 消息统一使用队列，间隔时间发送，减少被封几率
+- 其他业务访问本项目的对外接口，可实现消息转发到某信
 - 自动回复（默认效果是全匹配关键字回复和进群欢迎语）
 - jfinal-undertow开发部署的种种优势
-- 有开发能力可自行实现消息的处理
+- 扩展方便，有开发能力可自行实现消息的处理
 
 #### 项目缺点
 - WEB端接口有限，功能有些鸡肋
 - 没有合适的用户(群)唯一识别码，本项目使用用户(群)昵称作为标识，存在隐患
 - 代码不够优美，性能有待提高
 
-#### 软件组成
-- JDK1.8 + JFinal3.5 + undertow + mysql 
-- Bootstrap3+及相关插件
-- ......
+#### 项目组成
+- 后台：JDK1.8 + JFinal3.5 + undertow + mysql + 常用工具包
+- 前端：Bootstrap3+及相关插件
 
 #### 安装教程
 
@@ -46,7 +46,7 @@
 (是的，不需要布置tomcat之类的服务器)
 
 **常见问题**
-https://www.jfinal.com/doc/1-5
+[开发部署常见问题](https://www.jfinal.com/doc/1-5)
 
 #### 鸣谢
 <ul>
@@ -60,4 +60,10 @@ https://www.jfinal.com/doc/1-5
     <li><a href="https://promotion.aliyun.com/ntms/yunparter/invite.html?userCode=dnuqwh0e" target="_blank">阿里云推广计划</a></li>
 </ul>
 
-#### 众筹植发(滑稽)
+#### 技术交流群
+![QQ技术交流群](https://images.gitee.com/uploads/images/2019/0113/041630_383a6659_1581722.png "wxwobot_qq_qrcode.png")
+
+#### "众筹植发"(滑稽)
+![微信赞赏码](https://images.gitee.com/uploads/images/2019/0113/042649_289c8048_1581722.png "wxpay.png")
+![支付宝投币](https://images.gitee.com/uploads/images/2019/0113/042713_29e35e1a_1581722.jpeg "zhipay.jpg")
+[![阿里云推广](https://images.gitee.com/uploads/images/2019/0113/043826_4dbc36f4_1581722.png "源码页980-60.png")](https://promotion.aliyun.com/ntms/act/qwbk.html?userCode=dnuqwh0e)
