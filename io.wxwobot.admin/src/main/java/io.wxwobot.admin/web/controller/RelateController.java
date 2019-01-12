@@ -26,7 +26,6 @@ public class RelateController extends _BaseController {
         if (StringUtils.isNotEmpty(searchUk)){
             setAttr("search_uk",searchUk);
         }
-        setAttr("active","relate");
         renderTemplate("index.html");
     }
 
@@ -57,7 +56,7 @@ public class RelateController extends _BaseController {
         }
 
         Page<WxRobRelation> page = WxRobRelation.dao.paginate(pageNum, rows, "select * ",
-                " from wx_rob_relation with(nolock) "+where);
+                " from wx_rob_relation "+where);
 
         setAttrs(buildPagination(page.getList(), page.getTotalRow()));
         render(new JsonRender().forIE());
@@ -92,7 +91,6 @@ public class RelateController extends _BaseController {
         setAttr("isEdit",isEdit);
         setAttr("form",wxRobRelation);
         setAttr("groupNickNames",groupNickNames);
-        setAttr("active","relate");
         renderTemplate("editIndex.html");
     }
 

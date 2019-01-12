@@ -26,7 +26,7 @@ public class VisitLogInterceptor implements Interceptor {
 		String uid = inv.getController().getCookie("uid");
 		String sid = inv.getController().getCookie("sid");
 		String ip = IpUtil.getRealIp(inv.getController().getRequest());
-        LOG.info("{} - {}-{} 操作了 {}",ip,uid,sid,requestUrl);
+        LOG.info("{} - {} - {} 操作了 {}",ip,uid,sid,requestUrl);
 
 		inv.getController().setAttr("active",inv.getController().getControllerKey());
 

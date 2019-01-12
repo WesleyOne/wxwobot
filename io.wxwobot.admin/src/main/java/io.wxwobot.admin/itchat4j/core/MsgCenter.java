@@ -198,11 +198,11 @@ public class MsgCenter implements LogInterface {
 								msgHandler.videoMsgHandle(msg);
 							} else if (msg.getType().equals(MsgTypeEnum.NAMECARD.getType())) {
 								msgHandler.nameCardMsgHandle(msg);
-							} else if (msg.getType().equals(MsgTypeEnum.SYS.getType())) { // 系统消息
+							} else if (msg.getType().equals(MsgTypeEnum.SYS.getType())) {
 								msgHandler.sysMsgHandle(msg);
-							} else if (msg.getType().equals(MsgTypeEnum.VERIFYMSG.getType())) { // 确认添加好友消息
+							} else if (msg.getType().equals(MsgTypeEnum.VERIFYMSG.getType())) {
 								msgHandler.verifyAddFriendMsgHandle(msg);
-							} else if (msg.getType().equals(MsgTypeEnum.MEDIA.getType())) { // 多媒体消息
+							} else if (msg.getType().equals(MsgTypeEnum.MEDIA.getType())) {
 								msgHandler.mediaMsgHandle(msg);
 							} else{
 								LOG.warn("暂未处理信息【{}】", msg.getType());

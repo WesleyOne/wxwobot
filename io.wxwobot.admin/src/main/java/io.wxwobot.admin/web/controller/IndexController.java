@@ -1,8 +1,6 @@
 package io.wxwobot.admin.web.controller;
 
 import com.jfinal.kit.PropKit;
-import com.jfinal.plugin.activerecord.Db;
-import com.jfinal.plugin.activerecord.Record;
 import io.wxwobot.admin.web.annotation.UnCheckLogin;
 import io.wxwobot.admin.web.cache.UserSession;
 import io.wxwobot.admin.web.utils.MD5Util;
@@ -29,6 +27,12 @@ public class IndexController extends _BaseController {
 
     @UnCheckLogin
     public void login(){
+
+        // 测试免登录
+        if (PropKit.getBoolean("devMode")){
+            redirect("/loginPost?username=wxwobot&password=wxwobot",true);
+            return;
+        }
         renderTemplate("login.html");
     }
 

@@ -8,7 +8,6 @@ package io.wxwobot.admin.web.controller;
 public class ToolController extends _BaseController {
 
     public void index(){
-        setAttr("active","tool");
         renderTemplate("index.html");
     }
 

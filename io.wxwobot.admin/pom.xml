@@ -40,8 +40,8 @@
     <log.level>debug</log.level>
     <pro.user.hotreload>true</pro.user.hotreload>
     <pro.cookie.domain>localhost</pro.cookie.domain>
-    <pro.domain.img>http://localhost/img/</pro.domain.img>
-    <pro.domain.file>http://localhost/file/</pro.domain.file>
+    <pro.domain.img>http://localhost:8180/img/</pro.domain.img>
+    <pro.domain.file>http://localhost:8180/file/</pro.domain.file>
 
     <log.file.path>/home/www/output/logs/wxrobot</log.file.path>
     <pro.upload.img.realpath>D:\IdeaProjects\io.wxwobot\io.wxwobot.admin\src\main\webapp\img</pro.upload.img.realpath>
@@ -53,9 +53,9 @@
       <id>mac</id>
       <properties>
         <log.file.path>/Users/wesley/output/logs/wxrobot</log.file.path>
-        <pro.upload.img.realpath>/Users/wesley/output/images/rob/img</pro.upload.img.realpath>
-        <pro.upload.file.realpath>/Users/wesley/output/images/rob/file</pro.upload.file.realpath>
-        <pro.upload.reload.realpath>/Users/wesley/output/images/rob/reload</pro.upload.reload.realpath>
+        <pro.upload.img.realpath>/Users/wesley/IdeaProjects/wxwobot/io.wxwobot.admin/src/main/webapp/img</pro.upload.img.realpath>
+        <pro.upload.file.realpath>/Users/wesley/IdeaProjects/wxwobot/io.wxwobot.admin/src/main/webapp/file</pro.upload.file.realpath>
+        <pro.upload.reload.realpath>/Users/wesley/IdeaProjects/wxwobot/io.wxwobot.admin/src/main/webapp/reload</pro.upload.reload.realpath>
       </properties>
     </profile>
   </profiles>
@@ -186,7 +186,7 @@
           <stopPort>9990</stopPort>
           <connectors>
             <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-              <port>8080</port>
+              <port>8180</port>
               <maxIdleTime>60000</maxIdleTime>
             </connector>
           </connectors>

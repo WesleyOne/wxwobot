@@ -41,7 +41,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
          * 3.同个关键字只发最新创建的
          */
 
-        WxRobConfig robConfig = WxRobConfig.dao.findFirst("SELECT TOP 1 * FROM wx_rob_config WHERE unique_key = ?", uniqueKey);
+        WxRobConfig robConfig = WxRobConfig.dao.findFirst("SELECT * FROM wx_rob_config WHERE unique_key = ? LIMIT 1", uniqueKey);
         if(robConfig != null && robConfig.getEnable()){
             // 判断是否要回复
             boolean isOpen = false;
@@ -54,7 +54,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
                 isOpen = true;
             }
             if (isOpen){
-                WxRobKeyword robKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, text,fromNickName,msg.isGroupMsg()?1:0);
+                WxRobKeyword robKeyword = WxRobKeyword.dao.findFirst("SELECT * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC LIMIT 1", uniqueKey, text,fromNickName,msg.isGroupMsg()?1:0);
                 if (sendDataByType(fromUserName, robKeyword,groupMsg)) {
                     return;
                 }
@@ -72,7 +72,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
             }
 
             if (isOpen){
-                WxRobKeyword defaultRobKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, text,ConfigKeys.DEAFAULT_KEYWORD,msg.isGroupMsg()?1:0);
+                WxRobKeyword defaultRobKeyword = WxRobKeyword.dao.findFirst("SELECT * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC LIMIT 1", uniqueKey, text,ConfigKeys.DEAFAULT_KEYWORD,msg.isGroupMsg()?1:0);
                 if (sendDataByType(fromUserName, defaultRobKeyword, groupMsg)) {
                     return;
                 }
@@ -126,7 +126,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
 
         if (StringUtils.isNotEmpty(newNickName)){
 
-            WxRobConfig robConfig = WxRobConfig.dao.findFirst("SELECT TOP 1 * FROM wx_rob_config WHERE unique_key = ?", uniqueKey);
+            WxRobConfig robConfig = WxRobConfig.dao.findFirst("SELECT * FROM wx_rob_config WHERE unique_key = ? LIMIT 1", uniqueKey);
             if(robConfig != null && robConfig.getEnable()){
                 // 判断是否要回复
                 boolean isOpen = false;
@@ -135,7 +135,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
                     isOpen = true;
                 }
                 if (isOpen){
-                    WxRobKeyword robKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, ConfigKeys.DEAFAULT_WELCOME,fromNickName,msg.isGroupMsg()?1:0);
+                    WxRobKeyword robKeyword = WxRobKeyword.dao.findFirst("SELECT * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC LIMIT 1", uniqueKey, ConfigKeys.DEAFAULT_WELCOME,fromNickName,msg.isGroupMsg()?1:0);
                     if (sendSysWelcomeMsg(fromUserName, newNickName, robKeyword, groupMsg)){ return;}
                 }
 
@@ -146,7 +146,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
                     isOpen = true;
                 }
                 if (isOpen){
-                    WxRobKeyword defaultRobKeyword = WxRobKeyword.dao.findFirst("SELECT TOP 1 * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC", uniqueKey, ConfigKeys.DEAFAULT_WELCOME, ConfigKeys.DEAFAULT_KEYWORD,msg.isGroupMsg()?1:0);
+                    WxRobKeyword defaultRobKeyword = WxRobKeyword.dao.findFirst("SELECT * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC LIMIT 1", uniqueKey, ConfigKeys.DEAFAULT_WELCOME, ConfigKeys.DEAFAULT_KEYWORD,msg.isGroupMsg()?1:0);
                     if (sendSysWelcomeMsg(fromUserName, newNickName, defaultRobKeyword, groupMsg)){ return;}
                 }
             }

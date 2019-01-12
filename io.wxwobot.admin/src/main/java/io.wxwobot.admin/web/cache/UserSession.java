@@ -1,5 +1,6 @@
 package io.wxwobot.admin.web.cache;
 
+import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.web.utils.LRUCache;
 
 import java.util.LinkedHashMap;

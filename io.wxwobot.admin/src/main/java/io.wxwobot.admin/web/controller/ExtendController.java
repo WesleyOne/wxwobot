@@ -24,8 +24,8 @@ public class ExtendController extends _BaseController {
      * msg     消息列表
      *         类型参考@see     io.wxwobot.admin.itchat4j.utils.enums.SendMsgType
      *          TEXT     文本消息串
-     *          IMG      图片名串（需要后台上传获取）
-     *          FILE     文件名串（需要后台上传获取）
+     *          IMG      图片名串（需要后台-通用工具-上传获取）
+     *          FILE     文件名串（需要后台-通用工具-上传获取）
      *  例子:
      *  {"ok":"test123",
      *   "msg":[
@@ -59,7 +59,7 @@ public class ExtendController extends _BaseController {
             return;
         }
 
-        WxRobRelation relationRecord = WxRobRelation.dao.findFirst("SELECT TOP 1 * FROM wx_rob_relation with(nolock) WHERE out_key = ? ", outKey);
+        WxRobRelation relationRecord = WxRobRelation.dao.findFirst("SELECT * FROM wx_rob_relation WHERE out_key = ? LIMIT 1", outKey);
 
         /**
          * 校验IP

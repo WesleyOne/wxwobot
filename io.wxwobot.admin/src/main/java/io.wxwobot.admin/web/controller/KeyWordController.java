@@ -24,7 +24,6 @@ public class KeyWordController extends _BaseController{
         if (StringUtils.isNotEmpty(uniqueKey)){
             setAttr("search_uk",uniqueKey);
         }
-        setAttr("active","kw");
         setAttr("keys",KeyMsgValueType.LIST_KV);
         setAttr("imgdomain",PropKit.get("imgDomain"));
         setAttr("filedomain",PropKit.get("fileDomain"));
@@ -64,7 +63,7 @@ public class KeyWordController extends _BaseController{
         }
 
         Page<WxRobKeyword> page = WxRobKeyword.dao.paginate(pageNum, rows, "select * ",
-                " from wx_rob_keyword with(nolock) "+where);
+                " from wx_rob_keyword "+where);
 
         setAttrs(buildPagination(page.getList(), page.getTotalRow()));
         render(new JsonRender().forIE());
@@ -91,7 +90,6 @@ public class KeyWordController extends _BaseController{
         setAttr("isEdit",isEdit);
         setAttr("form",kwRecord);
 
-        setAttr("active","kw");
         setAttr("keys",KeyMsgValueType.LIST_KV);
         setAttr("imgdomain",PropKit.get("imgDomain"));
         setAttr("filedomain",PropKit.get("fileDomain"));

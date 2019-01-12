@@ -25,7 +25,6 @@ public class RobotController extends _BaseController {
      * 机器人页面
      */
     public void index(){
-        setAttr("active","rob");
         renderTemplate("index.html");
     }
 
@@ -51,7 +50,7 @@ public class RobotController extends _BaseController {
         }
 
         Page<WxRobConfig> page = WxRobConfig.dao.paginate(pageNum, rows, "select * ",
-                " from wx_rob_config with(nolock) "+where);
+                " from wx_rob_config "+where);
         //其他处理
         List<WxRobConfig> dataList = page.getList();
         if (CollectionUtils.isNotEmpty(dataList)){
@@ -70,7 +69,6 @@ public class RobotController extends _BaseController {
      * 机器人页面
      */
     public void addIndex(){
-        setAttr("active","rob");
         renderTemplate("addIndex.html");
     }
 
@@ -85,7 +83,7 @@ public class RobotController extends _BaseController {
             return;
         }
 
-        Record remarkRecord = Db.findFirst("SELECT TOP 1 remark FROM wx_rob_config with(nolock) WHERE remark = ?", remark);
+        Record remarkRecord = Db.findFirst("SELECT remark FROM wx_rob_config WHERE remark = ? LIMIT 1", remark);
         if (vldParamNull(remarkRecord != null,"备注已存在")){
             return;
         }
@@ -175,7 +173,7 @@ public class RobotController extends _BaseController {
             return;
         }
 
-        Record remarkRecord = Db.findFirst("SELECT TOP 1 remark FROM wx_rob_config with(nolock) WHERE remark = ?", remark);
+        Record remarkRecord = Db.findFirst("SELECT remark FROM wx_rob_config WHERE remark = ? LIMIT 1", remark);
         if (vldParamNull(remarkRecord != null,"备注已存在")){
             return;
         }

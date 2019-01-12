@@ -113,7 +113,7 @@
                 {
                     language : 'zh', //设置语言
                     uploadUrl : "/upload/img2local", //上传的地址
-                    allowedFileExtensions : [ 'jpg','gif', 'png' ],//接收的文件后缀
+                    allowedFileExtensions : [ 'jpg','gif', 'png', 'jpeg' ],//接收的文件后缀
                     uploadExtraData:function(){
                         var pre = $('#prefix_title').val();
                         return {'fn':pre+"_extimg"};
