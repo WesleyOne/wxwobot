@@ -23,7 +23,7 @@ MAIN_CLASS=io.wxwobot.admin.web.common.MyConfig
 # Java 命令行参数，根据需要开启下面的配置，改成自己需要的，注意等号前后不能有空格
 # JAVA_OPTS="-Xms256m -Xmx1024m -Dundertow.port=80 -Dundertow.host=0.0.0.0"
 # JAVA_OPTS="-Dundertow.port=80 -Dundertow.host=0.0.0.0"
-JAVA_OPTS="-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.$$.log -Djava.security.egd=file:/dev/./urandom -Xms500m -Xmx500m  -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:+UseConcMarkSweepGC -Xmn400m -Xss328k"
+JAVA_OPTS="-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/home/www/output/logs/wxrobot/gc.$$.log -Djava.security.egd=file:/dev/./urandom -Xms500m -Xmx500m  -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:+UseConcMarkSweepGC -Xmn400m -Xss328k"
 
 # 生成 class path 值
 APP_BASE_PATH=$(cd `dirname $0`; pwd)
@@ -36,7 +36,7 @@ CP=${APP_BASE_PATH}/config:${APP_BASE_PATH}/lib/*
 # nohup java -Xverify:none ${JAVA_OPTS} -cp ${CP} ${MAIN_CLASS} >/dev/null 2>&1 &
 
 # 运行为后台进程，并且将信息输出到 output.log 文件
-nohup java -Xverify:none ${JAVA_OPTS} -cp ${CP} ${MAIN_CLASS} > output.log 2>&1 &
+nohup java -Xverify:none ${JAVA_OPTS} -cp ${CP} ${MAIN_CLASS} > /home/www/output/logs/wxrobot/output.log 2>&1 &
 
 # 运行为非后台进程，多用于开发阶段，快捷键 ctrl + c 可停止服务
 # java -Xverify:none ${JAVA_OPTS} -cp ${CP} ${MAIN_CLASS}
