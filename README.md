@@ -1,6 +1,30 @@
 ### <a href="https://gitee.com/wesleyOne/wxwobot">wxwobot 某信运营自助工具</a>
 [![star](https://gitee.com/wesleyOne/wxwobot/badge/star.svg?theme=dark)](https://gitee.com/wesleyOne/wxwobot/stargazers)
 [![fork](https://gitee.com/wesleyOne/wxwobot/badge/fork.svg?theme=dark)](https://gitee.com/wesleyOne/wxwobot/members)
+
+#### 项目介绍
+- 项目简介：模拟某信WEB端接口的自助机器人
+- 基于<a href="https://github.com/yaphone/itchat4j">itchat4j开源项目</a>开发
+- 支持多开/热登录/远程操作等特点
+
+#### 项目特点
+- 支持多账号
+- 重启项目热登录
+- 消息统一使用队列，间隔时间发送，减少被封几率
+- 其他业务访问本项目的对外接口，可实现消息转发到某信
+- 自动回复（默认效果是全匹配关键字回复和进群欢迎语）
+- jfinal-undertow开发部署的种种优势
+- 扩展方便，有开发能力可自行实现消息的处理
+
+#### 项目缺点
+- WEB端接口有限，功能有些鸡肋，传说WEB端即将关闭
+- 没有合适的用户(群)唯一识别码，本项目使用用户(群)昵称作为标识，存在隐患
+- 代码不够优美，性能有待提高
+
+#### 项目组成
+- 后台：JDK1.8 + JFinal3.5 + undertow + mysql + 常用工具包
+- 前端：Bootstrap3+及相关插件
+
 #### 线上DEMO
 [点击跳转=>>在线DEMO 账号密码都是wxwobot](http://wxwobot.51guagua.top)
 - 由于是公开的线上项目，注意下自己的账号安全
@@ -26,35 +50,47 @@
 
 ![新增关键字](https://images.gitee.com/uploads/images/2019/0114/000816_81da763e_1581722.png "keyword.png")
 
-**外接配置**：机器人管理->点击相应机器人的【新增外接配置】-> 选择外接发送消息的目标，业务层的IP白名单->提交后点击顶部栏目【对外接口配置】，找到刚才的配置，启用
-> 外接和测试发送的区别在于**外接可以解耦合**
+**外接配置**：机器人管理->点击相应机器人的【新增外接配置】-> 选择外接发送消息的目标，业务层的IP白名单->提交后点击顶部栏目【对外接口配置】，找到刚才的配置获取**外接唯一码**，点击启用
+> 外接和测试发送的区别在于**外接可以解耦合**，可以由外部访问接口形式转发消息，本项目只做独立中台，不涉及业务
 
 ![外接配置](https://images.gitee.com/uploads/images/2019/0114/001510_caa748a6_1581722.png "weijiejiekou.png")
 
-#### 项目介绍
-- 项目简介：模拟某信WEB端接口的自助机器人
-- 基于<a href="https://github.com/yaphone/itchat4j">itchat4j开源项目</a>开发
-- 支持多开/热登录/远程操作等特点
+```
+    调用接口io.wxwobot.admin.web.controller.ExtendController
+    /**
+     * 对外通用规则发消息
+     * url: /ext/sendMsg
+     * 请求类型: Post
+     * 参数:
+     * ok      外接唯一码
+     * msg     消息列表
+     *         类型参考 @see     io.wxwobot.admin.itchat4j.utils.enums.SendMsgType
+     *          TEXT     文本消息串
+     *          IMG      图片名串（需要后台-通用工具-上传获取）
+     *          FILE     文件名串（需要后台-通用工具-上传获取）
+     *  例子:
+     *  {"ok":"test123",
+     *   "msg":[
+     *       {"type":"TEXT","body":"我是消息体"},
+     *       {"type":"IMG","body":"ty6yLk3X_1545142908614.jpg"},
+     *       {"type":"FILE","body":"ty6yLk3X_1545142537914.txt"},
+     *   ]
+     *  }
+     *
+     *  说明:
+     *      发送顺序按照列表顺序从前往后发
+     *
+     * 返回:
+     * 00   成功
+     * 01   外接码不存在
+     * 02   外接码失效
+     * 03   IP未通过审核
+     *
+     */
+    public void sendMsg();
+```
 
-#### 项目特点
-- 支持多账号
-- 重启项目热登录
-- 消息统一使用队列，间隔时间发送，减少被封几率
-- 其他业务访问本项目的对外接口，可实现消息转发到某信
-- 自动回复（默认效果是全匹配关键字回复和进群欢迎语）
-- jfinal-undertow开发部署的种种优势
-- 扩展方便，有开发能力可自行实现消息的处理
-
-#### 项目缺点
-- WEB端接口有限，功能有些鸡肋，传说WEB端即将关闭
-- 没有合适的用户(群)唯一识别码，本项目使用用户(群)昵称作为标识，存在隐患
-- 代码不够优美，性能有待提高
-
-#### 项目组成
-- 后台：JDK1.8 + JFinal3.5 + undertow + mysql + 常用工具包
-- 前端：Bootstrap3+及相关插件
-
-#### 安装教程
+#### 开发部署
 
 **准备**
 - 使用 wxwobot.sql 中的 sql 语句创建数据库与数据库表
