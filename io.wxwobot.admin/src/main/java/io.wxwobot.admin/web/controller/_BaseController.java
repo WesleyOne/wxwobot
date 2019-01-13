@@ -192,7 +192,7 @@ public class _BaseController extends Controller {
     public String getUniqueKey() throws BaseException {
         String uniqueKey = getPara("_ck", "");
         if (StringUtils.isEmpty(uniqueKey)){
-            throw new BaseException("CoreKey为空");
+            throw new BaseException("机器唯一码为空");
         }
         return uniqueKey;
     }

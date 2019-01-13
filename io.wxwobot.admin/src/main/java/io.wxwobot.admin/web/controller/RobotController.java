@@ -5,12 +5,15 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.render.JsonRender;
+import io.wxwobot.admin.itchat4j.core.Core;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
+import io.wxwobot.admin.web.base.BaseException;
 import io.wxwobot.admin.web.model.WxRobConfig;
 import io.wxwobot.admin.web.utils.UUIDShortUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -187,6 +190,34 @@ public class RobotController extends _BaseController {
             setData(update);
         }
         renderJson();
+    }
+
+    /**
+     * 发送页面
+     */
+    public void sendIndex() throws BaseException {
+        String uniqueKey = getUniqueKey();
+        Core core = CoreManage.getInstance(uniqueKey);
+        List<JSONObject> sourceSendList = new ArrayList<>();
+        sourceSendList.addAll( core.getGroupList());
+        sourceSendList.addAll( core.getContactList());
+        List<JSONObject> targetList = new ArrayList<>();
+        JSONObject filehelper = new JSONObject();
+        filehelper.put("UserName","filehelper");
+        filehelper.put("NickName","文件传输助手");
+        targetList.add(filehelper);
+        for (JSONObject jsonObject : sourceSendList) {
+            JSONObject newObject = new JSONObject();
+            if (StringUtils.isEmpty(jsonObject.getString("NickName"))){
+                continue;
+            }
+            newObject.put("NickName",jsonObject.getString("NickName"));
+            newObject.put("UserName",jsonObject.getString("UserName"));
+            targetList.add(newObject);
+        }
+        setAttr("uniqueKey",uniqueKey);
+        setAttr("targetList",targetList);
+        renderTemplate("sendIndex.html");
     }
 
 }

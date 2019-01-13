@@ -5,6 +5,7 @@ import io.wxwobot.admin.itchat4j.api.WechatTools;
 import io.wxwobot.admin.itchat4j.controller.LoginController;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.service.impl.LoginServiceImpl;
+import io.wxwobot.admin.itchat4j.utils.enums.SendMsgType;
 import io.wxwobot.admin.web.base.BaseException;
 
 import java.io.IOException;
@@ -163,6 +164,16 @@ public class RobotWorkController extends _BaseController {
         renderJson();
     }
 
+    public void testSend() throws BaseException {
 
+        JSONObject postParam = getPostParam();
+        String uniqueKey = postParam.getString("uniqueKey");
+        String data = postParam.getString("valueData");
+        String userName = postParam.getString("userName");
+        String typeData = postParam.getString("typeData");
+
+        CoreManage.addSendMsg(uniqueKey,userName,data, SendMsgType.fromValue(typeData));
+        renderJson();
+    }
 
 }

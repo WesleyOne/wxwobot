@@ -28,9 +28,9 @@
             <span class="glyphicon glyphicon-search" aria-hidden="true"></span>搜索
         </button>
         <a type="button" class="btn btn-primary" href="/rob/addIndex"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>添加机器人</a>
-        <button type="button" class="btn btn-primary" id="manualCopy">
-            <span class="glyphicon glyphicon-cloud" aria-hidden="true"></span>持久化热登信息
-        </button>
+        <!--<button type="button" class="btn btn-primary" id="manualCopy">-->
+            <!--<span class="glyphicon glyphicon-cloud" aria-hidden="true"></span>持久化热登信息-->
+        <!--</button>-->
     </div>
     <table id="rob_config" class="table table-hover" ></table>
 </div>
@@ -145,8 +145,9 @@
                                                 var btn = "<button type='button' class='btn btn-danger btn-xs' onclick='wxlogout(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>已在线-退出</button>";
                                                 var refresh_1 = "<button type='button' class='btn btn-info btn-xs' onclick='refresh_data(\""+row['uniqueKey']+"\")'>刷新群列表</button>";
                                                 var group_1 = "<button type='button' class='btn btn-warning btn-xs' onclick='openGroup(\""+row['uniqueKey']+"\")'>查看群列表</button>";
+                                                var test_send_1 = "<a type='button' class='btn btn-default btn-xs' href='/rob/sendIndex?_ck="+row['uniqueKey']+"'>测试发送</a>";
                                                 // var btn_reboot = "<button type='button' class='btn btn-danger btn-xs' onclick='wxReboot(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>重&nbsp;&nbsp;启</button>";
-                                                result = btn+refresh_1+group_1;
+                                                result = btn+refresh_1+group_1+test_send_1;
                                                 break;
                                             case false:
                                                 var btn = "<button type='button' class='btn btn-primary btn-xs' onclick='wxloginPost(\""+row['uniqueKey']+"\",\""+row['remark']+"\")'>已下线-登录</button>";

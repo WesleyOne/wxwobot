@@ -264,16 +264,19 @@ public class CoreManage implements LogInterface {
     /**
      * 消息统一加到队列里处理
      * @param uniqueKey
-     * @param fromUserName
+     * @param toUserName
      * @param data
      * @param type
-     * @param isGroup
      */
-    public static void addSendMsg(String uniqueKey, String fromUserName, String data, SendMsgType type, boolean isGroup){
+    public static void addSendMsg(String uniqueKey, String toUserName, String data, SendMsgType type){
         SendMsg sendMsg = new SendMsg();
-        sendMsg.setUserName(fromUserName);
+        sendMsg.setUserName(toUserName);
         sendMsg.setMessage(data);
         sendMsg.setMsgType(type);
+        boolean isGroup = false;
+        if (toUserName.startsWith("@@")){
+            isGroup = true;
+        }
         sendMsg.setGroup(isGroup);
         CoreManage.getInstance(uniqueKey).getSendList().add(sendMsg);
     }

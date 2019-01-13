@@ -87,7 +87,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
         if (robKeyword != null){
             data = robKeyword.getValueData();
             type = robKeyword.getTypeData();
-            CoreManage.addSendMsg(uniqueKey,fromUserName,data,SendMsgType.fromValue(type),isGroup);
+            CoreManage.addSendMsg(uniqueKey,fromUserName,data,SendMsgType.fromValue(type));
             return true;
         }
         return false;

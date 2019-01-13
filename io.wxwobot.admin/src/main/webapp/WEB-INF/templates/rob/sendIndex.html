@@ -1,74 +1,34 @@
 #@layout()
 
 #define main()
-<ol class="breadcrumb">
-    #if(form.uniqueKey ??)
-    <li><a href="/kw?uk=#(form.uniqueKey ??)">#(form.uniqueKey ??)的关键字</a></li>
-    #else
-    <li><a href="/kw">所有关键字</a></li>
-    #end
-    <li class="active">#if(isEdit)修改#else添加#end关键字</li>
-</ol>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">#if(isEdit)修改#else添加#end关键字</h3>
+        <h3 class="panel-title">发送消息#(uniqueKey ??)</h3>
     </div>
     <div class="panel-body">
         <div class="well" ><span style="color: red">预防封号，谨慎填写内容！</span></div>
         <div class="well" >
             <form class="form-horizontal"  role="form" id="addKwForm">
                 <div class="form-group">
-                    <label for="kid" class="col-sm-2 control-label"  #if(!isEdit) hidden #end>记录ID:</label>
-                    <div class="col-sm-4"  #if(!isEdit) hidden #end>
-                        <input type="text" class="form-control" id="kid" name="kid" value="#(form.id ??)" readonly>
-                    </div>
                     <label for="uniqueKey" class="col-sm-2 control-label">机器唯一码:</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="uniqueKey" name="uniqueKey" readonly value="#(form.uniqueKey ??)">
+                        <input type="text" class="form-control" id="uniqueKey" name="uniqueKey" readonly value="#(uniqueKey ??)">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="keyData" class="col-sm-2 control-label">关键字:</label>
-                    <div class="col-sm-4">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="keyData" name="keyData" value="#(form.keyData ??)">
-                            <span class="input-group-addon">
-                                 <input id="welcomeKey" type="checkbox" autocomplete="off" #if(form.keyData == io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_WELCOME ??) checked #end>欢迎加入
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="toGroup" class="col-sm-2 control-label">群聊/好友:</label>
-                    <div class="col-sm-2">
-                        <select class="form-control" id="toGroup" name="toGroup">
-                            #set(fg = form.toGroup ?? true)
-                            <option value="1" #if(fg) selected #end>群聊</option>
-                            <option value="0" #if(!fg) selected #end>好友</option>
-                        </select>
-                    </div>
                     <label for="nickName" class="col-sm-2 control-label">目标微信昵称:</label>
-                    <div class="col-sm-6">
-                        <!--<div class="input-group">-->
-                            <!--<input type="text" class="form-control" id="nickName" name="nickName" value="#(form.nickName ??)">-->
-                            <!--<span class="input-group-addon">-->
-                                <!--<input id="useDefaultNickName" type="checkbox" autocomplete="off" #if(form.nickName == io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_KEYWORD ??) checked #end>机器全局默认-->
-                            <!--</span>-->
-                        <!--</div>-->
+                    <div class="col-sm-10">
                         <div class="input-group">
                             <div class="input-group-btn">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择 <span class="caret"></span></button>
                                 <ul class="dropdown-menu" id="nickNameBox">
-                                    <li><a type="button" onclick="chooseName('#(io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_KEYWORD)')">机器全局默认</a></li>
-                                    #for( gp : groupNickNames ??)
-                                    <li><a type="button" onclick="chooseName('#(gp)')">#(gp)</a></li>
+                                    #for( tg : targetList ??)
+                                    <li><a onclick="chooseName('#(tg.NickName)','#(tg.UserName)')">#(tg.NickName)</a></li>
                                     #end
                                 </ul>
                             </div>
-                            <input type="text" class="form-control" id="nickName" name="nickName" value="#(form.nickName ??)" >
+                            <input type="text" disabled class="form-control" id="nickName" name="nickName" >
+                            <input type="hidden" class="form-control" id="userName" name="userName" >
                         </div>
                     </div>
                 </div>
@@ -76,46 +36,44 @@
                     <label for="valueData" class="col-sm-2 control-label">内容类型:</label>
                     <div class="col-sm-10">
                         <ul class="nav nav-pills nav-justified">
-                            #set(ft = form.typeData)
-                            <li #if(!ft || ft == "TEXT" ) class="active" #end><a data-toggle="tab" href="#TEXT" data-value="TEXT">纯文本</a></li>
-                            <li #if(ft && ft == "FILE" ) class="active" #end><a data-toggle="tab" href="#FILE" data-value="FILE">文件</a></li>
-                            <li #if(ft && ft == "IMG" ) class="active" #end><a data-toggle="tab" href="#IMG" data-value="IMG">图片</a></li>
+                            <li class="active" ><a data-toggle="tab" href="#TEXT" data-value="TEXT">纯文本</a></li>
+                            <li><a data-toggle="tab" href="#FILE" data-value="FILE">文件</a></li>
+                            <li><a data-toggle="tab" href="#IMG" data-value="IMG">图片</a></li>
                         </ul>
-                        <input type="hidden" class="form-control" id="typeData" name="typeData" value="#(form.typeData ??)">
+                        <input type="hidden" class="form-control" id="typeData" name="typeData" value="TEXT">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="valueData" class="col-sm-2 control-label">具体内容:</label>
                     <div class="col-sm-10">
                         <div class="tab-content">
-                            <div class="tab-pane fade #if(!ft || ft == "TEXT" ) in active #end" id="TEXT">
-                                <textarea class="form-control" rows="5" maxlength="250" id="valueData" name="valueData" style="resize: none;">#(form.valueData ??)</textarea>
-                            </div>
-                            <div class="tab-pane fade #if(ft && ft == "FILE" ) in active #end" id="FILE">
-                                <div class="file-loading">
-                                    <input id="f_upload" type="file" />
-                                </div>
-                            </div>
-                            <div class="tab-pane fade #if(ft && ft == "IMG" ) in active #end" id="IMG">
-                                #set(imgurl = form.valueData ? imgDomain+form.valueData :'#')
-                                <div class="file-loading">
-                                    <input id="img_upload" type="file" />
-                                </div>
-                            </div>
+                            <div class="tab-pane fade in active " id="TEXT">
+                            <textarea class="form-control" rows="5" maxlength="250" id="valueData" name="valueData" style="resize: none;"></textarea>
+                        </div>
+                        <div class="tab-pane fade " id="FILE">
+                        <div class="file-loading">
+                            <input id="f_upload" type="file" />
                         </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-offset-8 col-sm-2">
-                        <button type="reset" class="btn btn-default btn-lg btn-block" #if(isEdit) disabled #end>重置</button>
-                    </div>
-                    <div class="col-sm-2">
-                        <button type="button" class="btn btn-primary btn-lg btn-block" onclick="openAddModel()">提交</button>
+                    <div class="tab-pane fade " id="IMG">
+                    <div class="file-loading">
+                        <input id="img_upload" type="file" />
                     </div>
                 </div>
-            </form>
         </div>
     </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-offset-8 col-sm-2">
+        <button type="reset" class="btn btn-default btn-lg btn-block" >重置</button>
+    </div>
+    <div class="col-sm-2">
+        <button type="button" class="btn btn-primary btn-lg btn-block" onclick="openAddModel()">提交</button>
+    </div>
+</div>
+</form>
+</div>
+</div>
 </div>
 <!-- Modal -->
 <div class="modal fade" id="addPostModal" tabindex="-1" role="dialog" aria-labelledby="addPostModalLabel">
@@ -123,7 +81,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="addPostModalLabel">确认#if(isEdit)修改#else添加#end关键词</h4>
+                <h4 class="modal-title" id="addPostModalLabel">确认发送消息吗?</h4>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
@@ -154,22 +112,6 @@
             // 获取已激活的标签页的名称
             var activeTypeName = e.currentTarget.dataset.value;
             $('#typeData').val(activeTypeName);
-        });
-
-
-        $("#welcomeKey").on('click',function(){
-            var flag = $(this).is(':checked');
-            console.log(flag);
-            if(flag){
-                $('#keyData').val('#(io.wxwobot.admin.web.constant.ConfigKeys::DEAFAULT_WELCOME)');
-                $('#keyData').attr("readonly",true);
-                $('#toGroup').val("1");
-                $('#toGroup').attr("readonly",true);
-            }else{
-                $('#keyData').val('');
-                $('#keyData').attr("readonly",false);
-                $('#toGroup').attr("readonly",false);
-            }
         });
 
 
@@ -212,11 +154,6 @@
                 {
                     language : 'zh', //设置语言
                     uploadUrl : "/upload/img2local", //上传的地址
-    #if(ft && ft == "IMG" && imgurl != '#')
-                    initialPreview: [
-                        "<img src='#(imgurl)' class='img-thumbnail file-preview-image'>"
-                    ],
-    #end
                     allowedFileExtensions : [ 'jpeg','jpg','gif', 'png' ],//接收的文件后缀
                     uploadExtraData:{"fn": "#(form.uniqueKey ?? 'err')"},//其他参数
                     uploadAsync : true, //默认异步上传
@@ -233,7 +170,7 @@
                     autoReplace : true,//替代当前文件
                     previewFileIcon : "<iclass='glyphicon glyphicon-king'></i>",
                     msgFilesTooMany : "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
-                })
+            })
             .on("fileuploaded",function(event, data, previewId, index) {
                 if (data.response.code == "00") {
                     $('#valueData').text(data.response.name);
@@ -260,24 +197,10 @@
                         }
                     }
                 },
-                keyData: {
+                userName: {
                     validators: {
                         notEmpty: {
-                            message: '关键字不能为空'
-                        }
-                    }
-                },
-                toGroup: {
-                    validators: {
-                        notEmpty: {
-                            message: '未选择对象类型'
-                        }
-                    }
-                },
-                nickName: {
-                    validators: {
-                        notEmpty: {
-                            message: '目标昵称不能为空'
+                            message: '为选择发送对象'
                         }
                     }
                 },
@@ -293,8 +216,10 @@
 
     });
 
-    function chooseName(nickName) {
-       $('#nickName').val(nickName);
+    function chooseName(nickName, userName) {
+        console.log(nickName,userName);
+        $('#userName').val(userName);
+        $('#nickName').val(nickName);
     }
 
     function openAddModel() {
@@ -325,17 +250,13 @@
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: "/kw/editKeyWord" ,
+                url: "/robwk/testSend" ,
                 data: JSON.stringify(fv),
                 contentType: "application/json",
                 success: function (result) {
                     $('#addPostModal').modal('hide');
                     if (result.code == '00'){
                         bootbox.alert(result.message);
-                        var outKey = result.data;
-                        debounce(function () {
-                            window.top.location.reload();
-                        },1000);
                     } else{
                         bootbox.alert("请求异常:"+result.message);
                     }
