@@ -26,7 +26,7 @@
 - 前端：Bootstrap3+及相关插件
 
 #### 线上DEMO
-[点击跳转=>>在线DEMO 账号密码都是wxwobot](http://wxwobot.51guagua.top)
+[点击跳转=>>在线DEMO 账号密码都是wxwobot](https://wxwobot.51guagua.top)
 - 由于是公开的线上项目，注意下自己的账号安全
 - 那台服务器配置低，麻烦不要做压测
 
