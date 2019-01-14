@@ -101,7 +101,6 @@
 1. 将项目导入开发工具，推荐使用IDEA
 2. 打开 io.wxwobot.admin.web.common.MyConfig 文件，运行
 3. 打开浏览器输入  localhost:8180 即可查看运行效果,默认账号密码均为 wxwobot，开发模式无需登录
-注意： 
 
 **生产部署**
 1. 修改pom.xml中uat配置，填入生产的数据库连接用户名、密码
@@ -113,6 +112,7 @@
 (是的，不需要布置tomcat之类的服务器)
 
 **常见问题**
+
 [开发部署常见问题](https://www.jfinal.com/doc/1-5)
 
 #### 鸣谢
