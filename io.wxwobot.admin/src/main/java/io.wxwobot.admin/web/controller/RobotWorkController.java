@@ -172,7 +172,7 @@ public class RobotWorkController extends _BaseController {
         String userName = postParam.getString("userName");
         String typeData = postParam.getString("typeData");
 
-        CoreManage.addSendMsg(uniqueKey,userName,data, SendMsgType.fromValue(typeData));
+        CoreManage.addSendMsg(uniqueKey,userName,null,data, SendMsgType.fromValue(typeData));
         renderJson();
     }
 

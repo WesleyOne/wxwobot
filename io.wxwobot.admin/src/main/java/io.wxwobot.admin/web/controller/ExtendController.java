@@ -112,7 +112,7 @@ public class ExtendController extends _BaseController {
             String type = message.getString("type");
             String body = message.getString("body");
 
-            CoreManage.addSendMsg(uniqueKey,nickName,body,SendMsgType.fromValue(type));
+            CoreManage.addSendMsg(uniqueKey,null,nickName,body,SendMsgType.fromValue(type));
         }
 
         if (!result){

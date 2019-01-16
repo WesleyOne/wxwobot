@@ -268,9 +268,10 @@ public class CoreManage implements LogInterface {
      * @param data
      * @param type
      */
-    public static void addSendMsg(String uniqueKey, String toUserName, String data, SendMsgType type){
+    public static void addSendMsg(String uniqueKey, String toUserName, String toNickName,String data, SendMsgType type){
         SendMsg sendMsg = new SendMsg();
         sendMsg.setUserName(toUserName);
+        sendMsg.setNickName(toNickName);
         sendMsg.setMessage(data);
         sendMsg.setMsgType(type);
         boolean isGroup = false;
