@@ -113,7 +113,7 @@
             var activeTypeName = e.currentTarget.dataset.value;
             $('#typeData').val(activeTypeName);
             // 清空内容
-            $('#valueData').text('');
+            $('#valueData').val('');
         });
 
 
@@ -124,7 +124,7 @@
                     uploadUrl : "/upload/file2local", //上传的地址
                     allowedFileType : [ 'text', 'video', 'audio', 'flash'],
                     // allowedFileExtensions : [ 'jpg','gif', 'png', 'txt', 'pdf', 'excel', 'doc', 'docx' ],//接收的文件后缀
-                    uploadExtraData:{"fn": "#(form.uniqueKey ?? 'err')"},//其他参数
+                    uploadExtraData:{"fn": "#(uniqueKey ?? 'err')"},//其他参数
                     uploadAsync : true, //默认异步上传
                     showUpload : true, //是否显示上传按钮
                     showRemove : true, //显示移除按钮
@@ -144,7 +144,7 @@
                 console.log(event);
                 console.log(data);
                 if (data.response.code == "00") {
-                    $('#valueData').text(data.response.name);
+                    $('#valueData').val(data.response.name);
                 } else {
                     bootbox.alert("文件上传失败,请重试:"
                         + data.response.message);
@@ -157,7 +157,7 @@
                     language : 'zh', //设置语言
                     uploadUrl : "/upload/img2local", //上传的地址
                     allowedFileExtensions : [ 'jpeg','jpg','gif', 'png' ],//接收的文件后缀
-                    uploadExtraData:{"fn": "#(form.uniqueKey ?? 'err')"},//其他参数
+                    uploadExtraData:{"fn": "#(uniqueKey ?? 'err')"},//其他参数
                     uploadAsync : true, //默认异步上传
                     showUpload : true, //是否显示上传按钮
                     showRemove : true, //显示移除按钮
@@ -175,7 +175,7 @@
             })
             .on("fileuploaded",function(event, data, previewId, index) {
                 if (data.response.code == "00") {
-                    $('#valueData').text(data.response.name);
+                    $('#valueData').val(data.response.name);
                 } else {
                     bootbox.alert("图片上传失败,请重试:"
                         + data.response.message);

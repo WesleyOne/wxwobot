@@ -14,6 +14,7 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -54,7 +55,7 @@ public class SingleHttpClient {
             outCookieStore = new BasicCookieStore();
         }
         this.cookieStore = outCookieStore;
-        httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+        httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).setRetryHandler(new DefaultHttpRequestRetryHandler(0,false)).build();
     }
 
     private SingleHttpClient(){

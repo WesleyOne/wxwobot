@@ -70,6 +70,11 @@ public class LoginServiceImpl implements ILoginService , LogInterface {
 		boolean overTime = false;
 
 		while (!isLogin && !overTime) {
+			// 防止请求重复时的问题
+			if (core.isAlive()){
+				break;
+			}
+
 			long millis = System.currentTimeMillis();
 			params.add(new BasicNameValuePair(LoginParaEnum.R.para(), String.valueOf(millis / 1579L)));
 			params.add(new BasicNameValuePair(LoginParaEnum._.para(), String.valueOf(millis)));
