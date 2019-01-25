@@ -274,9 +274,9 @@ public class CoreManage implements LogInterface {
         sendMsg.setNickName(toNickName);
         sendMsg.setMessage(data);
         sendMsg.setMsgType(type);
-        boolean isGroup = false;
-        if (toUserName.startsWith("@@")){
-            isGroup = true;
+        boolean isGroup = true;
+        if (toUserName != null && !toUserName.startsWith("@@")){
+            isGroup = false;
         }
         sendMsg.setGroup(isGroup);
         CoreManage.getInstance(uniqueKey).getSendList().add(sendMsg);
