@@ -1,6 +1,7 @@
 package io.wxwobot.admin.web.msghandlers;
 
 
+import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.itchat4j.beans.BaseMsg;
 import io.wxwobot.admin.itchat4j.core.CoreManage;
 import io.wxwobot.admin.itchat4j.face.IMsgHandlerFace;
@@ -12,6 +13,7 @@ import io.wxwobot.admin.web.model.WxRobConfig;
 import io.wxwobot.admin.web.model.WxRobKeyword;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.util.regex.Matcher;
 
 /**
@@ -25,6 +27,11 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
 
     public MyMsgHandler(String uniqueKey){
         this.uniqueKey = uniqueKey;
+    }
+
+    private String getDownloadPath(String fileName) {
+        String download_path = PropKit.get("download_path");
+        return download_path+ File.separator + uniqueKey +File.separator + fileName;
     }
 
     @Override
@@ -55,7 +62,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
             }
             if (isOpen){
                 WxRobKeyword robKeyword = WxRobKeyword.dao.findFirst("SELECT * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC LIMIT 1", uniqueKey, text,fromNickName,msg.isGroupMsg()?1:0);
-                if (sendDataByType(fromUserName, robKeyword,groupMsg)) {
+                if (sendDataByType(fromUserName, robKeyword)) {
                     return;
                 }
             }
@@ -73,7 +80,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
 
             if (isOpen){
                 WxRobKeyword defaultRobKeyword = WxRobKeyword.dao.findFirst("SELECT * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC LIMIT 1", uniqueKey, text,ConfigKeys.DEAFAULT_KEYWORD,msg.isGroupMsg()?1:0);
-                if (sendDataByType(fromUserName, defaultRobKeyword, groupMsg)) {
+                if (sendDataByType(fromUserName, defaultRobKeyword)) {
                     return;
                 }
             }
@@ -81,13 +88,13 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
         return;
     }
 
-    private boolean sendDataByType(String fromUserName, WxRobKeyword robKeyword, boolean isGroup) {
+    private boolean sendDataByType(String fromUserName, WxRobKeyword robKeyword) {
         String data;
         String type;
         if (robKeyword != null){
             data = robKeyword.getValueData();
             type = robKeyword.getTypeData();
-            CoreManage.addSendMsg(uniqueKey,fromUserName,null,data,SendMsgType.fromValue(type));
+            CoreManage.addSendMsg4UserName(uniqueKey,fromUserName,data,SendMsgType.fromValue(type));
             return true;
         }
         return false;
@@ -136,7 +143,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
                 }
                 if (isOpen){
                     WxRobKeyword robKeyword = WxRobKeyword.dao.findFirst("SELECT * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC LIMIT 1", uniqueKey, ConfigKeys.DEAFAULT_WELCOME,fromNickName,msg.isGroupMsg()?1:0);
-                    if (sendSysWelcomeMsg(fromUserName, newNickName, robKeyword, groupMsg)){ return;}
+                    if (sendSysWelcomeMsg(fromUserName, newNickName, robKeyword)){ return;}
                 }
 
                 // 没有专门的关键字，则使用默认关键字
@@ -147,7 +154,7 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
                 }
                 if (isOpen){
                     WxRobKeyword defaultRobKeyword = WxRobKeyword.dao.findFirst("SELECT * FROM wx_rob_keyword WHERE unique_key = ? AND key_data = ? AND nick_name = ? AND enable = 1 AND to_group = ? ORDER BY id DESC LIMIT 1", uniqueKey, ConfigKeys.DEAFAULT_WELCOME, ConfigKeys.DEAFAULT_KEYWORD,msg.isGroupMsg()?1:0);
-                    if (sendSysWelcomeMsg(fromUserName, newNickName, defaultRobKeyword, groupMsg)){ return;}
+                    if (sendSysWelcomeMsg(fromUserName, newNickName, defaultRobKeyword)){ return;}
                 }
             }
         }
@@ -161,12 +168,12 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
      * @param robKeyword
      * @return
      */
-    private boolean sendSysWelcomeMsg(String fromUserName, String newNickName, WxRobKeyword robKeyword, boolean isGroup) {
+    private boolean sendSysWelcomeMsg(String fromUserName, String newNickName, WxRobKeyword robKeyword) {
         if (robKeyword != null){
             if (robKeyword.getTypeData().equals(SendMsgType.TEXT.toValue())){
                 robKeyword.setValueData(String.format("@%s\n%s",newNickName,robKeyword.getValueData()));
             }
-            if (sendDataByType(fromUserName, robKeyword,isGroup)) {
+            if (sendDataByType(fromUserName, robKeyword)) {
                 return true;
             }
         }
@@ -175,34 +182,38 @@ public class MyMsgHandler implements IMsgHandlerFace,LogInterface {
 
     @Override
     public void picMsgHandle(BaseMsg msg) {
-        return ;
-
-//        String fileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".jpg"; // 这里使用收到图片的时间作为文件名
-//        String picPath = "D://cn.zhouyafeng.itchat4j/pic" + File.separator + fileName; // 保存图片的路径
-//        DownloadTools.getDownloadFn(msg, MsgTypeEnum.PIC.getType(), picPath); // 调用此方法来保存图片
-//        CoreManage.addSendMsg(uniqueKey,msg.getFromUserName(),"图片保存成功",SendMsgType.TEXT,msg.isGroupMsg());
-//        return;
+//        // 这里使用收到图片的时间作为文件名
+//        String fileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".jpg";
+//        // 保存图片的路径
+//        String picPath = getDownloadPath(fileName);
+//        // 调用此方法来保存图片
+//        DownloadTools.getDownloadFn(msg, MsgTypeEnum.PIC.getType(), picPath, this.uniqueKey);
+//        CoreManage.addSendMsg4UserName(uniqueKey,msg.getFromUserName(),"图片保存成功",SendMsgType.TEXT);
+        return;
     }
 
     @Override
     public void voiceMsgHandle(BaseMsg msg) {
-        return ;
-//        String fileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".mp3"; // 这里使用收到语音的时间作为文件名
-//        String voicePath = "D://cn.zhouyafeng.itchat4j/voice" + File.separator + fileName; // 保存语音的路径
-//        DownloadTools.getDownloadFn(msg, MsgTypeEnum.VOICE.getType(), voicePath); // 调用此方法来保存语音
-//        CoreManage.addSendMsg(uniqueKey,msg.getFromUserName(),"声音保存成功",SendMsgType.TEXT,msg.isGroupMsg());
-//        return;
+//        // 这里使用收到语音的时间作为文件名
+//        String fileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".mp3";
+//        // 保存语音的路径
+//        String voicePath = getDownloadPath(fileName);
+//        // 调用此方法来保存语音
+//        DownloadTools.getDownloadFn(msg, MsgTypeEnum.VOICE.getType(), voicePath, this.uniqueKey);
+//        CoreManage.addSendMsg4UserName(uniqueKey,msg.getFromUserName(),"声音保存成功",SendMsgType.TEXT);
+        return;
     }
 
     @Override
     public void videoMsgHandle(BaseMsg msg) {
+//        // 这里使用收到小视频的时间作为文件名
+//        String fileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".mp4";
+//        // 保存小视频的路径
+//        String viedoPath = getDownloadPath(fileName);
+//        // 调用此方法来保存小视频
+//        DownloadTools.getDownloadFn(msg, MsgTypeEnum.VIEDO.getType(), viedoPath,this.uniqueKey);
+//        CoreManage.addSendMsg4UserName(uniqueKey,msg.getFromUserName(),"视频保存成功",SendMsgType.TEXT);
         return;
-
-//        String fileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".mp4"; // 这里使用收到小视频的时间作为文件名
-//        String viedoPath = "D://cn.zhouyafeng.itchat4j/video" + File.separator + fileName;// 保存小视频的路径
-//        DownloadTools.getDownloadFn(msg, MsgTypeEnum.VIEDO.getType(), viedoPath);// 调用此方法来保存小视频
-//        CoreManage.addSendMsg(uniqueKey,msg.getFromUserName(),"视频保存成功",SendMsgType.TEXT,msg.isGroupMsg());
-//        return;
     }
 
     @Override

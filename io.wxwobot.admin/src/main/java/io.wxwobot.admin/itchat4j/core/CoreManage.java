@@ -262,22 +262,51 @@ public class CoreManage implements LogInterface {
     }
 
     /**
-     * 消息统一加到队列里处理
+     * 消息统一加到队列里处理1
+     * 用于已知UserName
      * @param uniqueKey
      * @param toUserName
      * @param data
      * @param type
      */
-    public static void addSendMsg(String uniqueKey, String toUserName, String toNickName,String data, SendMsgType type){
+    public static void addSendMsg4UserName(String uniqueKey, String toUserName,String data, SendMsgType type){
+        if (StringUtils.isEmpty(uniqueKey) || StringUtils.isEmpty(toUserName) || StringUtils.isEmpty(data) || type == null){
+            LOG.error("消息参数不完整 uk:{} un: {} data: {} ",uniqueKey,toUserName,data);
+            return;
+        }
+
         SendMsg sendMsg = new SendMsg();
         sendMsg.setUserName(toUserName);
-        sendMsg.setNickName(toNickName);
         sendMsg.setMessage(data);
         sendMsg.setMsgType(type);
         boolean isGroup = true;
         if (toUserName != null && !toUserName.startsWith("@@")){
             isGroup = false;
         }
+        sendMsg.setGroup(isGroup);
+        CoreManage.getInstance(uniqueKey).getSendList().add(sendMsg);
+    }
+
+    /**
+     * 消息统一加到队列里处理2
+     * 用于已知NickName
+     * @param uniqueKey
+     * @param toNickName
+     * @param data
+     * @param type
+     * @param isGroup
+     */
+    public static void addSendMsg4NickName(String uniqueKey, String toNickName,String data, SendMsgType type, Boolean isGroup){
+
+        if (StringUtils.isEmpty(uniqueKey) || StringUtils.isEmpty(toNickName) || StringUtils.isEmpty(data) || type == null){
+            LOG.error("消息参数不完整 uk:{} nn: {} data: {} ",uniqueKey,toNickName,data);
+            return;
+        }
+
+        SendMsg sendMsg = new SendMsg();
+        sendMsg.setNickName(toNickName);
+        sendMsg.setMessage(data);
+        sendMsg.setMsgType(type);
         sendMsg.setGroup(isGroup);
         CoreManage.getInstance(uniqueKey).getSendList().add(sendMsg);
     }

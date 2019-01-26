@@ -43,6 +43,7 @@
     <pro.domain.port>8180</pro.domain.port>
     <log.level>debug</log.level>
     <log.file.path>/Users/wesley/output/logs/wxrobot</log.file.path>
+    <pro.download.path>/Users/wesley/download</pro.download.path>
   </properties>
   <profiles>
     <profile>
@@ -58,6 +59,7 @@
         <pro.domain.port>8180</pro.domain.port>
         <log.level>info</log.level>
         <log.file.path>/home/www/output/logs/wxrobot</log.file.path>
+        <pro.download.path>/home/www/download</pro.download.path>
       </properties>
     </profile>
   </profiles>

@@ -39,8 +39,8 @@ public class DownloadTools  implements LogInterface {
 	 * @param path
 	 * @return
 	 */
-	public static Object getDownloadFn(BaseMsg msg, String type, String path, String coreKey) {
-		Core core = CoreManage.getInstance(coreKey);
+	public static Object getDownloadFn(BaseMsg msg, String type, String path, String uniqueKey) {
+		Core core = CoreManage.getInstance(uniqueKey);
 		Map<String, String> headerMap = new HashMap<String, String>();
 		List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
 		String url = "";
