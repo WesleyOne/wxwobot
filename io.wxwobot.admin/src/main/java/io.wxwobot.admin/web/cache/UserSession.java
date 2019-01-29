@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
  * @create 2018/9/25
  */
 public class UserSession {
-    public static LinkedHashMap<String,String> USERSESSION_CACHE = new LRUCache<String, String>(16);
+    public static LinkedHashMap<String,String> USERSESSION_CACHE = new LRUCache<String, String>(64);
 
     public static void addUserSession(String username,String userSession){
         USERSESSION_CACHE.put(username,userSession);

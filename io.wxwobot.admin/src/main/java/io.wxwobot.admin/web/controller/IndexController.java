@@ -4,6 +4,7 @@ import com.jfinal.kit.PropKit;
 import io.wxwobot.admin.web.annotation.UnCheckLogin;
 import io.wxwobot.admin.web.cache.UserSession;
 import io.wxwobot.admin.web.utils.MD5Util;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
@@ -76,5 +77,17 @@ public class IndexController extends _BaseController {
         redirect("/login",false);
     }
 
+    /**
+     * 游客登录
+     */
+    @UnCheckLogin
+    public void visitLogin() {
+        String visitName = RandomStringUtils.randomAlphabetic(5);
+        String sid = UUID.randomUUID().toString();
+        UserSession.addUserSession(visitName,sid);
+        addCookie("uid",visitName,-1);
+        addCookie("sid",sid,-1);
+        redirect("/",false);
+    }
 
 }
