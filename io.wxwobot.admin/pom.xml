@@ -38,12 +38,13 @@
     <pro.jdbc.agent.password>root</pro.jdbc.agent.password>
     <pro.devMode>true</pro.devMode>
     <pro.undertow.devMode>true</pro.undertow.devMode>
-    <pro.user.hotreload>true</pro.user.hotreload>
     <pro.domain.host>localhost</pro.domain.host>
     <pro.domain.port>8180</pro.domain.port>
     <log.level>debug</log.level>
     <log.file.path>/Users/wesley/output/logs/wxrobot</log.file.path>
     <pro.download.path>/Users/wesley/download</pro.download.path>
+    <pro.hotreload.use>true</pro.hotreload.use>
+    <pro.hotreload.realpath>/Users/wesley/output/hotreload</pro.hotreload.realpath>
   </properties>
   <profiles>
     <profile>
@@ -54,12 +55,13 @@
         <pro.jdbc.agent.password>wxwobot</pro.jdbc.agent.password>
         <pro.devMode>false</pro.devMode>
         <pro.undertow.devMode>false</pro.undertow.devMode>
-        <pro.user.hotreload>true</pro.user.hotreload>
         <pro.domain.host>127.0.0.1</pro.domain.host>
         <pro.domain.port>8180</pro.domain.port>
         <log.level>info</log.level>
         <log.file.path>/home/www/output/logs/wxrobot</log.file.path>
         <pro.download.path>/home/www/download</pro.download.path>
+        <pro.hotreload.use>true</pro.hotreload.use>
+        <pro.hotreload.realpath>/home/www/hotreload</pro.hotreload.realpath>
       </properties>
     </profile>
   </profiles>
