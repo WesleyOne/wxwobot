@@ -4,7 +4,6 @@ import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.wall.WallFilter;
 import com.jfinal.config.*;
 import com.jfinal.json.FastJsonFactory;
-import com.jfinal.kit.PathKit;
 import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
@@ -18,6 +17,8 @@ import io.wxwobot.admin.web.interceptor.ExceptionInterceptor;
 import io.wxwobot.admin.web.model._MappingKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 
 /**
@@ -110,11 +111,43 @@ public class MyConfig extends JFinalConfig {
 	@Override
 	public void afterJFinalStart() {
 		System.setProperty("jsse.enableSNIExtension", "false");
+		// 检查文件夹(/热登录/下载根目录)是否存在
+        checkFileExist();
+
+		// 热登陆操作
 		CoreManage.reload();
 	}
 
-	@Override
+    @Override
 	public void beforeJFinalStop() {
 		CoreManage.persistence();
 	}
+
+    /**
+     * 检查文件夹(/热登录/下载根目录)是否存在
+     */
+    private void checkFileExist() {
+        String hotReloadDir = PropKit.get("hotReloadDir");
+        String downloadPath = PropKit.get("download_path");
+        String logPath = PropKit.get("log_path");
+        File hotReloadFile = new File(hotReloadDir);
+        if (!hotReloadFile.exists()){
+            if (!hotReloadFile.mkdirs()) {
+                LOG.error("热加载文件夹创建失败[{}]",hotReloadDir);
+            }
+        }
+        File downloadFile = new File(downloadPath);
+        if (!downloadFile.exists()){
+            if (!downloadFile.mkdirs()) {
+                LOG.error("下载文件夹创建失败[{}]",downloadPath);
+            }
+        }
+        File logFile = new File(logPath);
+        if (!logFile.exists()){
+            if (!logFile.mkdirs()) {
+                LOG.error("日志文件夹创建失败[{}]",logPath);
+            }
+        }
+    }
+
 }
