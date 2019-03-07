@@ -130,7 +130,4 @@
 #### 技术交流群
 ![QQ技术交流群](https://images.gitee.com/uploads/images/2019/0113/041630_383a6659_1581722.png "wxwobot_qq_qrcode.png")
 
-#### "众筹植发"(滑稽)
-![微信赞赏码](https://images.gitee.com/uploads/images/2019/0113/042649_289c8048_1581722.png "wxpay.png")
-![支付宝投币](https://images.gitee.com/uploads/images/2019/0113/042713_29e35e1a_1581722.jpeg "zhipay.jpg")
 [![阿里云推广](https://images.gitee.com/uploads/images/2019/0113/043826_4dbc36f4_1581722.png "源码页980-60.png")](https://promotion.aliyun.com/ntms/act/qwbk.html?userCode=dnuqwh0e)
