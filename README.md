@@ -22,7 +22,7 @@
 - 代码不够优美，性能有待提高
 
 #### 项目组成
-- 后台：JDK1.8 + JFinal3.5 + undertow + mysql + 常用工具包
+- 后台：JFinal3.5 + undertow + mysql + 常用工具包 + JDK1.8+ + maven3.5+
 - 前端：Bootstrap3+及相关插件
 
 #### 线上DEMO
